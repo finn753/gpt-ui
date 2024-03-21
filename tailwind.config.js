@@ -18,7 +18,7 @@ const config = {
 				border: "hsl(var(--border) / <alpha-value>)",
 				input: "hsl(var(--input) / <alpha-value>)",
 				ring: "hsl(var(--ring) / <alpha-value>)",
-				background: "hsl(var(--background) / <alpha-value>)",
+				background: "hsl(var(--background))",
 				foreground: "hsl(var(--foreground) / <alpha-value>)",
 				"level-one": "hsl(var(--level-one))",
 				"level-two": "hsl(var(--level-two))",
@@ -52,6 +52,7 @@ const config = {
 				}
 			},
 			borderRadius: {
+				"2lg": "calc(var(--radius) * 2)",
 				lg: "var(--radius)",
 				md: "calc(var(--radius) - 2px)",
 				sm: "calc(var(--radius) - 4px)"

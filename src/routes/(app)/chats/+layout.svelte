@@ -1,15 +1,15 @@
-<div class="grid grid-cols-4 lg:grid-cols-5 h-full">
-	<div class="col-span-1">
-		<div class="bg-level-two shadow-lg size-full">
+<script>
+	import CollapsibleSidebar from "$lib/components/CollapsibleSidebar.svelte";
+</script>
 
-		</div>
+<div class="grid h-full grid-cols-3 lg:grid-cols-4">
+	<div class="col-span-1">
+		<CollapsibleSidebar title="Chats">Test</CollapsibleSidebar>
 	</div>
-	<div class="col-span-2 lg:col-span-3">
-		<slot/>
+	<div class="col-span-1 lg:col-span-2">
+		<slot />
 	</div>
 	<div class="col-span-1">
-		<div class="bg-level-two shadow-lg size-full">
-
-		</div>
+		<CollapsibleSidebar title="Context" orientation="right">Testilein</CollapsibleSidebar>
 	</div>
 </div>
