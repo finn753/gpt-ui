@@ -2,8 +2,8 @@
 	import CollapsibleSidebar from "$lib/components/CollapsibleSidebar.svelte";
 	import { onMount } from 'svelte';
 
-	let leftOpened = true;
-	let rightOpened = true;
+	let leftOpened = false;
+	let rightOpened = false;
 
 	function handleMobileSidebar(from: "left" | "right" = "left") {
 		if (window.innerWidth < 768) {
@@ -16,7 +16,10 @@
 	}
 
 	onMount(() => {
-		handleMobileSidebar();
+		if(window.innerWidth >= 768) {
+			leftOpened = true;
+			rightOpened = true;
+		}
 	});
 </script>
 
