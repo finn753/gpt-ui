@@ -12,6 +12,9 @@
 	export let orientation: "left" | "right" = "left";
 	export let isOpen = true;
 
+	let className = "";
+	export { className as class };
+
 	let isRight = orientation === "right";
 
 	$: isRight = orientation === "right";
@@ -19,7 +22,7 @@
 	$: if(isOpen) dispatch("open");
 </script>
 
-<div class={cn("flex size-full", isRight ? "flex-row-reverse space-x-reverse" : "")}>
+<div class={cn("flex size-full col-span-1 absolute pointer-events-none md:relative md:w-auto", isRight ? "flex-row-reverse space-x-reverse" : "", className)}>
 	<div
 		class={cn(
 			"size-full overflow-hidden rounded-r-2lg bg-level-two shadow-lg transition-all duration-500 pointer-events-auto",

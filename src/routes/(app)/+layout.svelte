@@ -8,7 +8,7 @@
 
 <div class="flex h-dvh w-dvw flex-col-reverse md:flex-row">
 	<div
-		class="z-10 flex h-16 w-dvw items-center justify-evenly bg-background p-4 shadow-lg md:h-dvh md:w-16 md:flex-col md:space-y-4"
+		class="z-20 flex h-16 w-dvw items-center justify-evenly bg-background p-4 shadow-lg md:h-dvh md:w-16 md:flex-col md:space-y-4"
 	>
 		<Button variant="ghost" href="/chats">
 			<MessagesSquare {size} {strokeWidth} />

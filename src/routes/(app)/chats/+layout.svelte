@@ -26,13 +26,9 @@
 <svelte:window on:resize={() => handleMobileSidebar()}/>
 
 <div class="relative h-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
-	<div class="col-span-1 absolute w-full h-full pointer-events-none md:relative md:w-auto">
-		<CollapsibleSidebar title="Chats" bind:isOpen={leftOpened} on:open={() => handleMobileSidebar("left")}>Test</CollapsibleSidebar>
-	</div>
+	<CollapsibleSidebar class="" title="Chats" bind:isOpen={leftOpened} on:open={() => handleMobileSidebar("left")}>Test</CollapsibleSidebar>
 	<div class="col-span-1 lg:col-span-2">
 		<slot />
 	</div>
-	<div class="col-span-1 absolute w-full h-full pointer-events-none md:relative md:w-auto">
-		<CollapsibleSidebar title="Context" orientation="right" bind:isOpen={rightOpened} on:open={() => handleMobileSidebar("right")}>Testilein</CollapsibleSidebar>
-	</div>
+	<CollapsibleSidebar title="Context" orientation="right" bind:isOpen={rightOpened} on:open={() => handleMobileSidebar("right")}>Testilein</CollapsibleSidebar>
 </div>
