@@ -4,7 +4,7 @@
 
 	import { ChevronRight } from "lucide-svelte";
 	import { ChevronLeft } from "lucide-svelte";
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher } from "svelte";
 
 	const dispatch = createEventDispatcher();
 
@@ -19,13 +19,20 @@
 
 	$: isRight = orientation === "right";
 
-	$: if(isOpen) dispatch("open");
+	$: if (isOpen) dispatch("open");
 </script>
 
-<div class={cn("flex size-full col-span-1 absolute pointer-events-none md:relative md:w-auto", isRight ? "flex-row-reverse space-x-reverse" : "", className)}>
+<div
+	class={cn(
+		"pointer-events-none absolute col-span-1 flex size-full md:relative md:w-auto",
+		isRight ? "flex-row-reverse space-x-reverse" : "",
+		isOpen ? "z-10" : "",
+		className
+	)}
+>
 	<div
 		class={cn(
-			"size-full overflow-hidden rounded-r-2lg bg-level-two shadow-lg transition-all duration-500 pointer-events-auto",
+			"pointer-events-auto size-full overflow-hidden rounded-r-2lg bg-level-two shadow-lg transition-all duration-500",
 			isRight ? "rounded-l-2lg rounded-r-none" : "",
 			!isOpen ? "w-0" : ""
 		)}
@@ -39,7 +46,7 @@
 	</div>
 	<Button
 		variant="link"
-		class="h-16 px-1 transition-all duration-500 pointer-events-auto"
+		class="pointer-events-auto h-16 px-1 transition-all duration-500"
 		on:click={() => {
 			isOpen = !isOpen;
 		}}
