@@ -4,7 +4,7 @@
 
 	const size = 24;
 	const strokeWidth = 2;
-	const color = "#64748B"
+	const color = "#64748B";
 </script>
 
 <div class="flex h-dvh w-dvw flex-col-reverse md:flex-row">

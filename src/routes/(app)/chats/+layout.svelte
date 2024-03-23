@@ -32,7 +32,7 @@
 		bind:isOpen={leftOpened}
 		on:open={() => handleMobileSidebar("left")}>Test</CollapsibleSidebar
 	>
-	<div class="col-span-1 lg:col-span-2">
+	<div class="col-span-1 h-dvh max-h-dvh lg:col-span-2">
 		<slot />
 	</div>
 	<CollapsibleSidebar

@@ -1,5 +1,5 @@
 <script>
-	import ChatView from '$lib/components/chat/ChatView.svelte';
+	import ChatView from "$lib/components/chat/ChatView.svelte";
 </script>
 
-<ChatView/>
+<ChatView />
