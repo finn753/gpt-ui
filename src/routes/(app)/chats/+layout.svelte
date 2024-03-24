@@ -1,7 +1,7 @@
 <script lang="ts">
 	import CollapsibleSidebar from "$lib/components/CollapsibleSidebar.svelte";
 	import { onMount } from "svelte";
-	import ContextSidebar from '$lib/components/chat/ContextSidebar.svelte';
+	import ContextSidebar from "$lib/components/chat/ContextSidebar.svelte";
 
 	let leftOpened = false;
 	let rightOpened = false;
@@ -31,10 +31,11 @@
 		class="z-10"
 		title="Chats"
 		bind:isOpen={leftOpened}
-		on:open={() => handleMobileSidebar("left")}>
+		on:open={() => handleMobileSidebar("left")}
+	>
 		Test
 	</CollapsibleSidebar>
-	<div class="col-span-1 h-full min-h-0 max-h-full lg:col-span-2">
+	<div class="col-span-1 h-full max-h-full min-h-0 lg:col-span-2">
 		<slot />
 	</div>
 	<CollapsibleSidebar
@@ -43,6 +44,11 @@
 		bind:isOpen={rightOpened}
 		on:open={() => handleMobileSidebar("right")}
 	>
-		<ContextSidebar title="Chat Title" tags={["Test","Test2"]} contextMessages={[]} summary="Summary Text \n summ summ sumamry \n summmy \n Text Test"/>
+		<ContextSidebar
+			title="Chat Title"
+			tags={["Test", "Test2", "Test3", "Test4", "Test5", "Test6"]}
+			contextMessages={[]}
+			summary="Summary Text def summ summ sumamry erfn summmy ewmfv ek Text Test"
+		/>
 	</CollapsibleSidebar>
 </div>

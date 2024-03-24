@@ -2,13 +2,17 @@
 	import { Button } from "$lib/components/ui/button";
 
 	import { SendHorizontal } from "lucide-svelte";
-	import { cn } from '$lib/utils';
+	import { cn } from "$lib/utils";
 
 	let input: HTMLTextAreaElement;
 
 	let cursorPos = 0;
 	let actionWord: string = "";
-	$: actionWord = value.slice(0, cursorPos).split(/[\s\n]+/).pop() || "";
+	$: actionWord =
+		value
+			.slice(0, cursorPos)
+			.split(/[\s\n]+/)
+			.pop() || "";
 	$: {
 		isActionCommand = false;
 		isActionMention = false;
