@@ -7,7 +7,7 @@
 	const color = "#64748B";
 </script>
 
-<div class="flex h-dvh w-dvw flex-col-reverse md:flex-row">
+<div class="flex h-dvh max-h-dvh w-dvw flex-col-reverse md:flex-row">
 	<div
 		class="z-20 flex h-16 w-dvw items-center justify-evenly bg-background p-4 shadow-lg md:h-dvh md:w-16 md:flex-col md:space-y-4"
 	>
@@ -33,7 +33,7 @@
 			<User {size} {strokeWidth} {color} />
 		</Button>
 	</div>
-	<div class="flex-1">
+	<div class="flex-1 overflow-y-clip">
 		<slot />
 	</div>
 </div>
