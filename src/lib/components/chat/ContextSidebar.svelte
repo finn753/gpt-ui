@@ -4,7 +4,8 @@
 	import * as Select from "$lib/components/ui/select";
 	import * as Card from "$lib/components/ui/card";
 	import { Button } from '$lib/components/ui/button';
-	import { X } from 'lucide-svelte';
+	import { Pencil, X } from 'lucide-svelte';
+	import Check from 'lucide-svelte/icons/check';
 
 	const testModels = [
 		{ value: "gpt-3.5-turbo", label: "GPT-3" },
@@ -19,6 +20,9 @@
 	export let contextMessages: Message[];
 
 	let addTagInput = "";
+	let editingTitle = false;
+	let editTitleInput = title;
+	$: editTitleInput = title;
 
 	$: if(addTagInput) {
 		//split at space and any punctioation
@@ -50,7 +54,21 @@
 <div class="w-full space-y-2">
 	<Card.Root>
 		<Card.Header>
-			<Card.Title>{title}</Card.Title>
+			<Card.Title class="flex justify-between items-center gap-2 text-lg tracking-normal">
+				{#if !editingTitle}
+					{title} <Button variant="icon" size="none" on:click={() => editingTitle = true }><Pencil size={16}/></Button>
+				{:else}
+					<input class="flex w-full bg-background outline-none" bind:value={editTitleInput} autofocus/>
+					<div class="flex justify-between items-center min-w-10">
+						<Button variant="icon" size="none" on:click={() => {editTitleInput = title; editingTitle = false;}}>
+							<X size={16} />
+						</Button>
+						<Button variant="icon" size="none" on:click={() => {title = editTitleInput; editingTitle = false;}}>
+							<Check size={16} />
+						</Button>
+					</div>
+				{/if}
+			</Card.Title>
 			<Card.Description>
 				<div class="flex w-full flex-wrap gap-1">
 					{#each tags as tag}
