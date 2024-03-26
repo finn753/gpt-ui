@@ -24,7 +24,7 @@
 
 <div
 	class={cn(
-		"pointer-events-none absolute col-span-1 flex size-full md:relative md:w-auto",
+		"pointer-events-none absolute col-span-1 flex size-full h-[calc(100dvh-4rem)] md:h-dvh md:relative md:w-auto",
 		isRight ? "flex-row-reverse space-x-reverse" : "",
 		isOpen ? "z-10" : "",
 		className
@@ -32,7 +32,7 @@
 >
 	<div
 		class={cn(
-			"pointer-events-auto size-full overflow-hidden rounded-r-2lg bg-level-two shadow-lg transition-all duration-500",
+			"flex flex-col pointer-events-auto size-full overflow-hidden rounded-r-2lg bg-level-two shadow-lg transition-all duration-500",
 			isRight ? "rounded-l-2lg rounded-r-none" : "",
 			!isOpen ? "w-0" : ""
 		)}
@@ -40,7 +40,7 @@
 		<div class={cn("flex flex-row items-center justify-between bg-background p-4 shadow-lg")}>
 			<h2 class="flex-1 text-2xl font-bold">{title}</h2>
 		</div>
-		<div class="p-4 pb-0">
+		<div class="p-4 pb-0 h-full overflow-y-auto">
 			<slot />
 		</div>
 	</div>

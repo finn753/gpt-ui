@@ -51,8 +51,8 @@
 	}
 </script>
 
-<div class="w-full space-y-2">
-	<Card.Root>
+<div class="w-full space-y-2 pb-4">
+	<Card.Root class="min-h-0">
 		<Card.Header>
 			<Card.Title class="flex justify-between items-center gap-2 text-lg tracking-normal">
 				{#if !editingTitle}
