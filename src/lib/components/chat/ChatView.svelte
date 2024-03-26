@@ -1,17 +1,17 @@
 <script lang="ts">
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
-	import type { Message } from "$lib/types";
+	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
 
-	let testMessage: Message = {
+	let testMessage: MessageStructure = {
 		id: "1",
-		text: "Hello, World!",
+		content: "Hello, World!",
 		role: "assistant",
 		model: "gpt-3.5-turbo",
 		created_at: new Date("2021-09-01T12:00:00Z")
 	};
 
-	let messages: Message[] = [
+	let messages: MessageStructure[] = [
 		testMessage,
 		testMessage,
 		testMessage,
@@ -39,7 +39,7 @@
 	<div class="flex-1 overflow-y-auto">
 		<div class="flex flex-col-reverse">
 			{#each messages as message}
-				<ChatMessage {...message} />
+				<ChatMessage {message} />
 			{/each}
 		</div>
 	</div>

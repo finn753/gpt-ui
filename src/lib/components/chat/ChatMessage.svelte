@@ -3,15 +3,24 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Clipboard } from "lucide-svelte";
 	import { toast } from "svelte-sonner";
+	import type { MessageStructure } from '$lib/types';
 
-	export const id: string = "";
-	export let role: string;
-	export let model: string;
-	export let text: string;
-	export let created_at: Date;
+	export let message: MessageStructure;
+
+	let role: string = "";
+	let model: string = "";
+	let content: string = "";
+	let created_at: Date = new Date(Date.now());
+
+	$: {
+		role = message.role
+		model = message.model
+		content = message.content
+		created_at = message.created_at
+	}
 
 	function copyToClipboard() {
-		navigator.clipboard.writeText(text);
+		navigator.clipboard.writeText(content);
 		toast.success("Copied to clipboard");
 	}
 </script>
@@ -22,7 +31,7 @@
 		<p class="ml-2 text-sm text-muted-foreground">{format(created_at, "PP, HH:mm")}</p>
 	</div>
 	<p>
-		{text}
+		{content}
 	</p>
 	<div class="flex flex-row items-center py-2 opacity-0 transition-opacity group-hover:opacity-100">
 		<Button class="p-0" variant="icon" size="none" on:click={copyToClipboard}

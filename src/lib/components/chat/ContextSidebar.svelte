@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Message } from "$lib/types";
+	import type { MessageStructure } from "$lib/types";
 	import { Badge } from "$lib/components/ui/badge";
 	import * as Select from "$lib/components/ui/select";
 	import * as Card from "$lib/components/ui/card";
@@ -17,7 +17,7 @@
 	export let tags: string[];
 	export let model: { value: string; label: string } = testModels[0];
 	// eslint-disable-next-line svelte/valid-compile
-	export let contextMessages: Message[];
+	export let contextMessages: MessageStructure[];
 
 	let addTagInput = "";
 	let editingTitle = false;
