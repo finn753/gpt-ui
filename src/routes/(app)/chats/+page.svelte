@@ -2,4 +2,5 @@
 	import ChatView from "$lib/components/chat/ChatView.svelte";
 </script>
 
-<ChatView />
+<!-- New Chat -->
+<ChatView chat_id=""/>

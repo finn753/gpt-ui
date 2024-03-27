@@ -2,46 +2,37 @@
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
+	import { chatsData } from '$lib/stores';
 
-	let testMessage: MessageStructure = {
-		id: "1",
-		content: "Hello, World!",
-		role: "assistant",
-		model: "gpt-3.5-turbo",
-		created_at: new Date("2021-09-01T12:00:00Z")
-	};
+	export let chat_id: string;
+	let messages: MessageStructure[] = [];
 
-	let messages: MessageStructure[] = [
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage,
-		testMessage
-	];
+	$: if (chat_id && Object.keys($chatsData).includes(chat_id)) {
+		messages = $chatsData[chat_id].messages;
+	} else {
+		messages = [{id: '-1', content: "Hey, how can I help you?", chat_id: chat_id, role: "assistant", model: "", created_at: new Date(Date.now())}];
+	}
+	async function onSendMessage(event: CustomEvent<{ value: string }>) {
+		let newMessage: MessageStructure = {
+			id: "-",
+			content: event.detail.value,
+			chat_id: chat_id,
+			role: "user",
+			model: "",
+			created_at: new Date(Date.now())
+		};
+
+		$chatsData[chat_id].messages = [...messages, newMessage];
+	}
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
 	<div class="flex-1 overflow-y-auto">
-		<div class="flex flex-col-reverse">
+		<div class="flex flex-col">
 			{#each messages as message}
 				<ChatMessage {message} />
 			{/each}
 		</div>
 	</div>
-	<ChatInput />
+	<ChatInput on:submit={onSendMessage}/>
 </div>

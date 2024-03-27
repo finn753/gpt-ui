@@ -1,6 +1,6 @@
-export type Chat = {
+export type ChatStructure = {
 	id: string;
-	tile: string;
+	title: string;
 	tags: string[];
 	summary: string;
 	model: string;
@@ -16,3 +16,6 @@ export type MessageStructure = {
 	model: string;
 	created_at: Date;
 };
+
+export type ChatData = ChatStructure & { messages: MessageStructure[] };
+export type ChatDataMap = Record<string, ChatData>;

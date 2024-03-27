@@ -37,7 +37,7 @@
 			!isOpen ? "w-0" : ""
 		)}
 	>
-		<div class={cn("flex flex-row items-center justify-between bg-background p-4 shadow-lg")}>
+		<div class="flex flex-row items-center justify-between bg-background p-4 shadow-lg">
 			<h2 class="flex-1 text-2xl font-bold">{title}</h2>
 		</div>
 		<div class="p-4 pb-0 h-full overflow-y-auto">

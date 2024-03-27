@@ -3,6 +3,9 @@
 
 	import { SendHorizontal } from "lucide-svelte";
 	import { cn } from "$lib/utils";
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher<{submit: {value: string}}>();
 
 	let input: HTMLTextAreaElement;
 
@@ -29,12 +32,17 @@
 	let isActionCommand = false;
 	let isActionMention = false;
 
-	let value = "";
+	export let value = "";
 	let rows = 1;
 	$: rows = value.split("\n").length;
 
 	function updateCursorPos() {
 		cursorPos = input.selectionStart;
+	}
+
+	function send() {
+		dispatch("submit", { value })
+		value = "";
 	}
 </script>
 
@@ -53,7 +61,7 @@
 			placeholder="Type here..."
 		/>
 		<div class="p-2" style="width: calc(1.5em + 2rem); height: calc(1.5em + 2rem);">
-			<Button variant="ghost" class="size-full p-2">
+			<Button variant="ghost" class="size-full p-2" on:click={send}>
 				<SendHorizontal size={24} />
 			</Button>
 		</div>
