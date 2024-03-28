@@ -1,12 +1,14 @@
 <script lang="ts">
-	import type { ChatStructure } from '$lib/types';
+	import type { ChatDataMap } from '$lib/types';
 	import { Button } from '$lib/components/ui/button';
 
-	export let chatList: ChatStructure[];
+	export let chatMap: ChatDataMap = {};
+
+	$: chats = Array.from(Object.values(chatMap));
 </script>
 
 <Button class="w-full" href="/chats">New chat</Button>
-{#each chatList as chat}
+{#each chats as chat}
 	<Button variant="ghost" class="flex flex-col w-full" href="/chats/{chat.id}">
 		<h2>{chat.title}</h2>
 		<p>{chat.summary}</p>

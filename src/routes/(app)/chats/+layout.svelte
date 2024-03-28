@@ -2,12 +2,12 @@
 	import CollapsibleSidebar from "$lib/components/CollapsibleSidebar.svelte";
 	import { onMount } from "svelte";
 	import ContextSidebar from "$lib/components/chat/ContextSidebar.svelte";
-	import { chatList, selectedChatID } from '$lib/stores';
+	import { chatDataMap, selectedChatID } from '$lib/stores';
 	import ChatList from '$lib/components/chat/ChatList.svelte';
 
 	export let data;
 
-	$: chatList.set(data.exampleChatList);
+	$: chatDataMap.set(data.exampleChatDataMap);
 
 	let leftOpened = false;
 	let rightOpened = false;
@@ -39,7 +39,7 @@
 		bind:isOpen={leftOpened}
 		on:open={() => handleMobileSidebar("left")}
 	>
-		<ChatList chatList={$chatList}/>
+		<ChatList chatMap={$chatDataMap}/>
 	</CollapsibleSidebar>
 	<div class="col-span-1 h-full max-h-full min-h-0 lg:col-span-2">
 		<slot />

@@ -1,8 +1,8 @@
 import type { LayoutServerLoad } from "../../../../.svelte-kit/types/src/routes/$types";
-import type { ChatStructure } from "$lib/types";
+import type { ChatDataMap } from "$lib/types";
 
-const exampleChatList: ChatStructure[] = [
-	{
+const exampleChatDataMap: ChatDataMap = {
+	"1": {
 		id: "1",
 		title: "Chat 1",
 		tags: ["tag1", "tag2"],
@@ -11,7 +11,7 @@ const exampleChatList: ChatStructure[] = [
 		created_at: new Date(),
 		updated_at: new Date()
 	},
-	{
+	"2": {
 		id: "2",
 		title: "Chat 2",
 		tags: ["tag1", "tag2"],
@@ -20,8 +20,8 @@ const exampleChatList: ChatStructure[] = [
 		created_at: new Date(),
 		updated_at: new Date()
 	}
-];
+};
 
 export const load: LayoutServerLoad = async () => {
-	return { exampleChatList };
+	return { exampleChatDataMap };
 };

@@ -5,7 +5,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Pencil, X } from 'lucide-svelte';
 	import Check from 'lucide-svelte/icons/check';
-	import { chatList } from '$lib/stores';
+	import { chatDataMap } from '$lib/stores';
 	import { get } from 'svelte/store';
 
 	const testModels = [
@@ -21,7 +21,7 @@
 	let model: { value: string; label: string } = testModels[0];
 	//let contextMessages: MessageStructure[];
 
-	$: chatData = get(chatList).find(chat => chat.id === chatID);
+	$: chatData = chatID ? get(chatDataMap)[chatID] : null;
 
 	$: {
 		if (chatData) {
