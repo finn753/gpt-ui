@@ -17,5 +17,14 @@ export type MessageStructure = {
 	created_at: Date;
 };
 
-export type ChatData = ChatStructure & { messages: MessageStructure[] };
-export type ChatDataMap = Record<string, ChatData>;
+/**
+ * @deprecated Change of DataStructure
+ */
+export type OldChatData = ChatStructure & { messages: MessageStructure[] };
+/**
+ * @deprecated Change of DataStructure
+ */
+export type OldChatDataMap = Record<string, OldChatData>;
+
+export type ChatDataMap = Record<string, ChatStructure>;
+export type ChatContentMap = Record<string, MessageStructure[]>;
