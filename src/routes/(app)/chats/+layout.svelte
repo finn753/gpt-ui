@@ -2,7 +2,7 @@
 	import CollapsibleSidebar from "$lib/components/CollapsibleSidebar.svelte";
 	import { onMount } from "svelte";
 	import ContextSidebar from "$lib/components/chat/ContextSidebar.svelte";
-	import { chatList } from '$lib/stores';
+	import { chatList, selectedChatID } from '$lib/stores';
 	import ChatList from '$lib/components/chat/ChatList.svelte';
 
 	export let data;
@@ -51,10 +51,7 @@
 		on:open={() => handleMobileSidebar("right")}
 	>
 		<ContextSidebar
-			title="Chat Title"
-			tags={["Test", "Test2", "Test3", "Test4", "Test5", "Test6"]}
-			contextMessages={[]}
-			summary="Summary Text def summ summ sumamry erfn summmy ewmfv ek Text Test"
+			chatID={$selectedChatID}
 		/>
 	</CollapsibleSidebar>
 </div>

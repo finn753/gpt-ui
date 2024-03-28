@@ -1,31 +1,49 @@
 <script lang="ts">
-	import type { MessageStructure } from "$lib/types";
 	import { Badge } from "$lib/components/ui/badge";
 	import * as Select from "$lib/components/ui/select";
 	import * as Card from "$lib/components/ui/card";
 	import { Button } from '$lib/components/ui/button';
 	import { Pencil, X } from 'lucide-svelte';
 	import Check from 'lucide-svelte/icons/check';
+	import { chatList } from '$lib/stores';
+	import { get } from 'svelte/store';
 
 	const testModels = [
 		{ value: "gpt-3.5-turbo", label: "GPT-3" },
 		{ value: "gpt-4-turbo", label: "GPT-4" }
 	];
 
-	export let title: string;
-	export let summary: string;
-	export let tags: string[];
-	export let model: { value: string; label: string } = testModels[0];
-	// eslint-disable-next-line svelte/valid-compile
-	export let contextMessages: MessageStructure[];
+	export let chatID: string | null;
+
+	let title: string = "";
+	let summary: string = "";
+	let tags: string[] = [];
+	let model: { value: string; label: string } = testModels[0];
+	//let contextMessages: MessageStructure[];
+
+	$: chatData = get(chatList).find(chat => chat.id === chatID);
+
+	$: {
+		if (chatData) {
+			title = chatData.title;
+			summary = chatData.summary;
+			tags = chatData.tags;
+			model = testModels.find(model => model.value === chatData.model) || testModels[0];
+		} else {
+			title = "";
+			summary = "";
+			tags = [];
+			model = testModels[0];
+		}
+	}
 
 	let addTagInput = "";
 	let editingTitle = false;
-	let editTitleInput = title;
+	let editTitleInput = "";
 	$: editTitleInput = title;
 
 	$: if(addTagInput) {
-		//split at space and any punctioation
+		//split at space and ,
 		let splitTags = addTagInput.split(/[\s,]+/)
 
 		if(splitTags.length > 1) {
@@ -74,7 +92,7 @@
 					{#each tags as tag}
 						<Badge>{tag} <Button class="pl-1" variant="icon" size="none" on:click={() => {removeTag(tag)}}><X size={16}/></Button></Badge>
 					{/each}
-					<input bind:value={addTagInput} class="w-16 px-2.5 py-0.5 text-xs font-semibold bg-background outline-none placeholder:text-muted-foreground" placeholder="Add tag" on:blur={addTag} on:keydown={(e) => {if (e.key === 'Enter') addTag()}}/>
+					<input bind:value={addTagInput} class="w-20 px-2.5 py-0.5 text-xs font-semibold bg-background outline-none placeholder:text-muted-foreground" placeholder="Add tag" on:blur={addTag} on:keydown={(e) => {if (e.key === 'Enter') addTag()}}/>
 				</div>
 			</Card.Description>
 		</Card.Header>
