@@ -1,5 +1,5 @@
-import type { OldChatData, OldChatDataMap, ChatStructure, MessageStructure } from "$lib/types";
-import { chatDataMap, chatList, chatsData } from "$lib/stores";
+import type { MessageStructure, ChatContentMap } from "$lib/types";
+import { chatContentMap, chatDataMap } from "$lib/stores";
 import { get } from "svelte/store";
 
 const exampleMessages: MessageStructure[] = [
@@ -39,26 +39,23 @@ const exampleMessages: MessageStructure[] = [
 
 export const load = async ({ params }) => {
 	const chat_id = params.slug;
-	let oldChatDataMap: OldChatDataMap = {};
+	let oldChatDataMap: ChatContentMap = {};
 
 	if (chat_id in get(chatDataMap)) {
-		if (!Object.keys(get(chatsData)).includes(chat_id)) {
-			const chatData: OldChatData = <ChatStructure & { messages: MessageStructure[] }>{
-				...get(chatList).find((chat) => chat.id === chat_id),
-				messages: exampleMessages.map((message) => {
-					return {
-						...message,
-						chat_id
-					};
-				})
-			};
+		if (!Object.keys(get(chatContentMap)).includes(chat_id)) {
+			const chatData: MessageStructure[] = exampleMessages.map((message) => {
+				return {
+					...message,
+					chat_id
+				};
+			});
 
 			oldChatDataMap = {
-				...get(chatsData),
+				...get(chatContentMap),
 				[chat_id]: chatData
 			};
 		} else {
-			oldChatDataMap = get(chatsData);
+			oldChatDataMap = get(chatContentMap);
 		}
 	}
 

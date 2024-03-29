@@ -2,13 +2,13 @@
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatsData } from '$lib/stores';
+	import { chatContentMap } from '$lib/stores';
 
 	export let chat_id: string;
 	let messages: MessageStructure[] = [];
 
-	$: if (chat_id && Object.keys($chatsData).includes(chat_id)) {
-		messages = $chatsData[chat_id].messages;
+	$: if (chat_id && Object.keys($chatContentMap).includes(chat_id)) {
+		messages = $chatContentMap[chat_id];
 	} else {
 		messages = [{id: '-1', content: "Hey, how can I help you?", chat_id: chat_id, role: "assistant", model: "", created_at: new Date(Date.now())}];
 	}
@@ -22,7 +22,7 @@
 			created_at: new Date(Date.now())
 		};
 
-		$chatsData[chat_id].messages = [...messages, newMessage];
+		$chatContentMap[chat_id] = [...messages, newMessage];
 	}
 </script>
 

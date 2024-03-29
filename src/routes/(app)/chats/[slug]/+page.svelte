@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ChatView from "$lib/components/chat/ChatView.svelte";
-	import { chatsData, selectedChatID } from '$lib/stores';
+	import { chatContentMap, selectedChatID } from '$lib/stores';
 	import { beforeNavigate } from '$app/navigation';
 	import { get } from 'svelte/store';
 
@@ -14,7 +14,7 @@
 
 	let chatDataMap = data.chatDataMap;
 	$: chatDataMap = data.chatDataMap;
-	$: chatsData.set({ ...chatDataMap, ...get(chatsData) });
+	$: chatContentMap.set({ ...chatDataMap, ...get(chatContentMap) });
 
 	let generating = false;
 
