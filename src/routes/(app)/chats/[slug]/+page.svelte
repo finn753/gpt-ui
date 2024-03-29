@@ -1,8 +1,8 @@
 <script lang="ts">
 	import ChatView from "$lib/components/chat/ChatView.svelte";
-	import { chatContentMap, selectedChatID } from '$lib/stores';
-	import { beforeNavigate } from '$app/navigation';
-	import { get } from 'svelte/store';
+	import { chatContentMap, selectedChatID } from "$lib/stores";
+	import { beforeNavigate } from "$app/navigation";
+	import { get } from "svelte/store";
 
 	export let data;
 
@@ -21,20 +21,23 @@
 	function beforeUnload(event: BeforeUnloadEvent) {
 		if (generating) {
 			event.preventDefault();
-			return '';
+			return "";
 		}
 	}
 
-	beforeNavigate(({cancel}) => {
+	beforeNavigate(({ cancel }) => {
 		if (generating) {
-			if (!confirm('You are trying to leave the page while generating. Are you sure you want to leave?')) {
-				cancel()
+			if (
+				!confirm(
+					"You are trying to leave the page while generating. Are you sure you want to leave?"
+				)
+			) {
+				cancel();
 			}
-
 		}
 	});
 </script>
 
-<svelte:window on:beforeunload={beforeUnload}/>
+<svelte:window on:beforeunload={beforeUnload} />
 
-<ChatView chat_id={chat_id}/>
+<ChatView {chat_id} />

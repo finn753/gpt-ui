@@ -3,9 +3,9 @@
 
 	import { SendHorizontal } from "lucide-svelte";
 	import { cn } from "$lib/utils";
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher } from "svelte";
 
-	const dispatch = createEventDispatcher<{submit: {value: string}}>();
+	const dispatch = createEventDispatcher<{ submit: { value: string } }>();
 
 	let input: HTMLTextAreaElement;
 
@@ -41,7 +41,7 @@
 	}
 
 	function send() {
-		dispatch("submit", { value })
+		dispatch("submit", { value });
 		value = "";
 	}
 </script>

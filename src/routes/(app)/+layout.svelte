@@ -33,7 +33,7 @@
 			<User {size} {strokeWidth} {color} />
 		</Button>
 	</div>
-	<div class="flex-1 h-[calc(100dvh-4rem)] md:h-dvh">
+	<div class="h-[calc(100dvh-4rem)] flex-1 md:h-dvh">
 		<slot />
 	</div>
 </div>

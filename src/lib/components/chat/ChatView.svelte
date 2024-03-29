@@ -2,7 +2,9 @@
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatContentMap } from '$lib/stores';
+	import { chatContentMap, chatDataMap } from '$lib/stores';
+	import { createNewChat } from '$lib/helper';
+	import { goto } from '$app/navigation';
 
 	export let chat_id: string;
 	let messages: MessageStructure[] = [];
@@ -10,9 +12,15 @@
 	$: if (chat_id && Object.keys($chatContentMap).includes(chat_id)) {
 		messages = $chatContentMap[chat_id];
 	} else {
-		messages = [{id: '-1', content: "Hey, how can I help you?", chat_id: chat_id, role: "assistant", model: "", created_at: new Date(Date.now())}];
+		messages = [];
 	}
 	async function onSendMessage(event: CustomEvent<{ value: string }>) {
+		if(!chat_id) {
+			chat_id = await createNewChat()
+			await goto(`/chats/${chat_id}`)
+			$chatDataMap = $chatDataMap
+		}
+
 		let newMessage: MessageStructure = {
 			id: "-",
 			content: event.detail.value,
@@ -34,5 +42,5 @@
 			{/each}
 		</div>
 	</div>
-	<ChatInput on:submit={onSendMessage}/>
+	<ChatInput on:submit={onSendMessage} />
 </div>
