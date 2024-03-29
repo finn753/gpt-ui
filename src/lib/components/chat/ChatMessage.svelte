@@ -3,7 +3,7 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Clipboard } from "lucide-svelte";
 	import { toast } from "svelte-sonner";
-	import type { MessageStructure } from '$lib/types';
+	import type { MessageStructure } from "$lib/types";
 
 	export let message: MessageStructure;
 
@@ -13,10 +13,10 @@
 	let created_at: Date = new Date(Date.now());
 
 	$: {
-		role = message.role
-		model = message.model
-		content = message.content
-		created_at = message.created_at
+		role = message.role;
+		model = message.model;
+		content = message.content;
+		created_at = message.created_at;
 	}
 
 	function copyToClipboard() {

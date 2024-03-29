@@ -1,5 +1,4 @@
 export type ChatStructure = {
-	id: string;
 	title: string;
 	tags: string[];
 	summary: string;
