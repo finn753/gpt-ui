@@ -7,7 +7,7 @@
 
 	export let data;
 
-	$: chatDataMap.set(data.exampleChatDataMap);
+	$: chatDataMap.set(data.chatDataMap);
 
 	let leftOpened = false;
 	let rightOpened = false;

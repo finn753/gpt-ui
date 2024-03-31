@@ -1,27 +1,28 @@
 import type { LayoutServerLoad } from "../../../../.svelte-kit/types/src/routes/$types";
 import type { ChatDataMap } from "$lib/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
-const exampleChatDataMap: ChatDataMap = {
-	"1": {
-		id: "1",
-		title: "Chat 1",
-		tags: ["tag1", "tag2"],
-		summary: "Summary 1",
-		model: "model1",
-		created_at: new Date(),
-		updated_at: new Date()
-	},
-	"2": {
-		id: "2",
-		title: "Chat 2",
-		tags: ["tag1", "tag2"],
-		summary: "Summary 2",
-		model: "model2",
-		created_at: new Date(),
-		updated_at: new Date()
-	}
+export const load: LayoutServerLoad = async (event) => {
+	const supabase = event.locals.supabase;
+
+	const chatDataMap = await fetchChatList(supabase);
+
+	return { chatDataMap };
 };
 
-export const load: LayoutServerLoad = async () => {
-	return { exampleChatDataMap };
-};
+async function fetchChatList(supabase: SupabaseClient): Promise<ChatDataMap> {
+	const response = await supabase.from("Chats").select("*");
+
+	return response.data?.reduce((acc, chat) => {
+		acc[chat.id] = {
+			title: chat.title,
+			tags: chat.tags["tags"],
+			summary: chat.summary,
+			model: chat.model,
+			created_at: new Date(chat.created_at),
+			updated_at: new Date(chat.updated_at)
+		};
+
+		return acc;
+	}, {});
+}
