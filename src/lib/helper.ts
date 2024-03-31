@@ -4,7 +4,7 @@ import type { ChatStructure, MessageStructure } from "$lib/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { toast } from "svelte-sonner";
 
-export async function createNewChat() {
+export async function createNewChat(supabase: SupabaseClient) {
 	const emptyChat: ChatStructure = {
 		title: "",
 		tags: [],
@@ -14,8 +14,19 @@ export async function createNewChat() {
 		updated_at: new Date()
 	};
 
-	const newChatID =
-		Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+	const { error, data } = await supabase
+		.from("Chats")
+		.insert({ title: "", summary: "" })
+		.select()
+		.single();
+
+	if (error) {
+		toast.error("Failed to create new chat");
+		console.error("Failed to create new chat", error);
+		return;
+	}
+
+	const newChatID = data.id;
 
 	chatDataMap.set({ ...get(chatDataMap), [newChatID]: emptyChat });
 

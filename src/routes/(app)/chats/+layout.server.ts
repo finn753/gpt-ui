@@ -16,7 +16,7 @@ async function fetchChatList(supabase: SupabaseClient): Promise<ChatDataMap> {
 	return response.data?.reduce((acc, chat) => {
 		acc[chat.id] = {
 			title: chat.title,
-			tags: chat.tags["tags"],
+			tags: chat.tags && Object.keys(chat.tags).includes("tags") ? chat.tags["tags"] : [],
 			summary: chat.summary,
 			model: chat.model,
 			created_at: new Date(chat.created_at),

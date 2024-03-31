@@ -2,7 +2,7 @@
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatContentMap, chatDataMap } from '$lib/stores';
+	import { chatContentMap } from '$lib/stores';
 	import { createNewChat, sendMessage } from '$lib/helper';
 	import { goto } from '$app/navigation';
 	import type { SupabaseClient } from '@supabase/supabase-js';
@@ -19,9 +19,11 @@
 	}
 	async function onSendMessage(event: CustomEvent<{ value: string }>) {
 		if(!chat_id) {
-			chat_id = await createNewChat()
+			chat_id = await createNewChat(supabase)
+
+			if(!chat_id) return
+
 			await goto(`/chats/${chat_id}`)
-			$chatDataMap = $chatDataMap
 		}
 
 		let newMessage: MessageStructure = {
