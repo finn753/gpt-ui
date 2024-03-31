@@ -6,6 +6,7 @@
 	import ChatList from "$lib/components/chat/ChatList.svelte";
 
 	export let data;
+	$: supabase = data.supabase;
 
 	$: chatDataMap.set(data.chatDataMap);
 
@@ -50,6 +51,6 @@
 		bind:isOpen={rightOpened}
 		on:open={() => handleMobileSidebar("right")}
 	>
-		<ContextSidebar chatID={$selectedChatID} />
+		<ContextSidebar chatID={$selectedChatID} {supabase} />
 	</CollapsibleSidebar>
 </div>

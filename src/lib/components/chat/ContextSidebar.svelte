@@ -6,11 +6,15 @@
 	import { Pencil, X } from "lucide-svelte";
 	import Check from "lucide-svelte/icons/check";
 	import { chatDataMap } from "$lib/stores";
+	import { changeTitle } from "$lib/helper";
+	import type { SupabaseClient } from "@supabase/supabase-js";
 
 	const testModels = [
 		{ value: "gpt-3.5-turbo", label: "GPT-3" },
 		{ value: "gpt-4-turbo", label: "GPT-4" }
 	];
+
+	export let supabase: SupabaseClient;
 
 	export let chatID: string | null;
 
@@ -47,7 +51,7 @@
 			let splitTags = addTagInput.split(/[\s,]+/);
 
 			if (splitTags.length > 1 && chatID) {
-				let newTags = splitTags.filter((tag) => tag !== "")
+				let newTags = splitTags.filter((tag) => tag !== "");
 				$chatDataMap[chatID].tags = [...tags, ...newTags];
 
 				addTagInput = "";
@@ -70,6 +74,14 @@
 		}
 
 		tags = tags;
+	}
+
+	async function onAcceptTitle() {
+		if (chatID && editTitleInput !== title) {
+			await changeTitle(chatID, editTitleInput, supabase);
+		}
+
+		editingTitle = false;
 	}
 </script>
 
@@ -100,14 +112,7 @@
 						>
 							<X size={16} />
 						</Button>
-						<Button
-							variant="icon"
-							size="none"
-							on:click={() => {
-								title = editTitleInput;
-								editingTitle = false;
-							}}
-						>
+						<Button variant="icon" size="none" on:click={onAcceptTitle}>
 							<Check size={16} />
 						</Button>
 					</div>

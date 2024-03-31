@@ -1,7 +1,7 @@
 <script>
 	import { Button } from "$lib/components/ui/button";
 	import { MessagesSquare, User, Images, Brush, LayoutTemplate } from "lucide-svelte";
-	import { openaiApiKey } from '$lib/stores';
+	import { openaiApiKey } from "$lib/stores";
 
 	const size = 24;
 	const strokeWidth = 2;
@@ -9,7 +9,7 @@
 
 	export let data;
 
-	$: if(data) {
+	$: if (data) {
 		openaiApiKey.set(data.openaiApiKey);
 	}
 </script>

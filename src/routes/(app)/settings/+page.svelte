@@ -1,29 +1,32 @@
 <script lang="ts">
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import { Button } from '$lib/components/ui/button';
-	import { openaiApiKey } from '$lib/stores';
-	import { get } from 'svelte/store';
-	import { toast } from 'svelte-sonner';
+	import { Input } from "$lib/components/ui/input";
+	import { Label } from "$lib/components/ui/label";
+	import { Button } from "$lib/components/ui/button";
+	import { openaiApiKey } from "$lib/stores";
+	import { get } from "svelte/store";
+	import { toast } from "svelte-sonner";
 
 	export let data;
-	$: supabase = data.supabase
+	$: supabase = data.supabase;
 
 	let apiKey = get(openaiApiKey);
 
 	async function saveApiKey() {
-		const userId = await supabase.auth.getUser().then((user) => user.data.user?.id)
+		const userId = await supabase.auth.getUser().then((user) => user.data.user?.id);
 
-		if(userId) {
-			const response = await supabase.from("Profiles").update({ openai_api_key: apiKey }).eq("id", userId);
-			if(response.error) {
-				toast.error(response.error.message)
+		if (userId) {
+			const response = await supabase
+				.from("Profiles")
+				.update({ openai_api_key: apiKey })
+				.eq("id", userId);
+			if (response.error) {
+				toast.error(response.error.message);
 			} else {
 				openaiApiKey.set(apiKey);
-				toast.success("API key saved")
+				toast.success("API key saved");
 			}
 		} else {
-			alert("You need to be logged in to save your API key.")
+			alert("You need to be logged in to save your API key.");
 		}
 	}
 </script>

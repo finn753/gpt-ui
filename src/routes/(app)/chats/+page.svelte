@@ -12,4 +12,4 @@
 </script>
 
 <!-- New Chat -->
-<ChatView chat_id="" supabase={supabase}/>
+<ChatView chat_id="" {supabase} />

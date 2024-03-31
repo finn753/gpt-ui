@@ -113,3 +113,23 @@ export async function generateResponse(
 		return;
 	}
 }
+
+export async function changeTitle(chat_id: string, title: string, supabase: SupabaseClient) {
+	const { error } = await supabase.from("Chats").update({ title }).match({ id: chat_id });
+
+	if (error) {
+		toast.error("Failed to change title");
+		console.error("Failed to change title", error);
+		return;
+	}
+
+	chatDataMap.update((curr) => {
+		return {
+			...curr,
+			[chat_id]: {
+				...curr[chat_id],
+				title
+			}
+		};
+	});
+}
