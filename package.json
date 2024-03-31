@@ -39,7 +39,7 @@
 	"dependencies": {
 		"@supabase/ssr": "^0.1.0",
 		"@supabase/supabase-js": "^2.39.8",
-		"bits-ui": "^0.20.0",
+		"bits-ui": "^0.20.1",
 		"clsx": "^2.1.0",
 		"date-fns": "^3.6.0",
 		"lucide-svelte": "^0.360.0",
