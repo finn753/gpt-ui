@@ -1,10 +1,17 @@
 <script>
 	import { Button } from "$lib/components/ui/button";
 	import { MessagesSquare, User, Images, Brush, LayoutTemplate } from "lucide-svelte";
+	import { openaiApiKey } from '$lib/stores';
 
 	const size = 24;
 	const strokeWidth = 2;
 	const color = "#64748B";
+
+	export let data;
+
+	$: if(data) {
+		openaiApiKey.set(data.openaiApiKey);
+	}
 </script>
 
 <div class="flex h-dvh max-h-dvh w-dvw flex-col-reverse md:flex-row">
