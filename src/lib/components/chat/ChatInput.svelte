@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { Button } from "$lib/components/ui/button";
 
-	import { SendHorizontal } from "lucide-svelte";
+	import { SendHorizontal, Square } from 'lucide-svelte';
 	import { cn } from "$lib/utils";
 	import { createEventDispatcher } from "svelte";
 
 	const dispatch = createEventDispatcher<{ submit: { value: string } }>();
+
+	export let generating = false;
 
 	let input: HTMLTextAreaElement;
 
@@ -44,6 +46,13 @@
 		dispatch("submit", { value });
 		value = "";
 	}
+
+	function onKeyDown(event: KeyboardEvent) {
+		if (event.key === "Enter" && !event.shiftKey) {
+			event.preventDefault();
+			send();
+		}
+	}
 </script>
 
 <div class="rounded-2lg bg-background">
@@ -58,12 +67,19 @@
 			bind:this={input}
 			on:click={updateCursorPos}
 			on:keyup={updateCursorPos}
+			on:keydown={onKeyDown}
 			placeholder="Type here..."
 		/>
 		<div class="p-2" style="width: calc(1.5em + 2rem); height: calc(1.5em + 2rem);">
+			{#if !generating}
 			<Button variant="ghost" class="size-full p-2" on:click={send}>
 				<SendHorizontal size={24} />
 			</Button>
+			{:else}
+				<Button variant="ghost" class="size-full p-2" >
+					<Square size={24} />
+				</Button>
+			{/if}
 		</div>
 	</div>
 </div>

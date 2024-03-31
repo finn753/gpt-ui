@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
+import { isBrowser } from "@supabase/ssr";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -51,4 +52,8 @@ export const flyAndScale = (
 		},
 		easing: cubicOut
 	};
+};
+
+export const scrollToBottom = async (node: HTMLElement, behaviour: ScrollBehavior = "smooth") => {
+	if (isBrowser()) node.scroll({ top: node.scrollHeight, behavior: behaviour });
 };

@@ -7,9 +7,14 @@
 	import { goto } from "$app/navigation";
 	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { writable } from "svelte/store";
+	import { tick } from "svelte";
+	import { scrollToBottom } from "$lib/utils";
 
 	export let chat_id: string;
+	export let generating = false;
 	export let supabase: SupabaseClient;
+
+	let scrollContainer: HTMLElement;
 
 	let messages: MessageStructure[] = [];
 	let generatingProgress = writable<MessageStructure | null>();
@@ -19,6 +24,16 @@
 	} else {
 		messages = [];
 	}
+
+	$: {
+		if (chat_id) {
+			(async () => {
+				await tick();
+				await scrollToBottom(scrollContainer, "instant");
+			})();
+		}
+	}
+
 	async function onSendMessage(event: CustomEvent<{ value: string }>) {
 		if (!chat_id) {
 			chat_id = await createNewChat(supabase);
@@ -38,18 +53,23 @@
 
 		messages = [...messages, newMessage];
 		await sendMessage(newMessage, chat_id, supabase);
+		await scrollToBottom(scrollContainer);
 
+		generating = true;
 		const response = await generateResponse(messages, generatingProgress);
 		generatingProgress.set(null);
+		generating = false;
 
 		if (response) {
 			await sendMessage(response, chat_id, supabase);
 		}
+
+		await scrollToBottom(scrollContainer);
 	}
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
-	<div class="flex-1 overflow-y-auto">
+	<div class="flex-1 overflow-y-auto" bind:this={scrollContainer}>
 		<div class="flex flex-col">
 			{#each messages as message}
 				<ChatMessage {message} />
@@ -59,5 +79,5 @@
 			{/if}
 		</div>
 	</div>
-	<ChatInput on:submit={onSendMessage} />
+	<ChatInput on:submit={onSendMessage} generating={generating}/>
 </div>
