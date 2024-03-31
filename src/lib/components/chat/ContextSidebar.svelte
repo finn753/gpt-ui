@@ -3,10 +3,10 @@
 	import * as Select from "$lib/components/ui/select";
 	import * as Card from "$lib/components/ui/card";
 	import { Button } from "$lib/components/ui/button";
-	import { Pencil, X } from "lucide-svelte";
+	import { Pencil, Sparkles, X } from "lucide-svelte";
 	import Check from "lucide-svelte/icons/check";
-	import { chatDataMap } from "$lib/stores";
-	import { changeTitle } from "$lib/helper";
+	import { chatContentMap, chatDataMap } from "$lib/stores";
+	import { changeTitle, generateTitle } from "$lib/helper";
 	import type { SupabaseClient } from "@supabase/supabase-js";
 
 	const testModels = [
@@ -83,17 +83,29 @@
 
 		editingTitle = false;
 	}
+
+	async function generateNewTitle() {
+		if (chatID) {
+			let newTitle = await generateTitle($chatContentMap[chatID]);
+			if (newTitle) await changeTitle(chatID, newTitle, supabase);
+		}
+	}
 </script>
 
 <div class="w-full space-y-2 pb-4">
 	<Card.Root class="min-h-0">
 		<Card.Header>
-			<Card.Title class="flex items-center justify-between gap-2 text-lg tracking-normal">
+			<Card.Title class="flex justify-between gap-2 text-lg tracking-normal">
 				{#if !editingTitle}
-					{title}
-					<Button variant="icon" size="none" on:click={() => (editingTitle = true)}
-						><Pencil size={16} /></Button
-					>
+					<h3 class="">{title}</h3>
+					<div class="min-w-fit space-x-2">
+						<Button variant="icon" size="none" on:click={() => (editingTitle = true)}>
+							<Pencil size={16} />
+						</Button>
+						<Button variant="icon" size="none" on:click={generateNewTitle}>
+							<Sparkles size={16} />
+						</Button>
+					</div>
 				{:else}
 					<!-- svelte-ignore a11y-autofocus -->
 					<input
@@ -135,7 +147,8 @@
 					{/each}
 					<input
 						bind:value={addTagInput}
-						class="w-20 bg-background px-2.5 py-0.5 text-xs font-semibold outline-none placeholder:text-muted-foreground"
+						class="w-20 bg-background px-2.5 py-0.5 text-xs font-semibold outline-none placeholder:text-muted-foreground
+						{tags.length === 0 ? 'pl-0' : ''}"
 						placeholder="Add tag"
 						on:blur={addTag}
 						on:keydown={(e) => {

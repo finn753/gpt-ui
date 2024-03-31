@@ -2,7 +2,7 @@
 	import type { ChatDataMap } from "$lib/types";
 	import { Button } from "$lib/components/ui/button";
 	import { selectedChatID } from "$lib/stores";
-	import { format } from 'date-fns';
+	import { format } from "date-fns";
 
 	export let chatMap: ChatDataMap = {};
 </script>
@@ -12,15 +12,23 @@
 	{#each Object.entries(chatMap) as [chatId, chat]}
 		<Button
 			variant={chatId === $selectedChatID ? "secondary" : "ghost"}
-			class="flex w-full flex-col items-start h-auto"
+			class="flex h-auto w-full flex-col items-start"
 			href="/chats/{chatId}"
 		>
-			<h3 class="text-base font-bold">{chat.title.trim() === "" ? "Untitled" : chat.title}</h3>
-			<p class="text-muted-foreground text-base">{chat.summary.trim() === "" ? "No summary" : chat.summary}</p>
+			<h3 class="whitespace-normal break-words text-base font-bold">
+				{chat.title.trim() === "" ? "Untitled" : chat.title}
+			</h3>
+			<p class="text-base text-muted-foreground">
+				{chat.summary.trim() === "" ? "No summary" : chat.summary}
+			</p>
 
 			<div class="py-1">
-				<p class="text-muted-foreground font-light">Updated: {format(chat.updated_at, "PP, HH:mm")}</p>
-				<p class="text-muted-foreground font-light">Created: {format(chat.created_at, "PP, HH:mm")}</p>
+				<p class="font-light text-muted-foreground">
+					Updated: {format(chat.updated_at, "PP, HH:mm")}
+				</p>
+				<p class="font-light text-muted-foreground">
+					Created: {format(chat.created_at, "PP, HH:mm")}
+				</p>
 			</div>
 		</Button>
 	{/each}

@@ -133,3 +133,36 @@ export async function changeTitle(chat_id: string, title: string, supabase: Supa
 		};
 	});
 }
+
+export async function generateTitle(context: MessageStructure[]) {
+	const messages = [
+		{
+			role: "system",
+			content: "You're an AI that generates titles for chats. Keep them short"
+		},
+		{
+			role: "user",
+			content: JSON.stringify(context)
+		}
+	];
+
+	let openai: OpenAI;
+
+	try {
+		openai = new OpenAI({
+			apiKey: get(openaiApiKey) || "",
+			dangerouslyAllowBrowser: true
+		});
+	} catch (e: unknown) {
+		toast.error("Failed to initialize OpenAI");
+		console.error("Failed to initialize OpenAI", e);
+		return;
+	}
+
+	const completion = await openai.chat.completions.create({
+		messages: messages as ChatCompletionMessageParam[],
+		model: "gpt-3.5-turbo"
+	});
+
+	return completion.choices[0].message.content?.replace(/"/g, "");
+}
