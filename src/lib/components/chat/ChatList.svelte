@@ -18,7 +18,7 @@
 			<h3 class="whitespace-normal break-words text-base font-bold">
 				{chat.title.trim() === "" ? "Untitled" : chat.title}
 			</h3>
-			<p class="text-base text-muted-foreground">
+			<p class="text-base text-muted-foreground whitespace-normal break-words">
 				{chat.summary.trim() === "" ? "No summary" : chat.summary}
 			</p>
 

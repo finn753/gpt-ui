@@ -138,7 +138,10 @@ export async function generateTitle(context: MessageStructure[]) {
 	const messages = [
 		{
 			role: "system",
-			content: "You're an AI that generates titles for chats. Keep them short"
+			content:
+				"You're an AI that generates titles for chats \n Keep them short, summarise the chat, don't be too specific \n" +
+				"Don't enumerate the points, don't use the word 'chat' in the title \n" +
+				"SUMMARIZE the chat in a few words"
 		},
 		{
 			role: "user",
@@ -165,4 +168,70 @@ export async function generateTitle(context: MessageStructure[]) {
 	});
 
 	return completion.choices[0].message.content?.replace(/"/g, "");
+}
+
+export async function createSummary(chat_id: string, supabase: SupabaseClient) {
+	const currentSummary = get(chatDataMap)[chat_id].summary;
+	const newMessages = get(chatContentMap)[chat_id].slice(-6);
+
+	const messages = [
+		{
+			role: "system",
+			content:
+				"You're an AI that generates summaries for chats \n Keep them short, summarise the chat, don't be too specific \n" +
+				"Don't enumerate the points, don't use the word 'chat' in the summary \n" +
+				"DO NOT say 'The user said', 'The assistant said', etc. \n" +
+				"SUMMARIZE the chat in a few words, one sentence maximum \n"
+		},
+		{
+			role: "user",
+			content:
+				"Current summary: \n " +
+				currentSummary +
+				"\n\n" +
+				"Messages: \n" +
+				JSON.stringify(newMessages)
+		}
+	];
+
+	let openai: OpenAI;
+
+	try {
+		openai = new OpenAI({
+			apiKey: get(openaiApiKey) || "",
+			dangerouslyAllowBrowser: true
+		});
+	} catch (e: unknown) {
+		toast.error("Failed to initialize OpenAI");
+		console.error("Failed to initialize OpenAI", e);
+		return;
+	}
+
+	const newSummary = await openai.chat.completions
+		.create({
+			messages: messages as ChatCompletionMessageParam[],
+			model: "gpt-3.5-turbo"
+		})
+		.then((res) => res.choices[0].message.content);
+
+	const { error } = await supabase
+		.from("Chats")
+		.update({ summary: newSummary })
+		.match({ id: chat_id });
+
+	if (error || !newSummary) {
+		toast.error("Failed to create summary");
+		console.error("Failed to create summary", error);
+		return;
+	}
+
+	chatDataMap.update((curr) => {
+		return {
+			...curr,
+			[chat_id]: {
+				...curr[chat_id],
+				summary: newSummary
+			}
+		};
+	});
 }

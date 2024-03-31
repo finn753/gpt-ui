@@ -2,8 +2,8 @@
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatContentMap } from "$lib/stores";
-	import { createNewChat, generateResponse, sendMessage } from "$lib/helper";
+	import { chatContentMap, chatDataMap } from '$lib/stores';
+	import { createNewChat, createSummary, generateResponse, sendMessage } from '$lib/helper';
 	import { goto } from "$app/navigation";
 	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { writable } from "svelte/store";
@@ -65,6 +65,10 @@
 		}
 
 		await scrollToBottom(scrollContainer);
+
+		if(!$chatDataMap[chat_id].summary) {
+			await createSummary(chat_id, supabase);
+		}
 	}
 </script>
 
