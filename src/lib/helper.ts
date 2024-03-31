@@ -62,10 +62,7 @@ export async function sendMessage(
 
 export async function generateResponse(
 	context: MessageStructure[],
-	output?: (
-		context: MessageStructure[],
-		output?: Writable<MessageStructure | null>
-	) => Promise<MessageStructure | undefined>
+	output: Writable<MessageStructure | null>
 ): Promise<MessageStructure | undefined> {
 	const messages = context.map((message) => {
 		return {
@@ -106,7 +103,7 @@ export async function generateResponse(
 
 		for await (const part of stream) {
 			responseMessage.content = responseMessage.content + (part.choices[0]?.delta?.content || "");
-			output?.set(responseMessage);
+			output.set(responseMessage);
 		}
 
 		return responseMessage;
