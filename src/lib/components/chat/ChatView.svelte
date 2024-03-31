@@ -3,7 +3,7 @@
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
 	import { chatContentMap, chatDataMap } from '$lib/stores';
-	import { createNewChat, createSummary, generateResponse, sendMessage } from '$lib/helper';
+	import { changeTitle, createNewChat, createSummary, generateResponse, generateTitle, sendMessage } from '$lib/helper';
 	import { goto } from "$app/navigation";
 	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { writable } from "svelte/store";
@@ -53,6 +53,7 @@
 
 		messages = [...messages, newMessage];
 		await sendMessage(newMessage, chat_id, supabase);
+
 		await scrollToBottom(scrollContainer);
 
 		generating = true;
@@ -65,6 +66,11 @@
 		}
 
 		await scrollToBottom(scrollContainer);
+
+		if(!$chatDataMap[chat_id].title) {
+			let newTitle = await generateTitle(messages)
+			if(newTitle) await changeTitle(chat_id, newTitle, supabase)
+		}
 
 		if(!$chatDataMap[chat_id].summary) {
 			await createSummary(chat_id, supabase);

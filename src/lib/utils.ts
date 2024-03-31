@@ -55,5 +55,5 @@ export const flyAndScale = (
 };
 
 export const scrollToBottom = async (node: HTMLElement, behaviour: ScrollBehavior = "smooth") => {
-	if (isBrowser()) node.scroll({ top: node.scrollHeight, behavior: behaviour });
+	if (isBrowser() && node) node.scroll({ top: node.scrollHeight, behavior: behaviour });
 };
