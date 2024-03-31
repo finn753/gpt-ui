@@ -1,5 +1,5 @@
 import { chatContentMap, chatDataMap, openaiApiKey } from "$lib/stores";
-import { get, type Writable } from "svelte/store";
+import { get } from "svelte/store";
 import type { ChatStructure, MessageStructure } from "$lib/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { toast } from "svelte-sonner";
@@ -43,7 +43,7 @@ export async function sendMessage(
 	chatContentMap.update((curr) => {
 		return {
 			...curr,
-			[chat_id]: [...curr[chat_id], message]
+			[chat_id]: [...(curr[chat_id] || []), message]
 		};
 	});
 
@@ -60,10 +60,9 @@ export async function sendMessage(
 	}
 }
 
-export async function generateResponse(
-	context: MessageStructure[],
-	output: Writable<MessageStructure | null>
-): Promise<MessageStructure | undefined> {
+export async function* generateResponse(
+	context: MessageStructure[]
+): AsyncGenerator<MessageStructure | undefined> {
 	const messages = context.map((message) => {
 		return {
 			role: message.role as string,
@@ -103,7 +102,7 @@ export async function generateResponse(
 
 		for await (const part of stream) {
 			responseMessage.content = responseMessage.content + (part.choices[0]?.delta?.content || "");
-			output.set(responseMessage);
+			yield responseMessage;
 		}
 
 		return responseMessage;

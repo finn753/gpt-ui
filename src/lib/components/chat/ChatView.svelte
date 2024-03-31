@@ -6,7 +6,6 @@
 	import { changeTitle, createNewChat, createSummary, generateResponse, generateTitle, sendMessage } from '$lib/helper';
 	import { goto } from "$app/navigation";
 	import type { SupabaseClient } from "@supabase/supabase-js";
-	import { writable } from "svelte/store";
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";
 
@@ -17,7 +16,7 @@
 	let scrollContainer: HTMLElement;
 
 	let messages: MessageStructure[] = [];
-	let generatingProgress = writable<MessageStructure | null>();
+	let generatingProgress: MessageStructure | null;
 
 	$: if (chat_id && Object.keys($chatContentMap).includes(chat_id)) {
 		messages = $chatContentMap[chat_id];
@@ -35,12 +34,12 @@
 	}
 
 	async function onSendMessage(event: CustomEvent<{ value: string }>) {
+		let isNewChat = false;
 		if (!chat_id) {
+			isNewChat = true;
 			chat_id = await createNewChat(supabase);
 
 			if (!chat_id) return;
-
-			await goto(`/chats/${chat_id}`);
 		}
 
 		let newMessage: MessageStructure = {
@@ -51,14 +50,18 @@
 			created_at: new Date(Date.now())
 		};
 
-		messages = [...messages, newMessage];
+		messages = messages ? [...messages, newMessage] : [newMessage];
 		await sendMessage(newMessage, chat_id, supabase);
 
 		await scrollToBottom(scrollContainer);
 
 		generating = true;
-		const response = await generateResponse(messages, generatingProgress);
-		generatingProgress.set(null);
+		let response: MessageStructure | undefined;
+		for await (const r of generateResponse(messages)) {
+			response = r;
+			generatingProgress = response || null;
+		}
+		generatingProgress = null
 		generating = false;
 
 		if (response) {
@@ -66,6 +69,8 @@
 		}
 
 		await scrollToBottom(scrollContainer);
+
+		if(isNewChat) await goto(`/chats/${chat_id}`);
 
 		if(!$chatDataMap[chat_id].title) {
 			let newTitle = await generateTitle(messages)
@@ -84,8 +89,8 @@
 			{#each messages as message}
 				<ChatMessage {message} />
 			{/each}
-			{#if $generatingProgress}
-				<ChatMessage message={$generatingProgress} />
+			{#if generatingProgress}
+				<ChatMessage message={generatingProgress} />
 			{/if}
 		</div>
 	</div>
