@@ -1,8 +1,10 @@
-import { chatContentMap, chatDataMap } from "$lib/stores";
-import { get } from "svelte/store";
+import { chatContentMap, chatDataMap, openaiApiKey } from "$lib/stores";
+import { get, type Writable } from "svelte/store";
 import type { ChatStructure, MessageStructure } from "$lib/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { toast } from "svelte-sonner";
+import OpenAI from "openai";
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 export async function createNewChat(supabase: SupabaseClient) {
 	const emptyChat: ChatStructure = {
@@ -55,5 +57,62 @@ export async function sendMessage(
 	if (error) {
 		toast.error("Failed to send message");
 		console.error("Failed to send message", error);
+	}
+}
+
+export async function generateResponse(
+	context: MessageStructure[],
+	output?: (
+		context: MessageStructure[],
+		output?: Writable<MessageStructure | null>
+	) => Promise<MessageStructure | undefined>
+): Promise<MessageStructure | undefined> {
+	const messages = context.map((message) => {
+		return {
+			role: message.role as string,
+			content: message.content
+		};
+	});
+
+	const responseMessage: MessageStructure = {
+		chat_id: "",
+		content: "",
+		role: "assistant",
+		model: "",
+		created_at: new Date()
+	};
+
+	let openai: OpenAI;
+
+	try {
+		openai = new OpenAI({
+			apiKey: get(openaiApiKey) || "",
+			dangerouslyAllowBrowser: true
+		});
+	} catch (e: unknown) {
+		toast.error("Failed to initialize OpenAI");
+		console.error("Failed to initialize OpenAI", e);
+		return;
+	}
+
+	try {
+		const stream = await openai.chat.completions.create({
+			messages: messages as ChatCompletionMessageParam[],
+			model: "gpt-3.5-turbo",
+			stream: true
+		});
+
+		responseMessage.content = "";
+
+		for await (const part of stream) {
+			responseMessage.content = responseMessage.content + (part.choices[0]?.delta?.content || "");
+			output?.set(responseMessage);
+		}
+
+		return responseMessage;
+	} catch (e: unknown) {
+		toast.error("Failed to generate response");
+		console.error("Failed to generate response", e);
+		return;
 	}
 }

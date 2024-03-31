@@ -3,14 +3,16 @@
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
 	import { chatContentMap } from '$lib/stores';
-	import { createNewChat, sendMessage } from '$lib/helper';
+	import { createNewChat, generateResponse, sendMessage } from '$lib/helper';
 	import { goto } from '$app/navigation';
 	import type { SupabaseClient } from '@supabase/supabase-js';
+	import { writable } from 'svelte/store';
 
 	export let chat_id: string;
 	export let supabase: SupabaseClient
 
 	let messages: MessageStructure[] = [];
+	let generatingProgress = writable<MessageStructure | null>();
 
 	$: if (chat_id && Object.keys($chatContentMap).includes(chat_id)) {
 		messages = $chatContentMap[chat_id];
@@ -34,7 +36,15 @@
 			created_at: new Date(Date.now())
 		};
 
+		messages = [...messages, newMessage];
 		await sendMessage(newMessage, chat_id, supabase)
+
+		const response = await generateResponse(messages, generatingProgress)
+		generatingProgress.set(null)
+
+		if (response) {
+			await sendMessage(response, chat_id, supabase)
+		}
 	}
 </script>
 
@@ -44,6 +54,9 @@
 			{#each messages as message}
 				<ChatMessage {message} />
 			{/each}
+			{#if $generatingProgress}
+				<ChatMessage message={$generatingProgress} />
+			{/if}
 		</div>
 	</div>
 	<ChatInput on:submit={onSendMessage} />
