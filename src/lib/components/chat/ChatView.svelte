@@ -3,10 +3,13 @@
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
 	import { chatContentMap, chatDataMap } from '$lib/stores';
-	import { createNewChat } from '$lib/helper';
+	import { createNewChat, sendMessage } from '$lib/helper';
 	import { goto } from '$app/navigation';
+	import type { SupabaseClient } from '@supabase/supabase-js';
 
 	export let chat_id: string;
+	export let supabase: SupabaseClient
+
 	let messages: MessageStructure[] = [];
 
 	$: if (chat_id && Object.keys($chatContentMap).includes(chat_id)) {
@@ -22,7 +25,6 @@
 		}
 
 		let newMessage: MessageStructure = {
-			id: "-",
 			content: event.detail.value,
 			chat_id: chat_id,
 			role: "user",
@@ -30,7 +32,7 @@
 			created_at: new Date(Date.now())
 		};
 
-		$chatContentMap[chat_id] = [...messages, newMessage];
+		await sendMessage(newMessage, chat_id, supabase)
 	}
 </script>
 

@@ -8,7 +8,6 @@ export type ChatStructure = {
 };
 
 export type MessageStructure = {
-	id: string;
 	chat_id: string;
 	content: string;
 	role: "user" | "assistant" | "tool";

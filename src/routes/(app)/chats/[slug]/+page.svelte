@@ -5,6 +5,7 @@
 	import { get } from "svelte/store";
 
 	export let data;
+	$: supabase = data.supabase;
 
 	let chat_id = data.chat_id;
 	$: {
@@ -40,4 +41,4 @@
 
 <svelte:window on:beforeunload={beforeUnload} />
 
-<ChatView {chat_id} />
+<ChatView {chat_id} supabase={supabase}/>
