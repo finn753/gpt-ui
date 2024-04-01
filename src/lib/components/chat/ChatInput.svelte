@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from "$lib/components/ui/button";
 
-	import { SendHorizontal, Square } from 'lucide-svelte';
+	import { SendHorizontal, Square } from "lucide-svelte";
 	import { cn } from "$lib/utils";
 	import { createEventDispatcher } from "svelte";
 
@@ -72,11 +72,11 @@
 		/>
 		<div class="p-2" style="width: calc(1.5em + 2rem); height: calc(1.5em + 2rem);">
 			{#if !generating}
-			<Button variant="ghost" class="size-full p-2" on:click={send}>
-				<SendHorizontal size={24} />
-			</Button>
+				<Button variant="ghost" class="size-full p-2" on:click={send}>
+					<SendHorizontal size={24} />
+				</Button>
 			{:else}
-				<Button variant="ghost" class="size-full p-2" >
+				<Button variant="ghost" class="size-full p-2">
 					<Square size={24} />
 				</Button>
 			{/if}

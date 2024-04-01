@@ -41,4 +41,4 @@
 
 <svelte:window on:beforeunload={beforeUnload} />
 
-<ChatView {chat_id} {supabase} bind:generating/>
+<ChatView {chat_id} {supabase} bind:generating />

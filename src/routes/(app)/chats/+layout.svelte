@@ -40,7 +40,7 @@
 		bind:isOpen={leftOpened}
 		on:open={() => handleMobileSidebar("left")}
 	>
-		<ChatList chatMap={$chatDataMap} />
+		<ChatList chatMap={$chatDataMap} {supabase}/>
 	</CollapsibleSidebar>
 	<div class="col-span-1 h-full max-h-full min-h-0 lg:col-span-2">
 		<slot />

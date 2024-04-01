@@ -2,8 +2,15 @@
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatContentMap, chatDataMap } from '$lib/stores';
-	import { changeTitle, createNewChat, createSummary, generateResponse, generateTitle, sendMessage } from '$lib/helper';
+	import { chatContentMap, chatDataMap } from "$lib/stores";
+	import {
+		changeTitle,
+		createNewChat,
+		createSummary,
+		generateResponse,
+		generateTitle,
+		sendMessage
+	} from "$lib/helper";
 	import { goto } from "$app/navigation";
 	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { tick } from "svelte";
@@ -61,7 +68,7 @@
 			response = r;
 			generatingProgress = response || null;
 		}
-		generatingProgress = null
+		generatingProgress = null;
 		generating = false;
 
 		if (response) {
@@ -70,14 +77,14 @@
 
 		await scrollToBottom(scrollContainer);
 
-		if(isNewChat) await goto(`/chats/${chat_id}`);
+		if (isNewChat) await goto(`/chats/${chat_id}`);
 
-		if(!$chatDataMap[chat_id].title) {
-			let newTitle = await generateTitle(messages)
-			if(newTitle) await changeTitle(chat_id, newTitle, supabase)
+		if (!$chatDataMap[chat_id].title) {
+			let newTitle = await generateTitle(messages);
+			if (newTitle) await changeTitle(chat_id, newTitle, supabase);
 		}
 
-		if(!$chatDataMap[chat_id].summary) {
+		if (!$chatDataMap[chat_id].summary) {
 			await createSummary(chat_id, supabase);
 		}
 	}
@@ -94,5 +101,5 @@
 			{/if}
 		</div>
 	</div>
-	<ChatInput on:submit={onSendMessage} generating={generating}/>
+	<ChatInput on:submit={onSendMessage} {generating} />
 </div>

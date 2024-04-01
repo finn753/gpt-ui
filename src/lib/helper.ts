@@ -35,6 +35,28 @@ export async function createNewChat(supabase: SupabaseClient) {
 	return newChatID;
 }
 
+export async function deleteChat(chat_id: string, supabase: SupabaseClient) {
+	const { error } = await supabase.from("Chats").delete().match({ id: chat_id });
+
+	if (error) {
+		toast.error("Failed to delete chat");
+		console.error("Failed to delete chat", error);
+		return;
+	}
+
+	chatDataMap.update((curr) => {
+		const newMap = { ...curr };
+		delete newMap[chat_id];
+		return newMap;
+	});
+
+	chatContentMap.update((curr) => {
+		const newMap = { ...curr };
+		delete newMap[chat_id];
+		return newMap;
+	});
+}
+
 export async function sendMessage(
 	message: MessageStructure,
 	chat_id: string,
