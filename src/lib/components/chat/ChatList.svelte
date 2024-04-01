@@ -7,6 +7,7 @@
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 	import AlertDeleteChat from '$lib/components/chat/AlertDeleteChat.svelte';
 	import type { SupabaseClient } from '@supabase/supabase-js';
+	import AlertRenameChat from '$lib/components/chat/AlertRenameChat.svelte';
 
 	export let chatMap: ChatDataMap = {};
 	export let supabase: SupabaseClient;
@@ -36,7 +37,7 @@
 					></DropdownMenu.Trigger>
 					<DropdownMenu.Content>
 						<DropdownMenu.Group>
-							<DropdownMenu.Item>Rename</DropdownMenu.Item>
+							<DropdownMenu.Item class="p-0" on:click={(event) => {event.preventDefault()}}><AlertRenameChat chatID={chatId} supabase={supabase}/></DropdownMenu.Item>
 							<DropdownMenu.Item class="p-0" on:click={(event) => {event.preventDefault()}}><AlertDeleteChat chatID={chatId} supabase={supabase}/></DropdownMenu.Item>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
