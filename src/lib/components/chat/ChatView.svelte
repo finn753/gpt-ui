@@ -62,9 +62,17 @@
 
 		await scrollToBottom(scrollContainer);
 
+		let model, temperature, topP, systemMessage;
+
+		try {
+			({model, temperature, topP, systemMessage} = $chatDataMap[chat_id].model);
+		} catch (e: unknown) {
+			console.log("Defaulting to standard assistant model")
+		}
+
 		generating = true;
 		let response: MessageStructure | undefined;
-		for await (const r of generateResponse(messages)) {
+		for await (const r of generateResponse( messages, model, temperature, topP, systemMessage )) {
 			response = r;
 			generatingProgress = response || null;
 		}

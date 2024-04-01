@@ -15,7 +15,7 @@
 	const modelSelection = [
 		{ value: "", label: "Custom" },
 		{ value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
-		{ value: "gpt-4-turbo", label: "GPT-4 Turbo" },
+		{ value: "gpt-4-turbo-preview", label: "GPT-4 Turbo" },
 	];
 
 	export let supabase: SupabaseClient;

@@ -83,20 +83,37 @@ export async function sendMessage(
 }
 
 export async function* generateResponse(
-	context: MessageStructure[]
+	context: MessageStructure[],
+	model?: string,
+	temperature?: number,
+	top_p?: number,
+	systemMessage?: string
 ): AsyncGenerator<MessageStructure | undefined> {
-	const messages = context.map((message) => {
+	model = model || "gpt-3.5-turbo";
+	temperature = parseFloat(String(temperature)) || 0.5;
+	top_p = parseFloat(String(top_p)) || 1;
+	systemMessage = systemMessage || "";
+
+	let messages = context.map((message) => {
 		return {
 			role: message.role as string,
 			content: message.content
 		};
 	});
 
+	messages = [
+		{
+			role: "system",
+			content: systemMessage
+		},
+		...messages
+	];
+
 	const responseMessage: MessageStructure = {
 		chat_id: "",
 		content: "",
 		role: "assistant",
-		model: "",
+		model: model,
 		created_at: new Date()
 	};
 
@@ -116,7 +133,9 @@ export async function* generateResponse(
 	try {
 		const stream = await openai.chat.completions.create({
 			messages: messages as ChatCompletionMessageParam[],
-			model: "gpt-3.5-turbo",
+			model,
+			temperature,
+			top_p,
 			stream: true
 		});
 
