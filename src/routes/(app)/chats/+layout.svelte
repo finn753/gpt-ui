@@ -40,13 +40,13 @@
 		bind:isOpen={leftOpened}
 		on:open={() => handleMobileSidebar("left")}
 	>
-		<ChatList chatMap={$chatDataMap} {supabase}/>
+		<ChatList chatMap={$chatDataMap} {supabase} />
 	</CollapsibleSidebar>
 	<div class="col-span-1 h-full max-h-full min-h-0 lg:col-span-2">
 		<slot />
 	</div>
 	<CollapsibleSidebar
-		title="Context"
+		title={$selectedChatID ? "Context" : "New Chat"}
 		orientation="right"
 		bind:isOpen={rightOpened}
 		on:open={() => handleMobileSidebar("right")}

@@ -1,6 +1,6 @@
 import { chatContentMap, chatDataMap, openaiApiKey } from "$lib/stores";
 import { get } from "svelte/store";
-import type { ChatStructure, MessageStructure } from "$lib/types";
+import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { toast } from "svelte-sonner";
 import OpenAI from "openai";
@@ -11,7 +11,7 @@ export async function createNewChat(supabase: SupabaseClient) {
 		title: "",
 		tags: [],
 		summary: "",
-		model: "",
+		model: {} as AssistantStructure,
 		created_at: new Date(),
 		updated_at: new Date()
 	};
@@ -252,6 +252,33 @@ export async function createSummary(chat_id: string, supabase: SupabaseClient) {
 			[chat_id]: {
 				...curr[chat_id],
 				summary: newSummary
+			}
+		};
+	});
+}
+
+export async function changeAssistantData(
+	chat_id: string,
+	assistantData: AssistantStructure,
+	supabase: SupabaseClient
+) {
+	const { error } = await supabase
+		.from("Chats")
+		.update({ model: assistantData })
+		.match({ id: chat_id });
+
+	if (error) {
+		toast.error("Failed to change assistant data");
+		console.error("Failed to change assistant data", error);
+		return;
+	}
+
+	chatDataMap.update((curr) => {
+		return {
+			...curr,
+			[chat_id]: {
+				...curr[chat_id],
+				model: assistantData
 			}
 		};
 	});

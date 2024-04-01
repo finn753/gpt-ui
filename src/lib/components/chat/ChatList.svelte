@@ -5,9 +5,9 @@
 	import { format } from "date-fns";
 	import { Ellipsis } from "lucide-svelte";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-	import AlertDeleteChat from '$lib/components/chat/AlertDeleteChat.svelte';
-	import type { SupabaseClient } from '@supabase/supabase-js';
-	import AlertRenameChat from '$lib/components/chat/AlertRenameChat.svelte';
+	import AlertDeleteChat from "$lib/components/chat/AlertDeleteChat.svelte";
+	import type { SupabaseClient } from "@supabase/supabase-js";
+	import AlertRenameChat from "$lib/components/chat/AlertRenameChat.svelte";
 
 	export let chatMap: ChatDataMap = {};
 	export let supabase: SupabaseClient;
@@ -26,19 +26,31 @@
 					{chat.title.trim() === "" ? "Untitled" : chat.title}
 				</h3>
 				<DropdownMenu.Root>
-					<DropdownMenu.Trigger asChild let:builder><Button
-						variant="icon"
-						size="none"
-						class="opacity-0 group-hover:opacity-50 group-hover:hover:opacity-100"
-						builders={[builder]}
-						on:click={(event) => {
-						event.preventDefault();
-					}}><Ellipsis size={16} /></Button
-					></DropdownMenu.Trigger>
+					<DropdownMenu.Trigger asChild let:builder
+						><Button
+							variant="icon"
+							size="none"
+							class="opacity-0 group-hover:opacity-50 group-hover:hover:opacity-100"
+							builders={[builder]}
+							on:click={(event) => {
+								event.preventDefault();
+							}}><Ellipsis size={16} /></Button
+						></DropdownMenu.Trigger
+					>
 					<DropdownMenu.Content>
 						<DropdownMenu.Group>
-							<DropdownMenu.Item class="p-0" on:click={(event) => {event.preventDefault()}}><AlertRenameChat chatID={chatId} supabase={supabase}/></DropdownMenu.Item>
-							<DropdownMenu.Item class="p-0" on:click={(event) => {event.preventDefault()}}><AlertDeleteChat chatID={chatId} supabase={supabase}/></DropdownMenu.Item>
+							<DropdownMenu.Item
+								class="p-0"
+								on:click={(event) => {
+									event.preventDefault();
+								}}><AlertRenameChat chatID={chatId} {supabase} /></DropdownMenu.Item
+							>
+							<DropdownMenu.Item
+								class="p-0"
+								on:click={(event) => {
+									event.preventDefault();
+								}}><AlertDeleteChat chatID={chatId} {supabase} /></DropdownMenu.Item
+							>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>

@@ -3,6 +3,7 @@
 	import { cn } from "$lib/utils.js";
 
 	type $$Props = LabelPrimitive.Props;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	type $$Events = LabelPrimitive.Events;
 
 	let className: $$Props["class"] = undefined;
@@ -11,7 +12,7 @@
 
 <LabelPrimitive.Root
 	class={cn(
-		"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+		"flex flex-col gap-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 		className
 	)}
 	{...$$restProps}
