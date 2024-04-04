@@ -40,7 +40,8 @@
 		}
 	}
 
-	async function onSendMessage(event: CustomEvent<{ value: string }>) {
+	async function onSendMessage(event: CustomEvent<{ value: string }>)
+	{
 		let isNewChat = false;
 		if (!chat_id) {
 			isNewChat = true;
@@ -70,6 +71,8 @@
 			console.log("Defaulting to standard assistant model")
 		}
 
+		// await getContextFromMessages(messages);
+
 		generating = true;
 		let response: MessageStructure | undefined;
 		for await (const r of generateResponse( messages, model, temperature, topP, systemMessage )) {
@@ -96,6 +99,7 @@
 			await createSummary(chat_id, supabase);
 		}
 	}
+
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
