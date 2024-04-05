@@ -2,6 +2,8 @@
 	import { Button } from "$lib/components/ui/button";
 	import { MessagesSquare, User, Images, Brush, LayoutTemplate } from "lucide-svelte";
 	import { openaiApiKey } from "$lib/stores";
+	import { initializeModel } from "client-vector-search";
+	import { onMount } from "svelte";
 
 	const size = 24;
 	const strokeWidth = 2;
@@ -12,6 +14,14 @@
 	$: if (data) {
 		openaiApiKey.set(data.openaiApiKey);
 	}
+
+	onMount(() => {
+		try {
+			initializeModel();
+		} catch (e) {
+			console.error(e);
+		}
+	});
 </script>
 
 <div class="flex h-dvh max-h-dvh w-dvw flex-col-reverse md:flex-row">

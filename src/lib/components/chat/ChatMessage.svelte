@@ -4,7 +4,7 @@
 	import { Clipboard } from "lucide-svelte";
 	import { toast } from "svelte-sonner";
 	import type { MessageStructure } from "$lib/types";
-	import SvelteMarkdown from 'svelte-markdown';
+	import SvelteMarkdown from "svelte-markdown";
 
 	export let message: MessageStructure;
 
@@ -31,9 +31,11 @@
 		<h3 class="text-lg font-bold">{role} {model}</h3>
 		<p class="ml-2 text-sm text-muted-foreground">{format(created_at, "PP, HH:mm")}</p>
 	</div>
-	<p class="prose dark:prose-invert
-  prose-h1:font-bold prose-h1:text-xl
-  prose-a:text-blue-600 prose-p:text-justify prose-img:rounded-xl">
+	<p
+		class="prose dark:prose-invert
+  prose-h1:text-xl prose-h1:font-bold
+  prose-p:text-justify prose-a:text-blue-600 prose-img:rounded-xl"
+	>
 		<SvelteMarkdown source={content} />
 	</p>
 	<div class="flex flex-row items-center py-2 opacity-0 transition-opacity group-hover:opacity-100">

@@ -5,8 +5,8 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Pencil, Sparkles, X } from "lucide-svelte";
 	import Check from "lucide-svelte/icons/check";
-	import { chatContentMap, chatDataMap } from "$lib/stores";
-	import { changeAssistantData, changeTitle, generateTitle } from '$lib/helper';
+	import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/stores";
+	import { changeAssistantData, changeTitle, generateTitle } from "$lib/helper";
 	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
@@ -15,7 +15,7 @@
 	const modelSelection = [
 		{ value: "", label: "Custom" },
 		{ value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
-		{ value: "gpt-4-turbo-preview", label: "GPT-4 Turbo" },
+		{ value: "gpt-4-turbo-preview", label: "GPT-4 Turbo" }
 	];
 
 	export let supabase: SupabaseClient;
@@ -58,7 +58,13 @@
 			summary = chatData.summary;
 			tags = chatData.tags;
 
-			if(chatData.model && chatData.model.model && chatData.model.temperature && chatData.model.topP && chatData.model.systemMessage) {
+			if (
+				chatData.model &&
+				chatData.model.model &&
+				chatData.model.temperature &&
+				chatData.model.topP &&
+				chatData.model.systemMessage
+			) {
 				model = chatData.model.model;
 				temperature = chatData.model.temperature;
 				topP = chatData.model.topP;
@@ -120,7 +126,7 @@
 
 	async function onSaveAssistant() {
 		if (chatID) {
-			await changeAssistantData(chatID, {model, temperature, topP, systemMessage}, supabase);
+			await changeAssistantData(chatID, { model, temperature, topP, systemMessage }, supabase);
 			unsavedAssistantChanges = false;
 		}
 	}
@@ -207,7 +213,12 @@
 		<Card.Content class="flex flex-col gap-4">
 			<Label>
 				Model
-				<Select.Root selected={selectionModel} onSelectedChange={(v) => { v && (model = v.value)}}>
+				<Select.Root
+					selected={selectionModel}
+					onSelectedChange={(v) => {
+						v && (model = v.value);
+					}}
+				>
 					<Select.Trigger class="w-full">
 						<Select.Value placeholder="Select a model" />
 					</Select.Trigger>
@@ -221,7 +232,7 @@
 					</Select.Content>
 					<Select.Input name="selectedModel" />
 				</Select.Root>
-				<Input bind:value={model}/>
+				<Input bind:value={model} />
 			</Label>
 
 			<Label>
@@ -243,4 +254,21 @@
 			<Button on:click={onSaveAssistant} disabled={!unsavedAssistantChanges}>Save</Button>
 		</Card.Footer>
 	</Card.Root>
+
+	{#if chatID}
+		<Card.Root class="min-h-0">
+			<Card.Header>
+				<Card.Title>Context</Card.Title>
+			</Card.Header>
+			<Card.Content class="flex flex-col gap-4">
+				{#if !$lastContextOfChat[chatID]}
+					<p>No context available</p>
+				{:else}
+					{#each $lastContextOfChat[chatID] as message}
+						<p>{message.content}</p>
+					{/each}
+				{/if}
+			</Card.Content>
+		</Card.Root>
+	{/if}
 </div>
