@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
 import { isBrowser } from "@supabase/ssr";
+import * as math from "mathjs";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -57,3 +58,10 @@ export const flyAndScale = (
 export const scrollToBottom = async (node: HTMLElement, behaviour: ScrollBehavior = "smooth") => {
 	if (isBrowser() && node) node.scroll({ top: node.scrollHeight, behavior: behaviour });
 };
+
+export function cosineSimilarity(a: number[], b: number[]): number {
+	const dotProduct = math.dot(a, b);
+	const magnitudeA = math.sqrt(math.dot(a, a));
+	const magnitudeB = math.sqrt(math.dot(b, b));
+	return math.divide(dotProduct, math.multiply(magnitudeA, magnitudeB)) as number;
+}

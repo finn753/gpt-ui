@@ -5,6 +5,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { toast } from "svelte-sonner";
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { cosineSimilarity } from "$lib/utils";
 
 export async function createNewChat(supabase: SupabaseClient) {
 	const emptyChat: ChatStructure = {
@@ -301,4 +303,32 @@ export async function changeAssistantData(
 			}
 		};
 	});
+}
+
+export async function getContextFromMessages(
+	messages: MessageStructure[]
+): Promise<MessageStructure[]> {
+	const context: MessageStructure[] = [];
+	const query = messages.pop()?.content || "";
+
+	const embeddings = new OpenAIEmbeddings({ openAIApiKey: get(openaiApiKey) || "" });
+
+	const embeddedMessageValues = await embeddings.embedDocuments(
+		messages.map((message) => message.content)
+	);
+	const embeddedMessages = messages.map((message, index) => {
+		return {
+			message: message,
+			embedding: embeddedMessageValues[index]
+		};
+	});
+	const embeddedQuery = await embeddings.embedQuery(query);
+
+	embeddedMessages.sort((a, b) => {
+		const similarityA = cosineSimilarity(a.embedding, embeddedQuery);
+		const similarityB = cosineSimilarity(b.embedding, embeddedQuery);
+		return similarityB - similarityA;
+	});
+
+	return context;
 }

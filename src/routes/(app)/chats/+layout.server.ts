@@ -11,7 +11,10 @@ export const load: LayoutServerLoad = async (event) => {
 };
 
 async function fetchChatList(supabase: SupabaseClient): Promise<ChatDataMap> {
-	const response = await supabase.from("Chats").select("*");
+	const response = await supabase
+		.from("Chats")
+		.select("*")
+		.order("updated_at", { ascending: false });
 
 	return response.data?.reduce((acc, chat) => {
 		acc[chat.id] = {
