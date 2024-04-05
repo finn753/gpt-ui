@@ -58,10 +58,3 @@ export const flyAndScale = (
 export const scrollToBottom = async (node: HTMLElement, behaviour: ScrollBehavior = "smooth") => {
 	if (isBrowser() && node) node.scroll({ top: node.scrollHeight, behavior: behaviour });
 };
-
-export function cosineSimilarity(a: number[], b: number[]): number {
-	const dotProduct = math.dot(a, b);
-	const magnitudeA = math.sqrt(math.dot(a, a));
-	const magnitudeB = math.sqrt(math.dot(b, b));
-	return math.divide(dotProduct, math.multiply(magnitudeA, magnitudeB)) as number;
-}

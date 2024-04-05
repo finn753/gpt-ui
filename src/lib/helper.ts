@@ -1,12 +1,17 @@
-import { chatContentMap, chatDataMap, openaiApiKey } from "$lib/stores";
+import {
+	chatContentMap,
+	chatDataMap,
+	lastContextOfChat,
+	openaiApiKey,
+	selectedChatID
+} from "$lib/stores";
 import { get } from "svelte/store";
 import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { toast } from "svelte-sonner";
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { cosineSimilarity } from "$lib/utils";
+import { getEmbedding, EmbeddingIndex } from "client-vector-search";
 
 export async function createNewChat(supabase: SupabaseClient) {
 	const emptyChat: ChatStructure = {
@@ -95,6 +100,13 @@ export async function* generateResponse(
 	temperature = parseFloat(String(temperature)) || 0.5;
 	top_p = parseFloat(String(top_p)) || 1;
 	systemMessage = systemMessage || "";
+
+	lastContextOfChat.update((curr) => {
+		return {
+			...curr,
+			[get(selectedChatID) as string]: context
+		};
+	});
 
 	let messages = context.map((message) => {
 		return {
@@ -308,27 +320,26 @@ export async function changeAssistantData(
 export async function getContextFromMessages(
 	messages: MessageStructure[]
 ): Promise<MessageStructure[]> {
-	const context: MessageStructure[] = [];
+	messages = [...messages];
+	let context: MessageStructure[] = [];
 	const query = messages.pop()?.content || "";
 
-	const embeddings = new OpenAIEmbeddings({ openAIApiKey: get(openaiApiKey) || "" });
-
-	const embeddedMessageValues = await embeddings.embedDocuments(
-		messages.map((message) => message.content)
-	);
-	const embeddedMessages = messages.map((message, index) => {
+	const embeddedContextPromise = messages.map(async (message) => {
 		return {
-			message: message,
-			embedding: embeddedMessageValues[index]
+			message,
+			embedding: await getEmbedding(message.content)
 		};
 	});
-	const embeddedQuery = await embeddings.embedQuery(query);
+	const embeddedContext = await Promise.all(embeddedContextPromise);
+	const embeddedQuery = await getEmbedding(query);
 
-	embeddedMessages.sort((a, b) => {
-		const similarityA = cosineSimilarity(a.embedding, embeddedQuery);
-		const similarityB = cosineSimilarity(b.embedding, embeddedQuery);
-		return similarityB - similarityA;
-	});
+	const index = new EmbeddingIndex(embeddedContext);
+
+	const results = await index.search(embeddedQuery, { topK: 5 });
+
+	context = results.map((result) => result.object.message);
+
+	// alert(JSON.stringify(context));
 
 	return context;
 }

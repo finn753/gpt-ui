@@ -9,6 +9,7 @@
 		createSummary,
 		generateResponse,
 		generateTitle,
+		getContextFromMessages,
 		sendMessage
 	} from "$lib/helper";
 	import { goto } from "$app/navigation";
@@ -40,8 +41,7 @@
 		}
 	}
 
-	async function onSendMessage(event: CustomEvent<{ value: string }>)
-	{
+	async function onSendMessage(event: CustomEvent<{ value: string }>) {
 		let isNewChat = false;
 		if (!chat_id) {
 			isNewChat = true;
@@ -66,16 +66,21 @@
 		let model, temperature, topP, systemMessage;
 
 		try {
-			({model, temperature, topP, systemMessage} = $chatDataMap[chat_id].model);
+			({ model, temperature, topP, systemMessage } = $chatDataMap[chat_id].model);
 		} catch (e: unknown) {
-			console.log("Defaulting to standard assistant model")
+			console.log("Defaulting to standard assistant model");
 		}
 
-		// await getContextFromMessages(messages);
+		let context = messages;
+		try {
+			context = await getContextFromMessages(messages);
+		} catch (e: unknown) {
+			console.error("Failed to get context from messages", e);
+		}
 
 		generating = true;
 		let response: MessageStructure | undefined;
-		for await (const r of generateResponse( messages, model, temperature, topP, systemMessage )) {
+		for await (const r of generateResponse(context, model, temperature, topP, systemMessage)) {
 			response = r;
 			generatingProgress = response || null;
 		}
@@ -99,7 +104,6 @@
 			await createSummary(chat_id, supabase);
 		}
 	}
-
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
