@@ -37,7 +37,10 @@ export async function createNewChat(supabase: SupabaseClient) {
 
 	const newChatID = data.id;
 
-	chatDataMap.set({ ...get(chatDataMap), [newChatID]: emptyChat });
+	chatDataMap.update((curr) => {
+		delete curr[newChatID];
+		return { [newChatID]: emptyChat, ...curr };
+	});
 
 	return newChatID;
 }
@@ -74,6 +77,12 @@ export async function sendMessage(
 			...curr,
 			[chat_id]: [...(curr[chat_id] || []), message]
 		};
+	});
+
+	chatDataMap.update((curr) => {
+		const temp = { ...curr[chat_id], updated_at: new Date(Date.now()) };
+		delete curr[chat_id];
+		return { [chat_id]: temp, ...curr };
 	});
 
 	const { error } = await supabase.from("Messages").insert({
@@ -322,7 +331,8 @@ export async function getContextFromMessages(
 ): Promise<MessageStructure[]> {
 	messages = [...messages];
 	let context: MessageStructure[] = [];
-	const query = messages.pop()?.content || "";
+	const queryMessage = messages.pop() as MessageStructure;
+	const query = queryMessage?.content || "";
 
 	const embeddedContextPromise = messages.map(async (message) => {
 		return {
@@ -338,8 +348,7 @@ export async function getContextFromMessages(
 	const results = await index.search(embeddedQuery, { topK: 5 });
 
 	context = results.map((result) => result.object.message);
-
-	// alert(JSON.stringify(context));
+	context.push(queryMessage);
 
 	return context;
 }
