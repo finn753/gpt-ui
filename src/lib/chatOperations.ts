@@ -2,6 +2,39 @@ import { database } from "$lib/database";
 import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
 import { chatContentMap, chatDataMap } from "$lib/stores";
 
+function updateChatDataMap(chatID: string, update: Partial<ChatStructure>) {
+	chatDataMap.update((curr) => {
+		return {
+			...curr,
+			[chatID]: {
+				...curr[chatID],
+				...update
+			}
+		};
+	});
+}
+
+function updateChatContentMap(chatID: string, message: MessageStructure) {
+	chatContentMap.update((curr) => {
+		return {
+			...curr,
+			[chatID]: [...(curr[chatID] || []), message]
+		};
+	});
+}
+
+function moveChatToTopOfDataMap(chatID: string) {
+	chatDataMap.update((curr) => {
+		const temp = curr[chatID];
+		const newMap = { ...curr };
+		delete newMap[chatID];
+		return {
+			[chatID]: temp,
+			...newMap
+		};
+	});
+}
+
 export async function createNewChat() {
 	const newChatID = await database.createNewChat();
 
@@ -16,10 +49,8 @@ export async function createNewChat() {
 		updated_at: new Date()
 	};
 
-	chatDataMap.update((curr) => {
-		delete curr[newChatID];
-		return { [newChatID]: emptyChat, ...curr };
-	});
+	updateChatDataMap(newChatID, emptyChat);
+	moveChatToTopOfDataMap(newChatID);
 
 	return newChatID;
 }
@@ -43,20 +74,13 @@ export async function deleteChat(chatID: string) {
 }
 
 export async function sendMessage(message: MessageStructure, chatID: string) {
-	chatContentMap.update((curr) => {
-		return {
-			...curr,
-			[chatID]: [...(curr[chatID] || []), message]
-		};
-	});
+	updateChatContentMap(chatID, message);
 
-	chatDataMap.update((curr) => {
-		const temp = { ...curr[chatID], updated_at: new Date(Date.now()) };
-		delete curr[chatID];
-		return { [chatID]: temp, ...curr };
-	});
+	const temp = { updated_at: new Date(Date.now()) };
+	updateChatDataMap(chatID, temp);
 
 	await database.insertMessage(chatID, message);
+	moveChatToTopOfDataMap(chatID);
 }
 
 export async function changeTitle(chatID: string, title: string) {
@@ -64,15 +88,7 @@ export async function changeTitle(chatID: string, title: string) {
 
 	if (!success) return;
 
-	chatDataMap.update((curr) => {
-		return {
-			...curr,
-			[chatID]: {
-				...curr[chatID],
-				title
-			}
-		};
-	});
+	updateChatDataMap(chatID, { title });
 }
 
 export async function changeAssistantData(chatID: string, assistantData: AssistantStructure) {
@@ -80,15 +96,7 @@ export async function changeAssistantData(chatID: string, assistantData: Assista
 
 	if (!success) return;
 
-	chatDataMap.update((curr) => {
-		return {
-			...curr,
-			[chatID]: {
-				...curr[chatID],
-				model: assistantData
-			}
-		};
-	});
+	updateChatDataMap(chatID, { model: assistantData });
 }
 
 export async function changeTags(chatID: string, tags: string[]) {
@@ -96,13 +104,5 @@ export async function changeTags(chatID: string, tags: string[]) {
 
 	if (!success) return;
 
-	chatDataMap.update((curr) => {
-		return {
-			...curr,
-			[chatID]: {
-				...curr[chatID],
-				tags
-			}
-		};
-	});
+	updateChatDataMap(chatID, { tags });
 }
