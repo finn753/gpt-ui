@@ -82,30 +82,27 @@
 
 	async function onAddTagChange() {
 		if (addTagInput) {
-			//split at space and ,
-			let splitTags = addTagInput.split(/[\s,]+/);
+			let splitTags = addTagInput.split(/[\s,]+/); //split at space and ,
 
 			if (splitTags.length > 1 && chatID) {
-				let newTags = splitTags.filter((tag) => tag !== "");
-				$chatDataMap[chatID].tags = [...tags, ...newTags];
-				tags = $chatDataMap[chatID].tags;
-
+				let newTag = splitTags.filter((tag) => tag !== "")[0];
 				addTagInput = "";
-
-				await onSaveTags();
+				await addTag(newTag);
 			}
 		}
 	}
 
-	async function addTag() {
+	async function onAddTagSubmit() {
 		if (addTagInput && chatID) {
-			$chatDataMap[chatID].tags = [...tags, addTagInput];
-			tags = $chatDataMap[chatID].tags;
-
+			const newTag = addTagInput;
 			addTagInput = "";
+			await addTag(newTag)
 		}
+	}
 
-		await onSaveTags();
+	async function addTag(tag: string) {
+		tags = [...tags, tag];
+		await saveTags();
 	}
 
 	async function removeTag(tagToRemove: string) {
@@ -114,9 +111,7 @@
 			tags.splice(index, 1);
 		}
 
-		tags = tags;
-
-		await onSaveTags();
+		await saveTags();
 	}
 
 	async function onAcceptTitle() {
@@ -141,7 +136,7 @@
 		}
 	}
 
-	async function onSaveTags() {
+	async function saveTags() {
 		if (chatID) {
 			await changeTags(chatID, tags);
 		}
@@ -207,9 +202,9 @@
 							class="w-20 bg-background px-2.5 py-0.5 text-xs font-semibold outline-none placeholder:text-muted-foreground
 						{tags.length === 0 ? 'pl-0' : ''}"
 							placeholder="Add tag"
-							on:blur={addTag}
+							on:blur={onAddTagSubmit}
 							on:keydown={(e) => {
-								if (e.key === "Enter") addTag();
+								if (e.key === "Enter") onAddTagSubmit();
 							}}
 							on:input={onAddTagChange}
 						/>
@@ -232,7 +227,7 @@
 				<Select.Root
 					selected={selectionModel}
 					onSelectedChange={(v) => {
-						v && (model = v.value);
+						v && (model = String(v.value));
 					}}
 				>
 					<Select.Trigger class="w-full">
