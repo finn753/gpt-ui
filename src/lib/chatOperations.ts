@@ -1,22 +1,14 @@
 import { database } from "$lib/database";
 import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
 import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/stores";
+import * as templates from "$lib/templates";
 
 export async function createNewChat() {
 	const newChatID = await database.createNewChat();
 
 	if (!newChatID) return;
 
-	const emptyChat: ChatStructure = {
-		title: "",
-		tags: [],
-		summary: "",
-		model: {} as AssistantStructure,
-		created_at: new Date(),
-		updated_at: new Date()
-	};
-
-	updateChatDataMap(newChatID, emptyChat);
+	updateChatDataMap(newChatID, templates.getEmptyChat());
 	moveChatToTopOfDataMap(newChatID);
 
 	return newChatID;
@@ -62,15 +54,7 @@ export async function changeSummary(chatID: string, summary: string) {
 	const success = await database.saveSummary(chatID, summary);
 	if (!success) return;
 
-	chatDataMap.update((curr) => {
-		return {
-			...curr,
-			[chatID]: {
-				...curr[chatID],
-				summary
-			}
-		};
-	});
+	updateChatDataMap(chatID, { summary });
 }
 
 export async function changeAssistantData(chatID: string, assistantData: AssistantStructure) {
