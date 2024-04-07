@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
-	import { deleteChat } from "$lib/helper";
 	import { chatDataMap } from "$lib/stores";
+	import { deleteChat } from '$lib/chatOperations';
 
 	export let chatID: string;
 

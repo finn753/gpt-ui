@@ -4,18 +4,15 @@
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
 	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/stores";
 	import {
-		changeAssistantData,
-		changeTitle,
-		createNewChat,
 		createSummary,
 		generateResponse,
 		generateTitle,
-		getContextFromMessages,
-		sendMessage
+		getContextFromMessages
 	} from "$lib/helper";
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";
+	import { changeAssistantData, changeTitle, createNewChat, sendMessage } from '$lib/chatOperations';
 
 	export let chatID: string;
 	export let generating = false;

@@ -6,10 +6,11 @@
 	import { Pencil, Sparkles, X } from "lucide-svelte";
 	import Check from "lucide-svelte/icons/check";
 	import { chatContentMap, chatDataMap, lastContextOfChat, newChatSettings } from "$lib/stores";
-	import { changeAssistantData, changeTags, changeTitle, generateTitle } from "$lib/helper";
+	import { generateTitle } from "$lib/helper";
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
+	import { changeAssistantData, changeTags, changeTitle } from '$lib/chatOperations';
 
 	const modelSelection = [
 		{ value: "", label: "Custom" },
