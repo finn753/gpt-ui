@@ -48,6 +48,7 @@
 		"clsx": "^2.1.0",
 		"date-fns": "^3.6.0",
 		"faiss-node": "^0.5.1",
+		"gpt-tokenizer": "^2.1.2",
 		"langchain": "^0.1.30",
 		"lucide-svelte": "^0.360.0",
 		"marked": "^5.1.2",

@@ -12,6 +12,7 @@ import { toast } from "svelte-sonner";
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { getEmbedding, EmbeddingIndex } from "client-vector-search";
+import { encode } from "gpt-tokenizer";
 
 export async function createNewChat(supabase: SupabaseClient) {
 	const emptyChat: ChatStructure = {
@@ -354,8 +355,9 @@ export async function getContextFromMessages(
 	const queryMessage = messages.pop() as MessageStructure;
 	const query = queryMessage?.content || "";
 
-	const embeddedContextPromise = messages.map(async (message) => {
+	const embeddedContextPromise = messages.map(async (message, index) => {
 		return {
+			index,
 			message,
 			embedding: await getEmbedding(message.content)
 		};
@@ -365,9 +367,21 @@ export async function getContextFromMessages(
 
 	const index = new EmbeddingIndex(embeddedContext);
 
-	const results = await index.search(embeddedQuery, { topK: 5 });
+	const messagesOrderedBySimilarity = await index.search(embeddedQuery, {
+		topK: index.size()
+	});
 
-	context = results.map((result) => result.object.message);
+	const maxTokenLimit = 1000;
+	let tokenCount = 0;
+
+	const filteredOrderedMessages = messagesOrderedBySimilarity
+		.filter((message) => {
+			tokenCount += encode(message.object.message.content).length;
+			return tokenCount <= maxTokenLimit;
+		})
+		.sort((a, b) => a.object.index - b.object.index);
+
+	context = filteredOrderedMessages.map((result) => result.object.message);
 	context.push(queryMessage);
 
 	return context;
