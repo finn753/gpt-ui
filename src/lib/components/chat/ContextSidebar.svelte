@@ -10,7 +10,7 @@
 	import { Input } from "$lib/components/ui/input";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
 	import { changeAssistantData, changeTags, changeTitle } from "$lib/chatOperations";
-	import { generateTitle } from '$lib/generationHelper';
+	import { generateTitle } from "$lib/generationHelper";
 
 	const modelSelection = [
 		{ value: "", label: "Custom" },

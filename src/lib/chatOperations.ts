@@ -1,6 +1,6 @@
 import { database } from "$lib/database";
 import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
-import { chatContentMap, chatDataMap } from "$lib/stores";
+import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/stores";
 
 export async function createNewChat() {
 	const newChatID = await database.createNewChat();
@@ -87,6 +87,15 @@ export async function changeTags(chatID: string, tags: string[]) {
 	if (!success) return;
 
 	updateChatDataMap(chatID, { tags });
+}
+
+export function updateLastContextOfChat(chatID: string, context: MessageStructure[]) {
+	lastContextOfChat.update((curr) => {
+		return {
+			...curr,
+			[chatID]: context
+		};
+	});
 }
 
 function updateChatDataMap(chatID: string, update: Partial<ChatStructure>) {

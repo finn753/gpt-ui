@@ -1,86 +1,41 @@
 import type { MessageStructure } from "$lib/types";
 import OpenAI from "openai";
 import { get } from "svelte/store";
-import { lastContextOfChat, openaiApiKey, selectedChatID } from "$lib/stores";
-import { toast } from "svelte-sonner";
+import { openaiApiKey, selectedChatID } from "$lib/stores";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import * as errorHandler from "$lib/errorHandler";
+import * as chatOperations from "$lib/chatOperations";
+import * as templates from "$lib/templates";
+
+const STANDARD_MODEL = "gpt-3.5-turbo";
 
 export async function generateTitle(context: MessageStructure[]) {
-	const messages = [
-		{
-			role: "system",
-			content:
-				"You're an AI that generates titles for chats \n Keep them short, summarise the chat, don't be too specific \n" +
-				"Don't enumerate the points, don't use the word 'chat' in the title \n" +
-				"SUMMARIZE the chat in a few words"
-		},
-		{
-			role: "user",
-			content: JSON.stringify(context)
-		}
-	];
+	const messages = templates.getSingleTaskPromptMessages(
+		"You're an AI that generates titles for chats \n Keep them short, summarise the chat, don't be too specific \n" +
+			"Don't enumerate the points, don't use the word 'chat' in the title \n" +
+			"SUMMARIZE the chat in a few words",
+		JSON.stringify(context)
+	);
 
-	let openai: OpenAI;
+	const openai: OpenAI | null = getOpenAI();
+	if (!openai) return;
 
-	try {
-		openai = new OpenAI({
-			apiKey: get(openaiApiKey) || "",
-			dangerouslyAllowBrowser: true
-		});
-	} catch (e: unknown) {
-		toast.error("Failed to initialize OpenAI");
-		console.error("Failed to initialize OpenAI", e);
-		return;
-	}
-
-	const completion = await openai.chat.completions.create({
-		messages: messages as ChatCompletionMessageParam[],
-		model: "gpt-3.5-turbo"
-	});
-
-	return completion.choices[0].message.content?.replace(/"/g, "");
+	return (await generateChatCompletion(openai, messages))?.replace(/"/g, "");
 }
 
 export async function generateSummary(currentSummary: string, newMessages: MessageStructure[]) {
-	const messages = [
-		{
-			role: "system",
-			content:
-				"You're an AI that generates summaries for chats \n Keep them short, summarise the chat, don't be too specific \n" +
-				"Don't enumerate the points, don't use the word 'chat' in the summary \n" +
-				"DO NOT say 'The user said', 'The assistant said', etc. \n" +
-				"SUMMARIZE the chat in a few words, one sentence maximum \n"
-		},
-		{
-			role: "user",
-			content:
-				"Current summary: \n " +
-				currentSummary +
-				"\n\n" +
-				"Messages: \n" +
-				JSON.stringify(newMessages)
-		}
-	];
+	const messages = templates.getSingleTaskPromptMessages(
+		"You're an AI that generates summaries for chats \n Keep them short, summarise the chat, don't be too specific \n" +
+			"Don't enumerate the points, don't use the word 'chat' in the summary \n" +
+			"DO NOT say 'The user said', 'The assistant said', etc. \n" +
+			"SUMMARIZE the chat in a few words, one sentence maximum \n",
+		"Current summary: \n " + currentSummary + "\n\n" + "Messages: \n" + JSON.stringify(newMessages)
+	);
 
-	let openai: OpenAI;
+	const openai: OpenAI | null = getOpenAI();
+	if (!openai) return;
 
-	try {
-		openai = new OpenAI({
-			apiKey: get(openaiApiKey) || "",
-			dangerouslyAllowBrowser: true
-		});
-	} catch (e: unknown) {
-		toast.error("Failed to initialize OpenAI");
-		console.error("Failed to initialize OpenAI", e);
-		return;
-	}
-
-	return await openai.chat.completions
-		.create({
-			messages: messages as ChatCompletionMessageParam[],
-			model: "gpt-3.5-turbo"
-		})
-		.then((res) => res.choices[0].message.content);
+	return await generateChatCompletion(openai, messages);
 }
 
 export async function* generateResponse(
@@ -90,74 +45,101 @@ export async function* generateResponse(
 	top_p?: number,
 	systemMessage?: string
 ): AsyncGenerator<MessageStructure | undefined> {
-	model = model || "gpt-3.5-turbo";
+	model = model || STANDARD_MODEL;
 	temperature = parseFloat(String(temperature)) || 0.5;
 	top_p = parseFloat(String(top_p)) || 1;
 	systemMessage = systemMessage || "";
 
-	lastContextOfChat.update((curr) => {
-		return {
-			...curr,
-			[get(selectedChatID) as string]: context
-		};
-	});
+	chatOperations.updateLastContextOfChat(get(selectedChatID) as string, context);
 
-	let messages = context.map((message) => {
+	const messages = chatMessagesToCompletionMessages(context, systemMessage);
+
+	const responseMessage: MessageStructure = templates.getAssistantResponseMessageFromModel(model);
+
+	const openai: OpenAI | null = getOpenAI();
+	if (!openai) return;
+
+	try {
+		const stream = streamChatCompletion(openai, messages, model, temperature, top_p);
+
+		for await (const part of stream) {
+			responseMessage.content = part;
+			yield responseMessage;
+		}
+
+		return responseMessage;
+	} catch (e: unknown) {
+		errorHandler.handleError("Failed to generate response", e);
+		return;
+	}
+}
+
+function chatMessagesToCompletionMessages(
+	chatMessages: MessageStructure[],
+	systemMessage: string
+): ChatCompletionMessageParam[] {
+	const messages = chatMessages.map((message) => {
 		return {
 			role: message.role as string,
 			content: message.content
 		};
 	});
 
-	messages = [
+	return [
 		{
 			role: "system",
 			content: systemMessage
 		},
-		...messages
+		...(messages as ChatCompletionMessageParam[])
 	];
+}
 
-	const responseMessage: MessageStructure = {
-		chat_id: "",
-		content: "",
-		role: "assistant",
-		model: model,
-		created_at: new Date()
-	};
-
-	let openai: OpenAI;
-
+function getOpenAI() {
 	try {
-		openai = new OpenAI({
+		return new OpenAI({
 			apiKey: get(openaiApiKey) || "",
 			dangerouslyAllowBrowser: true
 		});
 	} catch (e: unknown) {
-		toast.error("Failed to initialize OpenAI");
-		console.error("Failed to initialize OpenAI", e);
-		return;
+		errorHandler.handleError("Failed to initialize OpenAI", e);
+		return null;
+	}
+}
+
+async function generateChatCompletion(
+	openai: OpenAI,
+	messages: { role: string; content: string }[],
+	model = STANDARD_MODEL
+) {
+	const completion = await openai.chat.completions.create({
+		messages: messages as ChatCompletionMessageParam[],
+		model
+	});
+
+	return completion.choices[0].message.content;
+}
+
+async function* streamChatCompletion(
+	openai: OpenAI,
+	messages: ChatCompletionMessageParam[],
+	model = STANDARD_MODEL,
+	temperature = 0.5,
+	top_p = 1
+) {
+	const stream = await openai.chat.completions.create({
+		messages: messages as ChatCompletionMessageParam[],
+		model,
+		temperature,
+		top_p,
+		stream: true
+	});
+
+	let response = "";
+
+	for await (const part of stream) {
+		response = response + (part.choices[0]?.delta?.content || "");
+		yield response;
 	}
 
-	try {
-		const stream = await openai.chat.completions.create({
-			messages: messages as ChatCompletionMessageParam[],
-			model,
-			temperature,
-			top_p,
-			stream: true
-		});
-
-		responseMessage.content = "";
-
-		for await (const part of stream) {
-			responseMessage.content = responseMessage.content + (part.choices[0]?.delta?.content || "");
-			yield responseMessage;
-		}
-
-		return responseMessage;
-	} catch (e: unknown) {
-		toast.error("Failed to generate response");
-		console.error("Failed to generate response", e);
-		return;
-	}
+	return response;
 }

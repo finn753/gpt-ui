@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AssistantStructure, MessageStructure } from "$lib/types";
-import { toast } from "svelte-sonner";
+import * as errorHandler from "$lib/errorHandler";
 
 class Database {
 	private _supabaseClient: SupabaseClient | null = null;
@@ -26,8 +26,7 @@ class Database {
 			.single();
 
 		if (error) {
-			toast.error("Failed to create new chat");
-			console.error("Failed to create new chat", error);
+			errorHandler.handleError("Failed to create new chat", error);
 			return null;
 		}
 
@@ -43,8 +42,7 @@ class Database {
 		const { error } = await this._supabaseClient.from("Chats").delete().match({ id: chatID });
 
 		if (error) {
-			toast.error("Failed to delete chat");
-			console.error("Failed to delete chat", error);
+			errorHandler.handleError("Failed to delete chat", error);
 			return false;
 		}
 
@@ -65,8 +63,7 @@ class Database {
 		});
 
 		if (error) {
-			toast.error("Failed to send message");
-			console.error("Failed to send message", error);
+			errorHandler.handleError("Failed to send message", error);
 			return false;
 		}
 
@@ -85,8 +82,7 @@ class Database {
 			.match({ id: chatID });
 
 		if (error) {
-			toast.error("Failed to change title");
-			console.error("Failed to change title", error);
+			errorHandler.handleError("Failed to change title", error);
 			return false;
 		}
 
@@ -105,8 +101,7 @@ class Database {
 			.match({ id: chatID });
 
 		if (error) {
-			toast.error("Failed to save summary");
-			console.error("Failed to save summary", error);
+			errorHandler.handleError("Failed to save summary", error);
 			return false;
 		}
 
@@ -125,8 +120,7 @@ class Database {
 			.match({ id: chatID });
 
 		if (error) {
-			toast.error("Failed to change tags");
-			console.error("Failed to change tags", error);
+			errorHandler.handleError("Failed to change tags", error);
 			return false;
 		}
 
@@ -145,8 +139,7 @@ class Database {
 			.match({ id: chatID });
 
 		if (error) {
-			toast.error("Failed to change assistant data");
-			console.error("Failed to change assistant data", error);
+			errorHandler.handleError("Failed to change assistant data", error);
 			return false;
 		}
 

@@ -1,15 +1,15 @@
 <script lang="ts">
-	import ChatInput from '$lib/components/chat/ChatInput.svelte';
-	import type { MessageStructure } from '$lib/types';
-	import ChatMessage from '$lib/components/chat/ChatMessage.svelte';
-	import { chatContentMap, chatDataMap, newChatSettings } from '$lib/stores';
-	import * as helper from '$lib/helper';
-	import { goto } from '$app/navigation';
-	import { tick } from 'svelte';
-	import { scrollToBottom } from '$lib/utils';
-	import * as chatOperations from '$lib/chatOperations';
-	import * as chatService from '$lib/chatService';
-	import * as generationHelper from '$lib/generationHelper';
+	import ChatInput from "$lib/components/chat/ChatInput.svelte";
+	import type { MessageStructure } from "$lib/types";
+	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
+	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/stores";
+	import * as helper from "$lib/helper";
+	import { goto } from "$app/navigation";
+	import { tick } from "svelte";
+	import { scrollToBottom } from "$lib/utils";
+	import * as chatOperations from "$lib/chatOperations";
+	import * as chatService from "$lib/chatService";
+	import * as generationHelper from "$lib/generationHelper";
 
 	export let chatID: string;
 	export let generating = false;
@@ -100,7 +100,6 @@
 			await chatOperations.sendMessage(response, chatID);
 		}
 	}
-
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
