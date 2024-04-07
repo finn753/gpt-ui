@@ -3,7 +3,7 @@
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
 	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/stores";
-	import * as helper from "$lib/helper";
+	import * as embeddingHelper from "$lib/embeddingHelper";
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";
@@ -76,7 +76,7 @@
 
 		let context = messages;
 		try {
-			context = await helper.getContextFromMessages(messages);
+			context = await embeddingHelper.getContextFromMessages(messages);
 		} catch (e: unknown) {
 			console.error("Failed to get context from messages", e);
 		}
