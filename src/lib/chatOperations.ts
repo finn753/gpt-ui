@@ -2,39 +2,6 @@ import { database } from "$lib/database";
 import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
 import { chatContentMap, chatDataMap } from "$lib/stores";
 
-function updateChatDataMap(chatID: string, update: Partial<ChatStructure>) {
-	chatDataMap.update((curr) => {
-		return {
-			...curr,
-			[chatID]: {
-				...curr[chatID],
-				...update
-			}
-		};
-	});
-}
-
-function updateChatContentMap(chatID: string, message: MessageStructure) {
-	chatContentMap.update((curr) => {
-		return {
-			...curr,
-			[chatID]: [...(curr[chatID] || []), message]
-		};
-	});
-}
-
-function moveChatToTopOfDataMap(chatID: string) {
-	chatDataMap.update((curr) => {
-		const temp = curr[chatID];
-		const newMap = { ...curr };
-		delete newMap[chatID];
-		return {
-			[chatID]: temp,
-			...newMap
-		};
-	});
-}
-
 export async function createNewChat() {
 	const newChatID = await database.createNewChat();
 
@@ -105,4 +72,37 @@ export async function changeTags(chatID: string, tags: string[]) {
 	if (!success) return;
 
 	updateChatDataMap(chatID, { tags });
+}
+
+function updateChatDataMap(chatID: string, update: Partial<ChatStructure>) {
+	chatDataMap.update((curr) => {
+		return {
+			...curr,
+			[chatID]: {
+				...curr[chatID],
+				...update
+			}
+		};
+	});
+}
+
+function updateChatContentMap(chatID: string, message: MessageStructure) {
+	chatContentMap.update((curr) => {
+		return {
+			...curr,
+			[chatID]: [...(curr[chatID] || []), message]
+		};
+	});
+}
+
+function moveChatToTopOfDataMap(chatID: string) {
+	chatDataMap.update((curr) => {
+		const temp = curr[chatID];
+		const newMap = { ...curr };
+		delete newMap[chatID];
+		return {
+			[chatID]: temp,
+			...newMap
+		};
+	});
 }
