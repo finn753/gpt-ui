@@ -46,8 +46,8 @@ export async function createNewChat(supabase: SupabaseClient) {
 	return newChatID;
 }
 
-export async function deleteChat(chat_id: string, supabase: SupabaseClient) {
-	const { error } = await supabase.from("Chats").delete().match({ id: chat_id });
+export async function deleteChat(chatID: string, supabase: SupabaseClient) {
+	const { error } = await supabase.from("Chats").delete().match({ id: chatID });
 
 	if (error) {
 		toast.error("Failed to delete chat");
@@ -57,37 +57,37 @@ export async function deleteChat(chat_id: string, supabase: SupabaseClient) {
 
 	chatDataMap.update((curr) => {
 		const newMap = { ...curr };
-		delete newMap[chat_id];
+		delete newMap[chatID];
 		return newMap;
 	});
 
 	chatContentMap.update((curr) => {
 		const newMap = { ...curr };
-		delete newMap[chat_id];
+		delete newMap[chatID];
 		return newMap;
 	});
 }
 
 export async function sendMessage(
 	message: MessageStructure,
-	chat_id: string,
+	chatID: string,
 	supabase: SupabaseClient
 ) {
 	chatContentMap.update((curr) => {
 		return {
 			...curr,
-			[chat_id]: [...(curr[chat_id] || []), message]
+			[chatID]: [...(curr[chatID] || []), message]
 		};
 	});
 
 	chatDataMap.update((curr) => {
-		const temp = { ...curr[chat_id], updated_at: new Date(Date.now()) };
-		delete curr[chat_id];
-		return { [chat_id]: temp, ...curr };
+		const temp = { ...curr[chatID], updated_at: new Date(Date.now()) };
+		delete curr[chatID];
+		return { [chatID]: temp, ...curr };
 	});
 
 	const { error } = await supabase.from("Messages").insert({
-		chat_id: chat_id,
+		chat_id: chatID,
 		content: message.content,
 		role: message.role,
 		model: message.model
@@ -178,8 +178,8 @@ export async function* generateResponse(
 	}
 }
 
-export async function changeTitle(chat_id: string, title: string, supabase: SupabaseClient) {
-	const { error } = await supabase.from("Chats").update({ title }).match({ id: chat_id });
+export async function changeTitle(chatID: string, title: string, supabase: SupabaseClient) {
+	const { error } = await supabase.from("Chats").update({ title }).match({ id: chatID });
 
 	if (error) {
 		toast.error("Failed to change title");
@@ -190,8 +190,8 @@ export async function changeTitle(chat_id: string, title: string, supabase: Supa
 	chatDataMap.update((curr) => {
 		return {
 			...curr,
-			[chat_id]: {
-				...curr[chat_id],
+			[chatID]: {
+				...curr[chatID],
 				title
 			}
 		};
@@ -234,9 +234,9 @@ export async function generateTitle(context: MessageStructure[]) {
 	return completion.choices[0].message.content?.replace(/"/g, "");
 }
 
-export async function createSummary(chat_id: string, supabase: SupabaseClient) {
-	const currentSummary = get(chatDataMap)[chat_id].summary;
-	const newMessages = get(chatContentMap)[chat_id].slice(-6);
+export async function createSummary(chatID: string, supabase: SupabaseClient) {
+	const currentSummary = get(chatDataMap)[chatID].summary;
+	const newMessages = get(chatContentMap)[chatID].slice(-6);
 
 	const messages = [
 		{
@@ -281,7 +281,7 @@ export async function createSummary(chat_id: string, supabase: SupabaseClient) {
 	const { error } = await supabase
 		.from("Chats")
 		.update({ summary: newSummary })
-		.match({ id: chat_id });
+		.match({ id: chatID });
 
 	if (error || !newSummary) {
 		toast.error("Failed to create summary");
@@ -292,8 +292,8 @@ export async function createSummary(chat_id: string, supabase: SupabaseClient) {
 	chatDataMap.update((curr) => {
 		return {
 			...curr,
-			[chat_id]: {
-				...curr[chat_id],
+			[chatID]: {
+				...curr[chatID],
 				summary: newSummary
 			}
 		};
@@ -301,14 +301,14 @@ export async function createSummary(chat_id: string, supabase: SupabaseClient) {
 }
 
 export async function changeAssistantData(
-	chat_id: string,
+	chatID: string,
 	assistantData: AssistantStructure,
 	supabase: SupabaseClient
 ) {
 	const { error } = await supabase
 		.from("Chats")
 		.update({ model: assistantData })
-		.match({ id: chat_id });
+		.match({ id: chatID });
 
 	if (error) {
 		toast.error("Failed to change assistant data");
@@ -319,16 +319,16 @@ export async function changeAssistantData(
 	chatDataMap.update((curr) => {
 		return {
 			...curr,
-			[chat_id]: {
-				...curr[chat_id],
+			[chatID]: {
+				...curr[chatID],
 				model: assistantData
 			}
 		};
 	});
 }
 
-export async function changeTags(chat_id: string, tags: string[], supabase: SupabaseClient) {
-	const { error } = await supabase.from("Chats").update({ tags: { tags } }).match({ id: chat_id });
+export async function changeTags(chatID: string, tags: string[], supabase: SupabaseClient) {
+	const { error } = await supabase.from("Chats").update({ tags: { tags } }).match({ id: chatID });
 
 	if (error) {
 		toast.error("Failed to change tags");
@@ -339,8 +339,8 @@ export async function changeTags(chat_id: string, tags: string[], supabase: Supa
 	chatDataMap.update((curr) => {
 		return {
 			...curr,
-			[chat_id]: {
-				...curr[chat_id],
+			[chatID]: {
+				...curr[chatID],
 				tags
 			}
 		};

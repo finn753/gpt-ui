@@ -7,10 +7,10 @@
 	export let data;
 	$: supabase = data.supabase;
 
-	let chat_id = data.chat_id;
+	let chatID = data.chatID;
 	$: {
-		chat_id = data.chat_id;
-		selectedChatID.set(chat_id);
+		chatID = data.chatID;
+		selectedChatID.set(chatID);
 	}
 
 	let chatDataMap = data.chatDataMap;
@@ -41,4 +41,4 @@
 
 <svelte:window on:beforeunload={beforeUnload} />
 
-<ChatView {chat_id} {supabase} bind:generating />
+<ChatView {chatID} {supabase} bind:generating />

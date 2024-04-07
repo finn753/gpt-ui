@@ -4,23 +4,23 @@ import { get } from "svelte/store";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const load = async ({ params, locals }) => {
-	const chat_id = params.slug;
+	const chatID = params.slug;
 	const chatDataMap: ChatContentMap = {
 		...get(chatContentMap),
-		...{ [chat_id]: await fetchChatMessages(chat_id, locals.supabase) }
+		...{ [chatID]: await fetchChatMessages(chatID, locals.supabase) }
 	};
 
 	return {
-		chat_id,
+		chatID: chatID,
 		chatDataMap
 	};
 };
 
 async function fetchChatMessages(
-	chat_id: string,
+	chatID: string,
 	supabase: SupabaseClient
 ): Promise<MessageStructure[]> {
-	const { data } = await supabase.from("Messages").select("*").eq("chat_id", chat_id);
+	const { data } = await supabase.from("Messages").select("*").eq("chat_id", chatID);
 	return data?.reduce((acc, message) => {
 		acc.push({
 			id: message.id,

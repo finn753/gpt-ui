@@ -18,7 +18,7 @@
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";
 
-	export let chat_id: string;
+	export let chatID: string;
 	export let generating = false;
 	export let supabase: SupabaseClient;
 
@@ -27,14 +27,14 @@
 	let messages: MessageStructure[] = [];
 	let generatingProgress: MessageStructure | null;
 
-	$: if (chat_id && Object.keys($chatContentMap).includes(chat_id)) {
-		messages = $chatContentMap[chat_id];
+	$: if (chatID && Object.keys($chatContentMap).includes(chatID)) {
+		messages = $chatContentMap[chatID];
 	} else {
 		messages = [];
 	}
 
 	$: {
-		if (chat_id) {
+		if (chatID) {
 			(async () => {
 				await tick();
 				await scrollToBottom(scrollContainer, "instant");
@@ -44,23 +44,23 @@
 
 	async function onSendMessage(event: CustomEvent<{ value: string }>) {
 		let isNewChat = false;
-		if (!chat_id) {
+		if (!chatID) {
 			isNewChat = true;
-			chat_id = await createNewChat(supabase);
+			chatID = await createNewChat(supabase);
 
-			if (!chat_id) return;
+			if (!chatID) return;
 		}
 
 		let newMessage: MessageStructure = {
 			content: event.detail.value,
-			chat_id: chat_id,
+			chatID: chatID,
 			role: "user",
 			model: "",
 			created_at: new Date(Date.now())
 		};
 
 		messages = messages ? [...messages, newMessage] : [newMessage];
-		await sendMessage(newMessage, chat_id, supabase);
+		await sendMessage(newMessage, chatID, supabase);
 
 		await scrollToBottom(scrollContainer);
 
@@ -69,9 +69,9 @@
 		try {
 			if (isNewChat && $newChatSettings.model) {
 				//$chatDataMap[chat_id].model = $newChatSettings.model;
-				await changeAssistantData(chat_id, $newChatSettings.model, supabase);
+				await changeAssistantData(chatID, $newChatSettings.model, supabase);
 			}
-			({ model, temperature, topP, systemMessage } = $chatDataMap[chat_id].model);
+			({ model, temperature, topP, systemMessage } = $chatDataMap[chatID].model);
 		} catch (e: unknown) {
 			console.log("Defaulting to standard assistant model");
 		}
@@ -93,20 +93,20 @@
 		generating = false;
 
 		if (response) {
-			await sendMessage(response, chat_id, supabase);
+			await sendMessage(response, chatID, supabase);
 		}
 
 		await scrollToBottom(scrollContainer);
 
-		if (isNewChat) await goto(`/chats/${chat_id}`);
+		if (isNewChat) await goto(`/chats/${chatID}`);
 
-		if (!$chatDataMap[chat_id].title) {
+		if (!$chatDataMap[chatID].title) {
 			let newTitle = await generateTitle(messages);
-			if (newTitle) await changeTitle(chat_id, newTitle, supabase);
+			if (newTitle) await changeTitle(chatID, newTitle, supabase);
 		}
 
-		if (!$chatDataMap[chat_id].summary) {
-			await createSummary(chat_id, supabase);
+		if (!$chatDataMap[chatID].summary) {
+			await createSummary(chatID, supabase);
 		}
 	}
 </script>

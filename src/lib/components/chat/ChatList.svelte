@@ -16,11 +16,11 @@
 
 <div class="space-y-2 pb-4">
 	<Button class="w-full" href="/chats">New chat</Button>
-	{#each Object.entries(chatMap) as [chatId, chat]}
+	{#each Object.entries(chatMap) as [chatID, chat]}
 		<Button
-			variant={chatId === $selectedChatID ? "secondary" : "ghost"}
+			variant={chatID === $selectedChatID ? "secondary" : "ghost"}
 			class="group flex h-auto w-full flex-col items-start"
-			href="/chats/{chatId}"
+			href="/chats/{chatID}"
 		>
 			<div class="flex w-full flex-row items-start justify-between">
 				<h3 class="whitespace-normal break-words text-base font-bold">
@@ -44,13 +44,13 @@
 								class="p-0"
 								on:click={(event) => {
 									event.preventDefault();
-								}}><AlertRenameChat chatID={chatId} {supabase} /></DropdownMenu.Item
+								}}><AlertRenameChat chatID={chatID} {supabase} /></DropdownMenu.Item
 							>
 							<DropdownMenu.Item
 								class="p-0"
 								on:click={(event) => {
 									event.preventDefault();
-								}}><AlertDeleteChat chatID={chatId} {supabase} /></DropdownMenu.Item
+								}}><AlertDeleteChat chatID={chatID} {supabase} /></DropdownMenu.Item
 							>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
