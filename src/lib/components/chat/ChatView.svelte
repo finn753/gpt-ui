@@ -1,18 +1,15 @@
 <script lang="ts">
-	import ChatInput from "$lib/components/chat/ChatInput.svelte";
-	import type { MessageStructure } from "$lib/types";
-	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/stores";
-	import {
-		createSummary,
-		generateResponse,
-		generateTitle,
-		getContextFromMessages
-	} from "$lib/helper";
-	import { goto } from "$app/navigation";
-	import { tick } from "svelte";
-	import { scrollToBottom } from "$lib/utils";
-	import { changeAssistantData, changeTitle, createNewChat, sendMessage } from '$lib/chatOperations';
+	import ChatInput from '$lib/components/chat/ChatInput.svelte';
+	import type { MessageStructure } from '$lib/types';
+	import ChatMessage from '$lib/components/chat/ChatMessage.svelte';
+	import { chatContentMap, chatDataMap, newChatSettings } from '$lib/stores';
+	import * as helper from '$lib/helper';
+	import { goto } from '$app/navigation';
+	import { tick } from 'svelte';
+	import { scrollToBottom } from '$lib/utils';
+	import * as chatOperations from '$lib/chatOperations';
+	import * as chatService from '$lib/chatService';
+	import * as generationHelper from '$lib/generationHelper';
 
 	export let chatID: string;
 	export let generating = false;
@@ -38,34 +35,40 @@
 	}
 
 	async function onSendMessage(event: CustomEvent<{ value: string }>) {
-		let isNewChat = false;
-		if (!chatID) {
-			isNewChat = true;
-			chatID = await createNewChat() || ""
+		let isNewChat = !chatID;
 
-			if (!chatID) return;
+		if (isNewChat) {
+			await createNewChat();
 		}
 
-		let newMessage: MessageStructure = {
-			content: event.detail.value,
-			chat_id: chatID,
-			role: "user",
-			model: "",
-			created_at: new Date(Date.now())
-		};
-
-		messages = messages ? [...messages, newMessage] : [newMessage];
-		await sendMessage(newMessage, chatID);
-
+		await chatService.sendUserMessage(chatID, event.detail.value);
 		await scrollToBottom(scrollContainer);
 
+		await generateResponse();
+		await scrollToBottom(scrollContainer);
+
+		if (isNewChat) await goto(`/chats/${chatID}`);
+
+		if (!$chatDataMap[chatID].title) {
+			await chatService.setGeneratedTitleForChat(chatID);
+		}
+		await chatService.updateSummaryForChat(chatID);
+	}
+
+	async function createNewChat() {
+		chatID = (await chatOperations.createNewChat()) || "";
+
+		if (!chatID) return;
+
+		if ($newChatSettings.model) {
+			await chatOperations.changeAssistantData(chatID, $newChatSettings.model);
+		}
+	}
+
+	async function generateResponse() {
 		let model, temperature, topP, systemMessage;
 
 		try {
-			if (isNewChat && $newChatSettings.model) {
-				//$chatDataMap[chat_id].model = $newChatSettings.model;
-				await changeAssistantData(chatID, $newChatSettings.model);
-			}
 			({ model, temperature, topP, systemMessage } = $chatDataMap[chatID].model);
 		} catch (e: unknown) {
 			console.log("Defaulting to standard assistant model");
@@ -73,14 +76,20 @@
 
 		let context = messages;
 		try {
-			context = await getContextFromMessages(messages);
+			context = await helper.getContextFromMessages(messages);
 		} catch (e: unknown) {
 			console.error("Failed to get context from messages", e);
 		}
 
 		generating = true;
 		let response: MessageStructure | undefined;
-		for await (const r of generateResponse(context, model, temperature, topP, systemMessage)) {
+		for await (const r of generationHelper.generateResponse(
+			context,
+			model,
+			temperature,
+			topP,
+			systemMessage
+		)) {
 			response = r;
 			generatingProgress = response || null;
 		}
@@ -88,22 +97,10 @@
 		generating = false;
 
 		if (response) {
-			await sendMessage(response, chatID);
-		}
-
-		await scrollToBottom(scrollContainer);
-
-		if (isNewChat) await goto(`/chats/${chatID}`);
-
-		if (!$chatDataMap[chatID].title) {
-			let newTitle = await generateTitle(messages);
-			if (newTitle) await changeTitle(chatID, newTitle);
-		}
-
-		if (!$chatDataMap[chatID].summary) {
-			await createSummary(chatID);
+			await chatOperations.sendMessage(response, chatID);
 		}
 	}
+
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">

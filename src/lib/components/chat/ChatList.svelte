@@ -42,13 +42,13 @@
 								class="p-0"
 								on:click={(event) => {
 									event.preventDefault();
-								}}><AlertRenameChat chatID={chatID} /></DropdownMenu.Item
+								}}><AlertRenameChat {chatID} /></DropdownMenu.Item
 							>
 							<DropdownMenu.Item
 								class="p-0"
 								on:click={(event) => {
 									event.preventDefault();
-								}}><AlertDeleteChat chatID={chatID} /></DropdownMenu.Item
+								}}><AlertDeleteChat {chatID} /></DropdownMenu.Item
 							>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>

@@ -2,7 +2,7 @@
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
 	import { chatDataMap } from "$lib/stores";
 	import { Input } from "$lib/components/ui/input";
-	import { changeTitle } from '$lib/chatOperations';
+	import { changeTitle } from "$lib/chatOperations";
 
 	export let chatID: string;
 

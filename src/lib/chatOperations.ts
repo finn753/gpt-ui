@@ -58,6 +58,21 @@ export async function changeTitle(chatID: string, title: string) {
 	updateChatDataMap(chatID, { title });
 }
 
+export async function changeSummary(chatID: string, summary: string) {
+	const success = await database.saveSummary(chatID, summary);
+	if (!success) return;
+
+	chatDataMap.update((curr) => {
+		return {
+			...curr,
+			[chatID]: {
+				...curr[chatID],
+				summary
+			}
+		};
+	});
+}
+
 export async function changeAssistantData(chatID: string, assistantData: AssistantStructure) {
 	const success = await database.changeAssistantData(chatID, assistantData);
 
