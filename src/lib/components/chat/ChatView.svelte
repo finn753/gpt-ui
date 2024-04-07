@@ -14,13 +14,11 @@
 		sendMessage
 	} from "$lib/helper";
 	import { goto } from "$app/navigation";
-	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";
 
 	export let chatID: string;
 	export let generating = false;
-	export let supabase: SupabaseClient;
 
 	let scrollContainer: HTMLElement;
 
@@ -46,21 +44,21 @@
 		let isNewChat = false;
 		if (!chatID) {
 			isNewChat = true;
-			chatID = await createNewChat(supabase);
+			chatID = await createNewChat() || ""
 
 			if (!chatID) return;
 		}
 
 		let newMessage: MessageStructure = {
 			content: event.detail.value,
-			chatID: chatID,
+			chat_id: chatID,
 			role: "user",
 			model: "",
 			created_at: new Date(Date.now())
 		};
 
 		messages = messages ? [...messages, newMessage] : [newMessage];
-		await sendMessage(newMessage, chatID, supabase);
+		await sendMessage(newMessage, chatID);
 
 		await scrollToBottom(scrollContainer);
 
@@ -69,7 +67,7 @@
 		try {
 			if (isNewChat && $newChatSettings.model) {
 				//$chatDataMap[chat_id].model = $newChatSettings.model;
-				await changeAssistantData(chatID, $newChatSettings.model, supabase);
+				await changeAssistantData(chatID, $newChatSettings.model);
 			}
 			({ model, temperature, topP, systemMessage } = $chatDataMap[chatID].model);
 		} catch (e: unknown) {
@@ -93,7 +91,7 @@
 		generating = false;
 
 		if (response) {
-			await sendMessage(response, chatID, supabase);
+			await sendMessage(response, chatID);
 		}
 
 		await scrollToBottom(scrollContainer);
@@ -102,11 +100,11 @@
 
 		if (!$chatDataMap[chatID].title) {
 			let newTitle = await generateTitle(messages);
-			if (newTitle) await changeTitle(chatID, newTitle, supabase);
+			if (newTitle) await changeTitle(chatID, newTitle);
 		}
 
 		if (!$chatDataMap[chatID].summary) {
-			await createSummary(chatID, supabase);
+			await createSummary(chatID);
 		}
 	}
 </script>

@@ -1,14 +1,12 @@
 <script lang="ts">
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
-	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { deleteChat } from "$lib/helper";
 	import { chatDataMap } from "$lib/stores";
 
 	export let chatID: string;
-	export let supabase: SupabaseClient;
 
 	async function onDeleteChat() {
-		await deleteChat(chatID, supabase);
+		await deleteChat(chatID);
 	}
 </script>
 

@@ -6,12 +6,10 @@
 	import { Ellipsis } from "lucide-svelte";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 	import AlertDeleteChat from "$lib/components/chat/AlertDeleteChat.svelte";
-	import type { SupabaseClient } from "@supabase/supabase-js";
 	import AlertRenameChat from "$lib/components/chat/AlertRenameChat.svelte";
 	import { Badge } from "$lib/components/ui/badge";
 
 	export let chatMap: ChatDataMap = {};
-	export let supabase: SupabaseClient;
 </script>
 
 <div class="space-y-2 pb-4">
@@ -44,13 +42,13 @@
 								class="p-0"
 								on:click={(event) => {
 									event.preventDefault();
-								}}><AlertRenameChat chatID={chatID} {supabase} /></DropdownMenu.Item
+								}}><AlertRenameChat chatID={chatID} /></DropdownMenu.Item
 							>
 							<DropdownMenu.Item
 								class="p-0"
 								on:click={(event) => {
 									event.preventDefault();
-								}}><AlertDeleteChat chatID={chatID} {supabase} /></DropdownMenu.Item
+								}}><AlertDeleteChat chatID={chatID} /></DropdownMenu.Item
 							>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>

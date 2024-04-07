@@ -7,7 +7,6 @@
 	import Check from "lucide-svelte/icons/check";
 	import { chatContentMap, chatDataMap, lastContextOfChat, newChatSettings } from "$lib/stores";
 	import { changeAssistantData, changeTags, changeTitle, generateTitle } from "$lib/helper";
-	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
@@ -17,8 +16,6 @@
 		{ value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
 		{ value: "gpt-4-turbo-preview", label: "GPT-4 Turbo" }
 	];
-
-	export let supabase: SupabaseClient;
 
 	export let chatID: string | null;
 
@@ -123,7 +120,7 @@
 
 	async function onAcceptTitle() {
 		if (chatID && editTitleInput !== title) {
-			await changeTitle(chatID, editTitleInput, supabase);
+			await changeTitle(chatID, editTitleInput);
 		}
 
 		editingTitle = false;
@@ -132,20 +129,20 @@
 	async function generateNewTitle() {
 		if (chatID) {
 			let newTitle = await generateTitle($chatContentMap[chatID]);
-			if (newTitle) await changeTitle(chatID, newTitle, supabase);
+			if (newTitle) await changeTitle(chatID, newTitle);
 		}
 	}
 
 	async function onSaveAssistant() {
 		if (chatID) {
-			await changeAssistantData(chatID, { model, temperature, topP, systemMessage }, supabase);
+			await changeAssistantData(chatID, { model, temperature, topP, systemMessage });
 			unsavedAssistantChanges = false;
 		}
 	}
 
 	async function onSaveTags() {
 		if (chatID) {
-			await changeTags(chatID, tags, supabase);
+			await changeTags(chatID, tags);
 		}
 	}
 </script>

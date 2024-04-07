@@ -7,14 +7,18 @@ import {
 } from "$lib/stores";
 import { get } from "svelte/store";
 import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { toast } from "svelte-sonner";
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { getEmbedding, EmbeddingIndex } from "client-vector-search";
 import { encode } from "gpt-tokenizer";
+import { database } from "$lib/database";
 
-export async function createNewChat(supabase: SupabaseClient) {
+export async function createNewChat() {
+	const newChatID = await database.createNewChat();
+
+	if (!newChatID) return;
+
 	const emptyChat: ChatStructure = {
 		title: "",
 		tags: [],
@@ -24,20 +28,6 @@ export async function createNewChat(supabase: SupabaseClient) {
 		updated_at: new Date()
 	};
 
-	const { error, data } = await supabase
-		.from("Chats")
-		.insert({ title: "", summary: "" })
-		.select()
-		.single();
-
-	if (error) {
-		toast.error("Failed to create new chat");
-		console.error("Failed to create new chat", error);
-		return;
-	}
-
-	const newChatID = data.id;
-
 	chatDataMap.update((curr) => {
 		delete curr[newChatID];
 		return { [newChatID]: emptyChat, ...curr };
@@ -46,14 +36,10 @@ export async function createNewChat(supabase: SupabaseClient) {
 	return newChatID;
 }
 
-export async function deleteChat(chatID: string, supabase: SupabaseClient) {
-	const { error } = await supabase.from("Chats").delete().match({ id: chatID });
+export async function deleteChat(chatID: string) {
+	const success = await database.deleteChat(chatID);
 
-	if (error) {
-		toast.error("Failed to delete chat");
-		console.error("Failed to delete chat", error);
-		return;
-	}
+	if (!success) return;
 
 	chatDataMap.update((curr) => {
 		const newMap = { ...curr };
@@ -68,11 +54,7 @@ export async function deleteChat(chatID: string, supabase: SupabaseClient) {
 	});
 }
 
-export async function sendMessage(
-	message: MessageStructure,
-	chatID: string,
-	supabase: SupabaseClient
-) {
+export async function sendMessage(message: MessageStructure, chatID: string) {
 	chatContentMap.update((curr) => {
 		return {
 			...curr,
@@ -86,17 +68,7 @@ export async function sendMessage(
 		return { [chatID]: temp, ...curr };
 	});
 
-	const { error } = await supabase.from("Messages").insert({
-		chat_id: chatID,
-		content: message.content,
-		role: message.role,
-		model: message.model
-	});
-
-	if (error) {
-		toast.error("Failed to send message");
-		console.error("Failed to send message", error);
-	}
+	await database.insertMessage(chatID, message);
 }
 
 export async function* generateResponse(
@@ -178,14 +150,10 @@ export async function* generateResponse(
 	}
 }
 
-export async function changeTitle(chatID: string, title: string, supabase: SupabaseClient) {
-	const { error } = await supabase.from("Chats").update({ title }).match({ id: chatID });
+export async function changeTitle(chatID: string, title: string) {
+	const success = await database.changeTitle(chatID, title);
 
-	if (error) {
-		toast.error("Failed to change title");
-		console.error("Failed to change title", error);
-		return;
-	}
+	if (!success) return;
 
 	chatDataMap.update((curr) => {
 		return {
@@ -234,7 +202,7 @@ export async function generateTitle(context: MessageStructure[]) {
 	return completion.choices[0].message.content?.replace(/"/g, "");
 }
 
-export async function createSummary(chatID: string, supabase: SupabaseClient) {
+export async function createSummary(chatID: string) {
 	const currentSummary = get(chatDataMap)[chatID].summary;
 	const newMessages = get(chatContentMap)[chatID].slice(-6);
 
@@ -278,16 +246,10 @@ export async function createSummary(chatID: string, supabase: SupabaseClient) {
 		})
 		.then((res) => res.choices[0].message.content);
 
-	const { error } = await supabase
-		.from("Chats")
-		.update({ summary: newSummary })
-		.match({ id: chatID });
+	if (!newSummary) return;
 
-	if (error || !newSummary) {
-		toast.error("Failed to create summary");
-		console.error("Failed to create summary", error);
-		return;
-	}
+	const success = await database.saveSummary(chatID, newSummary);
+	if (!success) return;
 
 	chatDataMap.update((curr) => {
 		return {
@@ -300,21 +262,10 @@ export async function createSummary(chatID: string, supabase: SupabaseClient) {
 	});
 }
 
-export async function changeAssistantData(
-	chatID: string,
-	assistantData: AssistantStructure,
-	supabase: SupabaseClient
-) {
-	const { error } = await supabase
-		.from("Chats")
-		.update({ model: assistantData })
-		.match({ id: chatID });
+export async function changeAssistantData(chatID: string, assistantData: AssistantStructure) {
+	const success = await database.changeAssistantData(chatID, assistantData);
 
-	if (error) {
-		toast.error("Failed to change assistant data");
-		console.error("Failed to change assistant data", error);
-		return;
-	}
+	if (!success) return;
 
 	chatDataMap.update((curr) => {
 		return {
@@ -327,14 +278,10 @@ export async function changeAssistantData(
 	});
 }
 
-export async function changeTags(chatID: string, tags: string[], supabase: SupabaseClient) {
-	const { error } = await supabase.from("Chats").update({ tags: { tags } }).match({ id: chatID });
+export async function changeTags(chatID: string, tags: string[]) {
+	const success = await database.changeTags(chatID, tags);
 
-	if (error) {
-		toast.error("Failed to change tags");
-		console.error("Failed to change tags", error);
-		return;
-	}
+	if (!success) return;
 
 	chatDataMap.update((curr) => {
 		return {
