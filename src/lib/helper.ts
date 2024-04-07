@@ -326,6 +326,26 @@ export async function changeAssistantData(
 	});
 }
 
+export async function changeTags(chat_id: string, tags: string[], supabase: SupabaseClient) {
+	const { error } = await supabase.from("Chats").update({ tags: { tags } }).match({ id: chat_id });
+
+	if (error) {
+		toast.error("Failed to change tags");
+		console.error("Failed to change tags", error);
+		return;
+	}
+
+	chatDataMap.update((curr) => {
+		return {
+			...curr,
+			[chat_id]: {
+				...curr[chat_id],
+				tags
+			}
+		};
+	});
+}
+
 export async function getContextFromMessages(
 	messages: MessageStructure[]
 ): Promise<MessageStructure[]> {

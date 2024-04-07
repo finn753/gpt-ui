@@ -8,6 +8,7 @@
 	import AlertDeleteChat from "$lib/components/chat/AlertDeleteChat.svelte";
 	import type { SupabaseClient } from "@supabase/supabase-js";
 	import AlertRenameChat from "$lib/components/chat/AlertRenameChat.svelte";
+	import { Badge } from "$lib/components/ui/badge";
 
 	export let chatMap: ChatDataMap = {};
 	export let supabase: SupabaseClient;
@@ -58,6 +59,12 @@
 			<p class="whitespace-normal break-words text-base text-muted-foreground">
 				{chat.summary.trim() === "" ? "No summary" : chat.summary}
 			</p>
+
+			<div class="flex w-full flex-wrap gap-1 py-2">
+				{#each chat.tags as tag}
+					<Badge>{tag}</Badge>
+				{/each}
+			</div>
 
 			<div class="py-1">
 				<p class="font-light text-muted-foreground">

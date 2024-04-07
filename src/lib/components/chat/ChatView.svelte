@@ -2,8 +2,9 @@
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatContentMap, chatDataMap } from "$lib/stores";
+	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/stores";
 	import {
+		changeAssistantData,
 		changeTitle,
 		createNewChat,
 		createSummary,
@@ -66,6 +67,10 @@
 		let model, temperature, topP, systemMessage;
 
 		try {
+			if (isNewChat && $newChatSettings.model) {
+				//$chatDataMap[chat_id].model = $newChatSettings.model;
+				await changeAssistantData(chat_id, $newChatSettings.model, supabase);
+			}
 			({ model, temperature, topP, systemMessage } = $chatDataMap[chat_id].model);
 		} catch (e: unknown) {
 			console.log("Defaulting to standard assistant model");

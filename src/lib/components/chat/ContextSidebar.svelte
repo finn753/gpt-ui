@@ -5,8 +5,8 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Pencil, Sparkles, X } from "lucide-svelte";
 	import Check from "lucide-svelte/icons/check";
-	import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/stores";
-	import { changeAssistantData, changeTitle, generateTitle } from "$lib/helper";
+	import { chatContentMap, chatDataMap, lastContextOfChat, newChatSettings } from "$lib/stores";
+	import { changeAssistantData, changeTags, changeTitle, generateTitle } from "$lib/helper";
 	import type { SupabaseClient } from "@supabase/supabase-js";
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
@@ -40,6 +40,10 @@
 
 	$: chatData = chatID ? $chatDataMap[chatID] : null;
 	$: newChat = !chatID;
+
+	$: if (newChat) {
+		$newChatSettings.model = { model, temperature, topP, systemMessage };
+	}
 
 	$: chatID, chatData, updateData();
 
@@ -78,7 +82,7 @@
 	let editTitleInput = "";
 	$: editTitleInput = title;
 
-	function onAddTagChange() {
+	async function onAddTagChange() {
 		if (addTagInput) {
 			//split at space and ,
 			let splitTags = addTagInput.split(/[\s,]+/);
@@ -86,27 +90,35 @@
 			if (splitTags.length > 1 && chatID) {
 				let newTags = splitTags.filter((tag) => tag !== "");
 				$chatDataMap[chatID].tags = [...tags, ...newTags];
+				tags = $chatDataMap[chatID].tags;
 
 				addTagInput = "";
+
+				await onSaveTags();
 			}
 		}
 	}
 
-	function addTag() {
+	async function addTag() {
 		if (addTagInput && chatID) {
 			$chatDataMap[chatID].tags = [...tags, addTagInput];
+			tags = $chatDataMap[chatID].tags;
 
 			addTagInput = "";
 		}
+
+		await onSaveTags();
 	}
 
-	function removeTag(tagToRemove: string) {
+	async function removeTag(tagToRemove: string) {
 		const index = tags.indexOf(tagToRemove);
 		if (index !== -1) {
 			tags.splice(index, 1);
 		}
 
 		tags = tags;
+
+		await onSaveTags();
 	}
 
 	async function onAcceptTitle() {
@@ -128,6 +140,12 @@
 		if (chatID) {
 			await changeAssistantData(chatID, { model, temperature, topP, systemMessage }, supabase);
 			unsavedAssistantChanges = false;
+		}
+	}
+
+	async function onSaveTags() {
+		if (chatID) {
+			await changeTags(chatID, tags, supabase);
 		}
 	}
 </script>
@@ -250,9 +268,11 @@
 				<Textarea class="w-full resize-none" bind:value={systemMessage} />
 			</Label>
 		</Card.Content>
-		<Card.Footer class="flex justify-end">
-			<Button on:click={onSaveAssistant} disabled={!unsavedAssistantChanges}>Save</Button>
-		</Card.Footer>
+		{#if !newChat}
+			<Card.Footer class="flex justify-end">
+				<Button on:click={onSaveAssistant} disabled={!unsavedAssistantChanges}>Save</Button>
+			</Card.Footer>
+		{/if}
 	</Card.Root>
 
 	{#if chatID}
