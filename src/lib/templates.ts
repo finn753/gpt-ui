@@ -2,7 +2,6 @@ import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/t
 
 export function getAssistantResponseMessageFromModel(model: string): MessageStructure {
 	return {
-		chat_id: "",
 		content: "",
 		role: "assistant",
 		model,

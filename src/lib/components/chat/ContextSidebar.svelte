@@ -96,7 +96,7 @@
 		if (addTagInput && chatID) {
 			const newTag = addTagInput;
 			addTagInput = "";
-			await addTag(newTag)
+			await addTag(newTag);
 		}
 	}
 

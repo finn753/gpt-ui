@@ -15,7 +15,6 @@ export type ChatStructure = {
 };
 
 export type MessageStructure = {
-	chat_id: string;
 	content: string;
 	role: "user" | "assistant" | "tool";
 	model: string;

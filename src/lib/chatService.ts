@@ -26,7 +26,6 @@ export async function updateSummaryForChat(chatID: string) {
 export async function sendUserMessage(chatID: string, message: string) {
 	const newMessage: MessageStructure = {
 		content: message,
-		chat_id: chatID,
 		role: "user",
 		model: "",
 		created_at: new Date(Date.now())
