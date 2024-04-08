@@ -55,6 +55,8 @@
 		topP = 0.5;
 		systemMessage = "You are a helpful assistant";
 
+		$newChatSettings.model = { model, systemMessage, temperature, topP }
+
 		if (chatData) {
 			title = chatData.title;
 			summary = chatData.summary;
