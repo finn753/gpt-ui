@@ -32,14 +32,19 @@ export async function deleteChat(chatID: string) {
 	});
 }
 
-export async function sendMessage(message: MessageStructure, chatID: string) {
+export async function sendMessage(message: MessageStructure, chatID: string): Promise<boolean> {
 	updateChatContentMap(chatID, message);
 
 	const temp = { updated_at: new Date(Date.now()) };
 	updateChatDataMap(chatID, temp);
 
-	await database.insertMessage(chatID, message);
+	const success = await database.insertMessage(chatID, message);
+
+	if (!success) return false;
+
 	moveChatToTopOfDataMap(chatID);
+
+	return true;
 }
 
 export async function changeTitle(chatID: string, title: string) {

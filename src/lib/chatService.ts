@@ -23,7 +23,9 @@ export async function updateSummaryForChat(chatID: string) {
 	await chatOperations.changeSummary(chatID, newSummary);
 }
 
-export async function sendUserMessage(chatID: string, message: string) {
+export async function sendUserMessage(chatID: string, message: string): Promise<boolean> {
+	if (message.trim() === "") return false;
+
 	const newMessage: MessageStructure = {
 		content: message,
 		role: "user",
@@ -31,7 +33,7 @@ export async function sendUserMessage(chatID: string, message: string) {
 		created_at: new Date(Date.now())
 	};
 
-	await chatOperations.sendMessage(newMessage, chatID);
+	return await chatOperations.sendMessage(newMessage, chatID);
 }
 
 async function isSummaryNeededForChat(chatID: string): Promise<boolean> {

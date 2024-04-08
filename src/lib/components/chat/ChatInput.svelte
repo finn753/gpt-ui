@@ -43,6 +43,8 @@
 	}
 
 	function send() {
+		if(value.trim() === "") return;
+
 		dispatch("submit", { value });
 		value = "";
 	}
@@ -72,7 +74,7 @@
 		/>
 		<div class="p-2" style="width: calc(1.5em + 2rem); height: calc(1.5em + 2rem);">
 			{#if !generating}
-				<Button variant="ghost" class="size-full p-2" on:click={send}>
+				<Button variant="ghost" class="size-full p-2" on:click={send} disabled={value.trim() === ""}>
 					<SendHorizontal size={24} />
 				</Button>
 			{:else}

@@ -41,7 +41,10 @@
 			await createNewChat();
 		}
 
-		await chatService.sendUserMessage(chatID, event.detail.value);
+		const success = await chatService.sendUserMessage(chatID, event.detail.value);
+
+		if(!success) return;
+
 		await scrollToBottom(scrollContainer);
 
 		await generateResponse();
