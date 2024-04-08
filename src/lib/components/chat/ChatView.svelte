@@ -75,7 +75,7 @@
 
 		const success = await chatOperations.retrySendMessage(message, chatID);
 
-		if(!success) return;
+		if(!success || message.role === "assistant") return;
 
 		await generateResponse();
 		await scrollToBottom(scrollContainer);
