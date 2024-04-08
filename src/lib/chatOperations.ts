@@ -2,6 +2,7 @@ import { database } from "$lib/database";
 import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
 import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/stores";
 import * as templates from "$lib/templates";
+import { get } from "svelte/store";
 
 export async function createNewChat() {
 	const newChatID = await database.createNewChat();
@@ -40,9 +41,38 @@ export async function sendMessage(message: MessageStructure, chatID: string): Pr
 
 	const success = await database.insertMessage(chatID, message);
 
+	moveChatToTopOfDataMap(chatID);
+
+	if (!success) {
+		const message = get(chatContentMap)[chatID].pop();
+
+		if (message) {
+			updateChatContentMap(chatID, { ...message, failed: true });
+		}
+
+		return false;
+	}
+
+	return true;
+}
+
+export async function retrySendMessage(message: MessageStructure, chatID: string) {
+	const success = await database.insertMessage(chatID, message);
+
 	if (!success) return false;
 
-	moveChatToTopOfDataMap(chatID);
+	chatContentMap.update((curr) => {
+		const chatMessages = curr;
+
+		chatMessages[chatID] = chatMessages[chatID].map((msg) => {
+			if (JSON.stringify(msg) === JSON.stringify(message)) {
+				return { ...msg, failed: false };
+			}
+			return msg;
+		});
+
+		return chatMessages;
+	});
 
 	return true;
 }

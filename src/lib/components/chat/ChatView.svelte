@@ -14,6 +14,8 @@
 	export let chatID: string;
 	export let generating = false;
 
+	let inputValue = "";
+
 	let scrollContainer: HTMLElement;
 
 	let messages: MessageStructure[] = [];
@@ -35,20 +37,30 @@
 	}
 
 	async function onSendMessage(event: CustomEvent<{ value: string }>) {
+		generating = true;
+
 		let isNewChat = !chatID;
 
 		if (isNewChat) {
-			await createNewChat();
+			const success = await createNewChat();
+			if(!success) {
+				generating = false;
+				return;
+			}
 		}
+
+		inputValue = "";
 
 		const success = await chatService.sendUserMessage(chatID, event.detail.value);
 
-		if(!success) return;
-
 		await scrollToBottom(scrollContainer);
+
+		if(!success) return;
 
 		await generateResponse();
 		await scrollToBottom(scrollContainer);
+
+		generating = false;
 
 		if (isNewChat) await goto(`/chats/${chatID}`);
 
@@ -58,14 +70,29 @@
 		await chatService.updateSummaryForChat(chatID);
 	}
 
+	async function onRetrySendMessage(event: CustomEvent<{ message: MessageStructure }>) {
+		const { message } = event.detail;
+
+		const success = await chatOperations.retrySendMessage(message, chatID);
+
+		if(!success) return;
+
+		await generateResponse();
+		await scrollToBottom(scrollContainer);
+
+		generating = false;
+	}
+
 	async function createNewChat() {
 		chatID = (await chatOperations.createNewChat()) || "";
 
-		if (!chatID) return;
+		if (!chatID) return false;
 
 		if ($newChatSettings.model) {
 			await chatOperations.changeAssistantData(chatID, $newChatSettings.model);
 		}
+
+		return true;
 	}
 
 	async function generateResponse() {
@@ -84,7 +111,6 @@
 			console.error("Failed to get context from messages", e);
 		}
 
-		generating = true;
 		let response: MessageStructure | undefined;
 		for await (const r of generationHelper.generateResponse(
 			context,
@@ -97,7 +123,6 @@
 			generatingProgress = response || null;
 		}
 		generatingProgress = null;
-		generating = false;
 
 		if (response) {
 			await chatOperations.sendMessage(response, chatID);
@@ -109,12 +134,12 @@
 	<div class="flex-1 overflow-y-auto" bind:this={scrollContainer}>
 		<div class="flex flex-col">
 			{#each messages as message}
-				<ChatMessage {message} />
+				<ChatMessage {message} on:retry={onRetrySendMessage} />
 			{/each}
 			{#if generatingProgress}
 				<ChatMessage message={generatingProgress} />
 			{/if}
 		</div>
 	</div>
-	<ChatInput on:submit={onSendMessage} {generating} />
+	<ChatInput bind:value={inputValue} on:submit={onSendMessage} {generating} />
 </div>

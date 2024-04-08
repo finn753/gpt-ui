@@ -20,7 +20,11 @@ async function fetchChatMessages(
 	chatID: string,
 	supabase: SupabaseClient
 ): Promise<MessageStructure[]> {
-	const { data } = await supabase.from("Messages").select("*").eq("chat_id", chatID);
+	const { data } = await supabase
+		.from("Messages")
+		.select("*")
+		.eq("chat_id", chatID)
+		.order("created_at");
 	return data?.reduce((acc, message) => {
 		acc.push({
 			id: message.id,

@@ -59,7 +59,8 @@ class Database {
 			chat_id: chatID,
 			content: message.content,
 			role: message.role,
-			model: message.model
+			model: message.model,
+			created_at: message.created_at
 		});
 
 		if (error) {

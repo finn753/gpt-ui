@@ -19,6 +19,7 @@ export type MessageStructure = {
 	role: "user" | "assistant" | "tool";
 	model: string;
 	created_at: Date;
+	failed?: boolean;
 };
 
 export type ChatDataMap = Record<string, ChatStructure>;

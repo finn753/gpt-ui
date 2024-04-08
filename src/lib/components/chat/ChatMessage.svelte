@@ -5,6 +5,9 @@
 	import { toast } from "svelte-sonner";
 	import type { MessageStructure } from "$lib/types";
 	import SvelteMarkdown from "svelte-markdown";
+	import { createEventDispatcher } from "svelte";
+
+	const dispatch = createEventDispatcher<{ retry: { message: MessageStructure } }>();
 
 	export let message: MessageStructure;
 
@@ -12,17 +15,23 @@
 	let model: string = "";
 	let content: string = "";
 	let created_at: Date = new Date(Date.now());
+	let failed = false;
 
 	$: {
 		role = message.role;
 		model = message.model;
 		content = message.content;
 		created_at = message.created_at;
+		failed = message.failed || false;
 	}
 
 	function copyToClipboard() {
 		navigator.clipboard.writeText(content);
 		toast.success("Copied to clipboard");
+	}
+
+	function onRetry() {
+		dispatch("retry", {message} )
 	}
 </script>
 
@@ -38,6 +47,14 @@
 	>
 		<SvelteMarkdown source={content} />
 	</p>
+
+	{#if failed}
+		<div class="flex text-red-500 justify-between">
+			<p>Failed to send message</p>
+			<span><Button class="text-red-500" variant="link" size="none" on:click={onRetry}>Retry</Button></span>
+		</div>
+	{/if}
+
 	<div class="flex flex-row items-center py-2 opacity-0 transition-opacity group-hover:opacity-100">
 		<Button class="p-0" variant="icon" size="none" on:click={copyToClipboard}
 			><Clipboard size={20} /></Button

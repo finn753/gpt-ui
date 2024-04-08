@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from "$lib/components/ui/button";
 
-	import { SendHorizontal, Square } from "lucide-svelte";
+	import { LoaderCircle, SendHorizontal } from 'lucide-svelte';
 	import { cn } from "$lib/utils";
 	import { createEventDispatcher } from "svelte";
 
@@ -46,7 +46,6 @@
 		if(value.trim() === "") return;
 
 		dispatch("submit", { value });
-		value = "";
 	}
 
 	function onKeyDown(event: KeyboardEvent) {
@@ -70,7 +69,8 @@
 			on:click={updateCursorPos}
 			on:keyup={updateCursorPos}
 			on:keydown={onKeyDown}
-			placeholder="Type here..."
+			placeholder={generating ? "Generating..." : "Type here..." }
+			disabled={generating}
 		/>
 		<div class="p-2" style="width: calc(1.5em + 2rem); height: calc(1.5em + 2rem);">
 			{#if !generating}
@@ -78,9 +78,9 @@
 					<SendHorizontal size={24} />
 				</Button>
 			{:else}
-				<Button variant="ghost" class="size-full p-2">
-					<Square size={24} />
-				</Button>
+				<div class="size-full p-2">
+					<LoaderCircle class="animate-spin opacity-50" size={24} />
+				</div>
 			{/if}
 		</div>
 	</div>
