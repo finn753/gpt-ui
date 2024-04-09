@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ChatDataMap } from "$lib/types";
+	import type { ChatDataMap, ChatStructure } from '$lib/types';
 	import { Button } from "$lib/components/ui/button";
 	import { selectedChatID } from "$lib/stores";
 	import { format } from "date-fns";
@@ -8,21 +8,29 @@
 	import AlertDeleteChat from "$lib/components/chat/AlertDeleteChat.svelte";
 	import AlertRenameChat from "$lib/components/chat/AlertRenameChat.svelte";
 	import { Badge } from "$lib/components/ui/badge";
-	import { Input } from '$lib/components/ui/input';
+	import { Input } from "$lib/components/ui/input";
+	import * as chatService from "$lib/chatService"
 
 	export let chatMap: ChatDataMap = {};
 
-	$: chatEntries = Object.entries(chatMap);
+	let searchQuery = "";
+
+	let chatEntries: [string, ChatStructure][]  = Object.entries(chatMap);
+
+	$: {
+		chatEntries = Object.entries(chatMap);
+
+		if (searchQuery.trim() !== "") {
+			chatEntries = Object.entries(chatService.searchChats(chatMap, searchQuery.trim()));
+		}
+	}
 </script>
 
-<div class="space-y-2 h-full">
-	<Button class="w-full h-10" href="/chats">New chat</Button>
-	<Input
-		type="search"
-		placeholder="Search chats"
-		class="w-full h-10"/>
+<div class="h-full space-y-2">
+	<Button class="h-10 w-full" href="/chats">New chat</Button>
+	<Input type="search" placeholder="Search chats" class="h-10 w-full" bind:value={searchQuery} />
 
-	<div class="overflow-y-auto space-y-2 h-[calc(100%-6rem)] pb-4">
+	<div class="h-[calc(100%-6rem)] space-y-2 overflow-y-auto pb-4">
 		{#each chatEntries as [chatID, chat]}
 			<Button
 				variant={chatID === $selectedChatID ? "secondary" : "ghost"}
@@ -34,8 +42,7 @@
 						{chat.title.trim() === "" ? "Untitled" : chat.title}
 					</h3>
 					<DropdownMenu.Root>
-						<DropdownMenu.Trigger asChild let:builder
-						>
+						<DropdownMenu.Trigger asChild let:builder>
 							<Button
 								variant="icon"
 								size="none"
@@ -43,30 +50,29 @@
 								builders={[builder]}
 								on:click={(event) => {
 									event.preventDefault();
-								}}>
-								<Ellipsis size={16} />
-							</Button
+								}}
 							>
-						</DropdownMenu.Trigger
-						>
+								<Ellipsis size={16} />
+							</Button>
+						</DropdownMenu.Trigger>
 						<DropdownMenu.Content>
 							<DropdownMenu.Group>
 								<DropdownMenu.Item
 									class="p-0"
 									on:click={(event) => {
 										event.preventDefault();
-									}}>
-									<AlertRenameChat {chatID} />
-								</DropdownMenu.Item
+									}}
 								>
+									<AlertRenameChat {chatID} />
+								</DropdownMenu.Item>
 								<DropdownMenu.Item
 									class="p-0"
 									on:click={(event) => {
 										event.preventDefault();
-									}}>
-									<AlertDeleteChat {chatID} />
-								</DropdownMenu.Item
+									}}
 								>
+									<AlertDeleteChat {chatID} />
+								</DropdownMenu.Item>
 							</DropdownMenu.Group>
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>

@@ -1,11 +1,11 @@
 import { chatContentMap, chatDataMap } from "$lib/stores";
 import { get } from "svelte/store";
 import * as chatOperations from "$lib/chatOperations";
-import type { MessageStructure } from "$lib/types";
+import type { ChatDataMap, MessageStructure } from "$lib/types";
 import * as generationHelper from "$lib/generationHelper";
+import { generateTitle } from "$lib/generationHelper";
 import * as embeddingHelper from "$lib/embeddingHelper";
 import * as templates from "$lib/templates";
-import { generateTitle } from "$lib/generationHelper";
 
 export async function setGeneratedTitleForChat(chatID: string) {
 	const messages = get(chatContentMap)[chatID] || [];
@@ -67,6 +67,24 @@ export async function getContextFromMessages(
 	context.push(queryMessage);
 
 	return context;
+}
+
+export function searchChats(chatMap: ChatDataMap, query: string): ChatDataMap {
+	const lowerCaseQuery = query.toLowerCase();
+
+	const filteredChats = Object.entries(chatMap).filter(([, chat]) => {
+		const lowerCaseTitle = chat.title.toLowerCase();
+		const lowerCaseSummary = chat.summary.toLowerCase();
+		const lowerCaseTags = chat.tags.map((tag) => tag.toLowerCase());
+
+		return (
+			lowerCaseTitle.includes(lowerCaseQuery) ||
+			lowerCaseSummary.includes(lowerCaseQuery) ||
+			lowerCaseTags.includes(lowerCaseQuery)
+		);
+	});
+
+	return Object.fromEntries(filteredChats);
 }
 
 async function isSummaryNeededForChat(chatID: string): Promise<boolean> {
