@@ -8,70 +8,88 @@
 	import AlertDeleteChat from "$lib/components/chat/AlertDeleteChat.svelte";
 	import AlertRenameChat from "$lib/components/chat/AlertRenameChat.svelte";
 	import { Badge } from "$lib/components/ui/badge";
+	import { Input } from '$lib/components/ui/input';
 
 	export let chatMap: ChatDataMap = {};
+
+	$: chatEntries = Object.entries(chatMap);
 </script>
 
-<div class="space-y-2 pb-4">
-	<Button class="w-full" href="/chats">New chat</Button>
-	{#each Object.entries(chatMap) as [chatID, chat]}
-		<Button
-			variant={chatID === $selectedChatID ? "secondary" : "ghost"}
-			class="group flex h-auto w-full flex-col items-start"
-			href="/chats/{chatID}"
-		>
-			<div class="flex w-full flex-row items-start justify-between">
-				<h3 class="whitespace-normal break-words text-base font-bold">
-					{chat.title.trim() === "" ? "Untitled" : chat.title}
-				</h3>
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger asChild let:builder
-						><Button
-							variant="icon"
-							size="none"
-							class="opacity-0 group-hover:opacity-50 group-hover:hover:opacity-100"
-							builders={[builder]}
-							on:click={(event) => {
-								event.preventDefault();
-							}}><Ellipsis size={16} /></Button
-						></DropdownMenu.Trigger
-					>
-					<DropdownMenu.Content>
-						<DropdownMenu.Group>
-							<DropdownMenu.Item
-								class="p-0"
+<div class="space-y-2 h-full">
+	<Button class="w-full h-10" href="/chats">New chat</Button>
+	<Input
+		type="search"
+		placeholder="Search chats"
+		class="w-full h-10"/>
+
+	<div class="overflow-y-auto space-y-2 h-[calc(100%-6rem)] pb-4">
+		{#each chatEntries as [chatID, chat]}
+			<Button
+				variant={chatID === $selectedChatID ? "secondary" : "ghost"}
+				class="group flex h-auto w-full flex-col items-start"
+				href="/chats/{chatID}"
+			>
+				<div class="flex w-full flex-row items-start justify-between">
+					<h3 class="whitespace-normal break-words text-base font-bold">
+						{chat.title.trim() === "" ? "Untitled" : chat.title}
+					</h3>
+					<DropdownMenu.Root>
+						<DropdownMenu.Trigger asChild let:builder
+						>
+							<Button
+								variant="icon"
+								size="none"
+								class="opacity-0 group-hover:opacity-50 group-hover:hover:opacity-100"
+								builders={[builder]}
 								on:click={(event) => {
 									event.preventDefault();
-								}}><AlertRenameChat {chatID} /></DropdownMenu.Item
+								}}>
+								<Ellipsis size={16} />
+							</Button
 							>
-							<DropdownMenu.Item
-								class="p-0"
-								on:click={(event) => {
-									event.preventDefault();
-								}}><AlertDeleteChat {chatID} /></DropdownMenu.Item
-							>
-						</DropdownMenu.Group>
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
-			</div>
-			<p class="whitespace-normal break-words text-base text-muted-foreground">
-				{chat.summary.trim() === "" ? "No summary" : chat.summary}
-			</p>
-
-			<div class="flex w-full flex-wrap gap-1 py-2">
-				{#each chat.tags as tag}
-					<Badge>{tag}</Badge>
-				{/each}
-			</div>
-
-			<div class="py-1">
-				<p class="font-light text-muted-foreground">
-					Updated: {format(chat.updated_at, "PP, HH:mm")}
+						</DropdownMenu.Trigger
+						>
+						<DropdownMenu.Content>
+							<DropdownMenu.Group>
+								<DropdownMenu.Item
+									class="p-0"
+									on:click={(event) => {
+										event.preventDefault();
+									}}>
+									<AlertRenameChat {chatID} />
+								</DropdownMenu.Item
+								>
+								<DropdownMenu.Item
+									class="p-0"
+									on:click={(event) => {
+										event.preventDefault();
+									}}>
+									<AlertDeleteChat {chatID} />
+								</DropdownMenu.Item
+								>
+							</DropdownMenu.Group>
+						</DropdownMenu.Content>
+					</DropdownMenu.Root>
+				</div>
+				<p class="whitespace-normal break-words text-base text-muted-foreground">
+					{chat.summary.trim() === "" ? "No summary" : chat.summary}
 				</p>
-				<p class="font-light text-muted-foreground">
-					Created: {format(chat.created_at, "PP, HH:mm")}
-				</p>
-			</div>
-		</Button>
-	{/each}
+
+				<div class="flex w-full flex-wrap gap-1 py-2">
+					{#each chat.tags as tag}
+						<Badge>{tag}</Badge>
+					{/each}
+				</div>
+
+				<div class="py-1">
+					<p class="font-light text-muted-foreground">
+						Updated: {format(chat.updated_at, "PP, HH:mm")}
+					</p>
+					<p class="font-light text-muted-foreground">
+						Created: {format(chat.created_at, "PP, HH:mm")}
+					</p>
+				</div>
+			</Button>
+		{/each}
+	</div>
 </div>
