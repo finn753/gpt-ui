@@ -3,7 +3,7 @@
 	import { onMount } from "svelte";
 	import { Button } from "$lib/components/ui/button";
 	import { page } from "$app/stores";
-	import { AudioLines, Image } from "lucide-svelte";
+	import { AudioLines, Image, Wrench } from 'lucide-svelte';
 
 	const size = 24;
 	const strokeWidth = 2;
@@ -51,9 +51,17 @@
 				<AudioLines {size} {strokeWidth} />
 				Text To Speech
 			</Button>
+			<Button
+				class="flex w-full justify-start gap-2 pl-2 text-sm font-medium text-muted-foreground"
+				variant={currentPath.startsWith("/generator/tools") ? "secondary" : "ghost"}
+				href="/generator/tools"
+			>
+				<Wrench {size} {strokeWidth} />
+				Generated Tools
+			</Button>
 		</div>
 	</CollapsibleSidebar>
-	<div class="col-span-1 h-full max-h-full min-h-0 lg:col-span-2">
+	<div class="col-span-1 h-full max-h-full min-h-0 md:col-span-2">
 		<slot />
 	</div>
 </div>
