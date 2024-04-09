@@ -31,7 +31,7 @@
 	}
 
 	function onRetry() {
-		dispatch("retry", {message} )
+		dispatch("retry", { message });
 	}
 </script>
 
@@ -49,9 +49,12 @@
 	</p>
 
 	{#if failed}
-		<div class="flex text-red-500 justify-between">
+		<div class="flex justify-between text-red-500">
 			<p>Failed to send message</p>
-			<span><Button class="text-red-500" variant="link" size="none" on:click={onRetry}>Retry</Button></span>
+			<span
+				><Button class="text-red-500" variant="link" size="none" on:click={onRetry}>Retry</Button
+				></span
+			>
 		</div>
 	{/if}
 

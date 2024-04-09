@@ -19,6 +19,7 @@ export type MessageStructure = {
 	role: "user" | "assistant" | "tool";
 	model: string;
 	created_at: Date;
+	pinned?: boolean; // TODO - Include this in the type
 	failed?: boolean;
 };
 

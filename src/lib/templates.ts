@@ -22,6 +22,15 @@ export function getSingleTaskPromptMessages(system: string, user: string) {
 	];
 }
 
+export function getUserMessageWithContent(content: string): MessageStructure {
+	return {
+		content,
+		role: "user",
+		model: "",
+		created_at: new Date()
+	};
+}
+
 export function getEmptyChat(): ChatStructure {
 	return {
 		title: "",

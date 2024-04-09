@@ -2,12 +2,13 @@ import type { MessageStructure } from "$lib/types";
 import { EmbeddingIndex, getEmbedding } from "client-vector-search";
 import { encode } from "gpt-tokenizer";
 
-export async function getContextFromMessages(
-	messages: MessageStructure[]
+export async function getSimilarMessagesToQuery(
+	messages: MessageStructure[],
+	query: string,
+	maxTokenLimit = 1000,
+	similarityThreshold = 0.9
 ): Promise<MessageStructure[]> {
 	messages = [...messages];
-	const queryMessage = messages.pop() as MessageStructure;
-	const query = queryMessage?.content || "";
 
 	const embeddedQuery = await getEmbedding(query);
 
@@ -17,20 +18,16 @@ export async function getContextFromMessages(
 		topK: embeddingIndexOfMessages.size()
 	});
 
-	const maxTokenLimit = 1000;
 	let tokenCount = 0;
 
 	const filteredOrderedMessages = messagesOrderedBySimilarity
 		.filter((message) => {
 			tokenCount += encode(message.object.message.content).length;
-			return tokenCount <= maxTokenLimit;
+			return tokenCount <= maxTokenLimit && message.similarity >= similarityThreshold;
 		})
 		.sort((a, b) => a.object.index - b.object.index);
 
-	const context = filteredOrderedMessages.map((result) => result.object.message);
-	context.push(queryMessage);
-
-	return context;
+	return filteredOrderedMessages.map((result) => result.object.message);
 }
 
 async function getEmbeddingIndexOfMessages(messages: MessageStructure[]) {

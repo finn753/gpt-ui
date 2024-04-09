@@ -5,7 +5,7 @@
 	import { initializeModel } from "client-vector-search";
 	import { onMount } from "svelte";
 
-	import { page } from '$app/stores';
+	import { page } from "$app/stores";
 	import * as Tooltip from "$lib/components/ui/tooltip";
 
 	$: currentPath = $page.url.pathname;
@@ -39,56 +39,57 @@
 					<MessagesSquare {size} {strokeWidth} {color} />
 				</Button>
 			</Tooltip.Trigger>
-			<Tooltip.Content>
-				Chats
-			</Tooltip.Content>
+			<Tooltip.Content>Chats</Tooltip.Content>
 		</Tooltip.Root>
-
 
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<Button variant={currentPath.startsWith("/generator") ? "secondary" : "ghost"} href="/generator">
+				<Button
+					variant={currentPath.startsWith("/generator") ? "secondary" : "ghost"}
+					href="/generator"
+				>
 					<Brush {size} {strokeWidth} {color} />
 				</Button>
 			</Tooltip.Trigger>
-			<Tooltip.Content>
-				Generator
-			</Tooltip.Content>
+			<Tooltip.Content>Generator</Tooltip.Content>
 		</Tooltip.Root>
 
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<Button variant={currentPath.startsWith("/gallery") ? "secondary" : "ghost"} href="/gallery">
+				<Button
+					variant={currentPath.startsWith("/gallery") ? "secondary" : "ghost"}
+					href="/gallery"
+				>
 					<Images {size} {strokeWidth} {color} />
 				</Button>
 			</Tooltip.Trigger>
-			<Tooltip.Content>
-				Gallery
-			</Tooltip.Content>
+			<Tooltip.Content>Gallery</Tooltip.Content>
 		</Tooltip.Root>
 
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<Button variant={currentPath.startsWith("/templates") ? "secondary" : "ghost"} href="/templates">
+				<Button
+					variant={currentPath.startsWith("/templates") ? "secondary" : "ghost"}
+					href="/templates"
+				>
 					<LayoutTemplate {size} {strokeWidth} {color} />
 				</Button>
 			</Tooltip.Trigger>
-			<Tooltip.Content>
-				Templates
-			</Tooltip.Content>
+			<Tooltip.Content>Templates</Tooltip.Content>
 		</Tooltip.Root>
 
 		<div class="hidden md:block md:flex-1"></div>
 
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<Button variant={currentPath.startsWith("/settings") ? "secondary" : "ghost"} href="/settings">
+				<Button
+					variant={currentPath.startsWith("/settings") ? "secondary" : "ghost"}
+					href="/settings"
+				>
 					<User {size} {strokeWidth} {color} />
 				</Button>
 			</Tooltip.Trigger>
-			<Tooltip.Content>
-				Settings
-			</Tooltip.Content>
+			<Tooltip.Content>Settings</Tooltip.Content>
 		</Tooltip.Root>
 	</div>
 	<div class="h-[calc(100dvh-4rem)] flex-1 md:h-dvh">

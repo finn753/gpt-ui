@@ -3,6 +3,8 @@ import { get } from "svelte/store";
 import * as chatOperations from "$lib/chatOperations";
 import type { MessageStructure } from "$lib/types";
 import * as generationHelper from "$lib/generationHelper";
+import * as embeddingHelper from "$lib/embeddingHelper";
+import * as templates from "$lib/templates";
 import { generateTitle } from "$lib/generationHelper";
 
 export async function setGeneratedTitleForChat(chatID: string) {
@@ -34,6 +36,37 @@ export async function sendUserMessage(chatID: string, message: string): Promise<
 	};
 
 	return await chatOperations.sendMessage(newMessage, chatID);
+}
+
+export async function getContextFromMessages(
+	messages: MessageStructure[],
+	summary: string
+): Promise<MessageStructure[]> {
+	messages = [...messages];
+
+	const lastMessagesCount = 2;
+	const similarityMessagesMaxTokenLimit = 1000;
+	const similarityMessagesThreshold = 0.5;
+
+	const queryMessage = messages.pop() as MessageStructure;
+
+	const lastMessages = messages.slice(-lastMessagesCount);
+
+	const similarMessages = await embeddingHelper.getSimilarMessagesToQuery(
+		messages,
+		queryMessage.content,
+		similarityMessagesMaxTokenLimit,
+		similarityMessagesThreshold
+	);
+
+	const context: MessageStructure[] = [];
+
+	if (summary) context.push(templates.getUserMessageWithContent("Summary:\n" + summary));
+	context.push(...similarMessages);
+	context.push(...lastMessages);
+	context.push(queryMessage);
+
+	return context;
 }
 
 async function isSummaryNeededForChat(chatID: string): Promise<boolean> {

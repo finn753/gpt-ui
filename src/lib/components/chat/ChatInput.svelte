@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from "$lib/components/ui/button";
 
-	import { LoaderCircle, SendHorizontal } from 'lucide-svelte';
+	import { LoaderCircle, SendHorizontal } from "lucide-svelte";
 	import { cn } from "$lib/utils";
 	import { createEventDispatcher } from "svelte";
 
@@ -43,7 +43,7 @@
 	}
 
 	function send() {
-		if(value.trim() === "") return;
+		if (value.trim() === "") return;
 
 		dispatch("submit", { value });
 	}
@@ -69,12 +69,17 @@
 			on:click={updateCursorPos}
 			on:keyup={updateCursorPos}
 			on:keydown={onKeyDown}
-			placeholder={generating ? "Generating..." : "Type here..." }
+			placeholder={generating ? "Generating..." : "Type here..."}
 			disabled={generating}
 		/>
 		<div class="p-2" style="width: calc(1.5em + 2rem); height: calc(1.5em + 2rem);">
 			{#if !generating}
-				<Button variant="ghost" class="size-full p-2" on:click={send} disabled={value.trim() === ""}>
+				<Button
+					variant="ghost"
+					class="size-full p-2"
+					on:click={send}
+					disabled={value.trim() === ""}
+				>
 					<SendHorizontal size={24} />
 				</Button>
 			{:else}

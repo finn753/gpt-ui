@@ -3,7 +3,6 @@
 	import type { MessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
 	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/stores";
-	import * as embeddingHelper from "$lib/embeddingHelper";
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";
@@ -43,7 +42,7 @@
 
 		if (isNewChat) {
 			const success = await createNewChat();
-			if(!success) {
+			if (!success) {
 				generating = false;
 				return;
 			}
@@ -55,7 +54,7 @@
 
 		await scrollToBottom(scrollContainer);
 
-		if(!success) return;
+		if (!success) return;
 
 		await generateResponse();
 		await scrollToBottom(scrollContainer);
@@ -75,7 +74,7 @@
 
 		const success = await chatOperations.retrySendMessage(message, chatID);
 
-		if(!success || message.role === "assistant") return;
+		if (!success || message.role === "assistant") return;
 
 		await generateResponse();
 		await scrollToBottom(scrollContainer);
@@ -106,7 +105,7 @@
 
 		let context = messages;
 		try {
-			context = await embeddingHelper.getContextFromMessages(messages);
+			context = await chatService.getContextFromMessages(messages, $chatDataMap[chatID].summary);
 		} catch (e: unknown) {
 			console.error("Failed to get context from messages", e);
 		}
