@@ -26,7 +26,7 @@
 				toast.success("API key saved");
 			}
 		} else {
-			alert("You need to be logged in to save your API key.");
+			toast.error("You need to be logged in to save your API key.");
 		}
 	}
 </script>

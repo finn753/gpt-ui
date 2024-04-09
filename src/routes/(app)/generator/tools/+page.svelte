@@ -15,7 +15,6 @@
 	let toolData: LoadOutput
 
 	async function onGenerate() {
-		alert("Generating tool...")
 		const prompt = inputValue.trim();
 		inputValue = "";
 
