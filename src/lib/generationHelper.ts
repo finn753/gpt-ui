@@ -9,12 +9,12 @@ import * as templates from "$lib/templates";
 
 const STANDARD_MODEL = "gpt-3.5-turbo";
 
-export async function generateTitle(context: MessageStructure[]) {
+export async function generateTitle(context: string) {
 	const messages = templates.getSingleTaskPromptMessages(
 		"You're an AI that generates titles for chats \n Keep them short, summarise the chat, don't be too specific \n" +
 			"Don't enumerate the points, don't use the word 'chat' in the title \n" +
 			"SUMMARIZE the chat in a few words",
-		JSON.stringify(context)
+		context
 	);
 
 	const openai: OpenAI | null = getOpenAI();

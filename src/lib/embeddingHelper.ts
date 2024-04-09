@@ -30,6 +30,22 @@ export async function getSimilarMessagesToQuery(
 	return filteredOrderedMessages.map((result) => result.object.message);
 }
 
+export async function getSimilarityFromMessagesToQuery(
+	messages: MessageStructure[],
+	query: string
+) {
+	const embeddedQuery = await getEmbedding(query);
+	const embeddingIndexOfMessages = await getEmbeddingIndexOfMessages(messages);
+	const messagesOrderedBySimilarity = await embeddingIndexOfMessages.search(embeddedQuery, {
+		topK: embeddingIndexOfMessages.size()
+	});
+
+	const messageSimilarities = messagesOrderedBySimilarity.map((obj) => obj.similarity);
+
+	const sum = messageSimilarities.reduce((a, b) => a + b, 0);
+	return sum / messageSimilarities.length;
+}
+
 async function getEmbeddingIndexOfMessages(messages: MessageStructure[]) {
 	const embeddedContextPromise = messages.map(async (message, index) => {
 		return {

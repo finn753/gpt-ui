@@ -5,12 +5,12 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Pencil, Sparkles, X } from "lucide-svelte";
 	import Check from "lucide-svelte/icons/check";
-	import { chatContentMap, chatDataMap, lastContextOfChat, newChatSettings } from "$lib/stores";
+	import { chatDataMap, lastContextOfChat, newChatSettings } from "$lib/stores";
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
 	import { changeAssistantData, changeTags, changeTitle } from "$lib/chatOperations";
-	import { generateTitle } from "$lib/generationHelper";
+	import * as chatService from "$lib/chatService"
 
 	const modelSelection = [
 		{ value: "", label: "Custom" },
@@ -126,8 +126,7 @@
 
 	async function generateNewTitle() {
 		if (chatID) {
-			let newTitle = await generateTitle($chatContentMap[chatID]);
-			if (newTitle) await changeTitle(chatID, newTitle);
+			await chatService.setGeneratedTitleForChat(chatID)
 		}
 	}
 

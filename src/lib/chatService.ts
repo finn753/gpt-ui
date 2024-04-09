@@ -3,13 +3,16 @@ import { get } from "svelte/store";
 import * as chatOperations from "$lib/chatOperations";
 import type { ChatDataMap, MessageStructure } from "$lib/types";
 import * as generationHelper from "$lib/generationHelper";
-import { generateTitle } from "$lib/generationHelper";
 import * as embeddingHelper from "$lib/embeddingHelper";
 import * as templates from "$lib/templates";
+import { browser } from "$app/environment";
 
 export async function setGeneratedTitleForChat(chatID: string) {
 	const messages = get(chatContentMap)[chatID] || [];
-	const newTitle = await generateTitle(messages);
+	const summary = get(chatDataMap)[chatID].summary;
+
+	if (browser) alert(summary);
+	const newTitle = await generationHelper.generateTitle(summary || JSON.stringify(messages));
 	if (newTitle) await chatOperations.changeTitle(chatID, newTitle);
 }
 
@@ -88,5 +91,17 @@ export function searchChats(chatMap: ChatDataMap, query: string): ChatDataMap {
 }
 
 async function isSummaryNeededForChat(chatID: string): Promise<boolean> {
-	return !get(chatDataMap)[chatID].summary;
+	const currentSummary = get(chatDataMap)[chatID].summary;
+	//const context = [...get(lastContextOfChat)[chatID], ...get(chatContentMap)[chatID].slice(-1)];
+	const context = get(chatContentMap)[chatID].slice(-6);
+
+	if (!currentSummary) return true;
+
+	const similarity = await embeddingHelper.getSimilarityFromMessagesToQuery(
+		context.slice(-2),
+		currentSummary
+	);
+	if (browser) alert(similarity);
+
+	return similarity < 0.8;
 }
