@@ -1,3 +1,5 @@
+import type OpenAI from "openai";
+
 export type AssistantStructure = {
 	model: string;
 	temperature: number;
@@ -25,3 +27,4 @@ export type MessageStructure = {
 
 export type ChatDataMap = Record<string, ChatStructure>;
 export type ChatContentMap = Record<string, MessageStructure[]>;
+export type GenerationHistory = { images: OpenAI.Images.Image[] };

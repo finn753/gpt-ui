@@ -74,6 +74,27 @@ export async function* generateResponse(
 	}
 }
 
+export async function generateImage(prompt: string, model = "dall-e-2") {
+	const openai: OpenAI | null = getOpenAI();
+	if (!openai) return;
+
+	try {
+		const completion = await openai.images.generate({
+			model,
+			prompt,
+			quality: "standard",
+			response_format: "b64_json",
+			size: "1024x1024",
+			style: "vivid"
+		});
+
+		return completion.data[0];
+	} catch (e: unknown) {
+		errorHandler.handleError("Failed to generate image", e);
+		return;
+	}
+}
+
 function chatMessagesToCompletionMessages(
 	chatMessages: MessageStructure[],
 	systemMessage: string
