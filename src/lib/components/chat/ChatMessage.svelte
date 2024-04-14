@@ -59,8 +59,11 @@
 	{/if}
 
 	<div class="flex flex-row items-center py-2 opacity-0 transition-opacity group-hover:opacity-100">
-		<Button class="p-0" variant="icon" size="none" on:click={copyToClipboard}
-			><Clipboard size={20} /></Button
+		<Button
+			class="p-0 opacity-50 hover:opacity-100"
+			variant="icon"
+			size="none"
+			on:click={copyToClipboard}><Clipboard size={20} /></Button
 		>
 	</div>
 </div>

@@ -10,6 +10,7 @@
 	import { Badge } from "$lib/components/ui/badge";
 	import { Input } from "$lib/components/ui/input";
 	import * as chatService from "$lib/chatService";
+	import { Separator } from "$lib/components/ui/separator";
 
 	export let chatMap: ChatDataMap = {};
 
@@ -96,6 +97,9 @@
 					</p>
 				</div>
 			</Button>
+			<div class="px-4 last:hidden">
+				<Separator />
+			</div>
 		{/each}
 	</div>
 </div>

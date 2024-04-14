@@ -23,5 +23,5 @@ export type InputEvents = {
 export {
 	Root as InputNumber,
 	//
-	Root as Input,
+	Root as Input
 };

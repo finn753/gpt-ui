@@ -3,9 +3,9 @@
 	import { onMount } from "svelte";
 	import { Button } from "$lib/components/ui/button";
 	import { page } from "$app/stores";
-	import { AudioLines, History, Image, Wrench } from 'lucide-svelte';
-	import { generationHistory } from '$lib/stores';
-	import { Separator } from '$lib/components/ui/separator';
+	import { AudioLines, History, Image, Wrench } from "lucide-svelte";
+	import { generationHistory } from "$lib/stores";
+	import { Separator } from "$lib/components/ui/separator";
 
 	const size = 24;
 	const strokeWidth = 2;
@@ -62,15 +62,21 @@
 				Generated Tools
 			</Button>
 
-			<Separator class="my-2"/>
+			<Separator class="my-2" />
 
-			<h2 class="text-xl font-semibold flex gap-2 items-center"><History/> Current history</h2>
+			<h2 class="flex items-center gap-2 text-xl font-semibold"><History /> Current history</h2>
 			<div class="flex flex-col gap-2 pt-2">
 				{#if currentPath.startsWith("/generator/images")}
 					{#each $generationHistory.images as imageData}
 						<div class="flex flex-row items-center justify-between gap-2">
-							<img src="data:image/png;base64,{imageData.b64_json}" alt="Generated output" class="size-24 rounded-lg" />
-							<Button class="" href="data:image/png;base64,{imageData.b64_json}" download>Download</Button>
+							<img
+								src="data:image/png;base64,{imageData.b64_json}"
+								alt="Generated output"
+								class="size-24 rounded-lg"
+							/>
+							<Button class="" href="data:image/png;base64,{imageData.b64_json}" download
+								>Download</Button
+							>
 						</div>
 					{/each}
 				{/if}

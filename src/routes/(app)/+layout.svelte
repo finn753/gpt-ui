@@ -35,9 +35,7 @@
 	>
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<Button
-					variant={currentPath.startsWith("/chats") ? "secondary" : "ghost"}
-					href="/chats">
+				<Button variant={currentPath.startsWith("/chats") ? "secondary" : "ghost"} href="/chats">
 					<MessagesSquare {size} {strokeWidth} {color} />
 				</Button>
 			</Tooltip.Trigger>

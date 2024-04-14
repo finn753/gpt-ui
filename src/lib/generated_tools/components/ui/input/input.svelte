@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { HTMLInputAttributes } from "svelte/elements";
 	import { cn } from "$lib/utils";
-	import {type InputEvents, inputStyleClasses} from ".";
+	import { type InputEvents, inputStyleClasses } from ".";
 
 	type $$Props = HTMLInputAttributes;
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -13,10 +13,7 @@
 </script>
 
 <input
-	class={cn(
-		inputStyleClasses,
-		className
-	)}
+	class={cn(inputStyleClasses, className)}
 	bind:value
 	on:blur
 	on:change

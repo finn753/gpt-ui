@@ -1,5 +1,5 @@
 <script>
-	import ImageGenerator from '$lib/components/generator/ImageGenerator.svelte';
+	import ImageGenerator from "$lib/components/generator/ImageGenerator.svelte";
 </script>
 
-<ImageGenerator class="size-full"/>
+<ImageGenerator class="size-full" />
