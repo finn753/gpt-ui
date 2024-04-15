@@ -44,7 +44,8 @@ export async function* generateResponse(
 	model?: string,
 	temperature?: number,
 	top_p?: number,
-	systemMessage?: string
+	systemMessage?: string,
+	imageAttachments?: File[]
 ): AsyncGenerator<MessageStructure | undefined> {
 	model = model || STANDARD_MODEL;
 	temperature = parseFloat(String(temperature)) || 0.5;
@@ -53,7 +54,7 @@ export async function* generateResponse(
 
 	chatOperations.updateLastContextOfChat(get(selectedChatID) as string, context);
 
-	const messages = chatMessagesToCompletionMessages(context, systemMessage);
+	const messages = await chatMessagesToCompletionMessages(context, systemMessage, imageAttachments);
 
 	const responseMessage: MessageStructure = templates.getAssistantResponseMessageFromModel(model);
 
@@ -116,15 +117,54 @@ export async function generateVoice(input: string, voice: string) {
 	}
 }
 
-function chatMessagesToCompletionMessages(
+async function chatMessagesToCompletionMessages(
 	chatMessages: MessageStructure[],
-	systemMessage: string
-): ChatCompletionMessageParam[] {
-	const messages = chatMessages.map((message) => {
+	systemMessage: string,
+	imageAttachments?: File[]
+): Promise<ChatCompletionMessageParam[]> {
+	type ContentType =
+		| { type: "text"; text: string }
+		| { type: "image_url"; image_url: { url: string } };
+
+	const messages: { role: string; content: ContentType[] }[] = chatMessages.map((message) => {
 		return {
 			role: message.role as string,
-			content: message.content
+			content: [{ type: "text", text: message.content as string }]
 		};
+	});
+
+	const base64Strings: string[] = [];
+
+	if (imageAttachments) {
+		const promises = imageAttachments.map((file) => {
+			return new Promise<string>((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					const base64 = e.target?.result as string;
+					resolve(base64);
+				};
+				reader.onerror = (e) => {
+					reject(new Error(`Failed to read file: ${e.target?.error}`));
+				};
+				reader.readAsDataURL(file);
+			});
+		});
+
+		try {
+			const results = await Promise.all(promises);
+			base64Strings.push(...results);
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	const query = messages.pop();
+
+	base64Strings.forEach((image) => {
+		query?.content.push({
+			type: "image_url",
+			image_url: { url: image }
+		});
 	});
 
 	return [
@@ -132,7 +172,8 @@ function chatMessagesToCompletionMessages(
 			role: "system",
 			content: systemMessage
 		},
-		...(messages as ChatCompletionMessageParam[])
+		...(messages as ChatCompletionMessageParam[]),
+		query as ChatCompletionMessageParam
 	];
 }
 

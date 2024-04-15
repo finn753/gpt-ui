@@ -17,7 +17,7 @@
 		{ value: "fable", label: "Fable" },
 		{ value: "onyx", label: "Onyx" },
 		{ value: "nova", label: "Nova" },
-		{ value: "shimmer", label: "Shimmer" },
+		{ value: "shimmer", label: "Shimmer" }
 	];
 	let voice = voiceSelection[0].value;
 	let selectionModel: { value: string; label: string } = voiceSelection[0];
@@ -28,7 +28,7 @@
 
 		if (!input) return;
 
-		const generatedVoice = await generationHelper.generateVoice(input, voice)
+		const generatedVoice = await generationHelper.generateVoice(input, voice);
 
 		if (!generatedVoice) return;
 
@@ -65,14 +65,9 @@
 
 	{#if $generationHistory.voice[0]}
 		<div class="flex flex-col items-center gap-2">
-			<audio
-				class="w-full"
-				controls
-				src="data:audio/mpeg;base64,{$generationHistory.voice[0]}" />
-			<Button
-				class="w-full"
-				href="data:audio/mpeg;base64,{$generationHistory.voice[0]}"
-				download>Download</Button
+			<audio class="w-full" controls src="data:audio/mpeg;base64,{$generationHistory.voice[0]}" />
+			<Button class="w-full" href="data:audio/mpeg;base64,{$generationHistory.voice[0]}" download
+				>Download</Button
 			>
 		</div>
 	{/if}

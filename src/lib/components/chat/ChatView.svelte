@@ -14,6 +14,7 @@
 	export let generating = false;
 
 	let inputValue = "";
+	let currentImageAttachments: File[] = [];
 
 	let scrollContainer: HTMLElement;
 
@@ -35,7 +36,7 @@
 		}
 	}
 
-	async function onSendMessage(event: CustomEvent<{ value: string }>) {
+	async function onSendMessage(event: CustomEvent<{ value: string, images?: File[] }>) {
 		generating = true;
 
 		let isNewChat = !chatID;
@@ -49,6 +50,7 @@
 		}
 
 		inputValue = "";
+		currentImageAttachments = event.detail.images || [];
 
 		const success = await chatService.sendUserMessage(chatID, event.detail.value);
 
@@ -116,7 +118,8 @@
 			model,
 			temperature,
 			topP,
-			systemMessage
+			systemMessage,
+			currentImageAttachments
 		)) {
 			response = r;
 			generatingProgress = response || null;
@@ -140,5 +143,5 @@
 			{/if}
 		</div>
 	</div>
-	<ChatInput bind:value={inputValue} on:submit={onSendMessage} {generating} />
+	<ChatInput bind:value={inputValue} on:submit={onSendMessage} {generating} canAttachImages={$chatDataMap[chatID].model.model === "gpt-4-turbo"} />
 </div>
