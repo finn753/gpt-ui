@@ -80,6 +80,20 @@
 						</div>
 					{/each}
 				{/if}
+
+				{#if currentPath.startsWith("/generator/voice")}
+					{#each $generationHistory.voice as voiceData}
+						<div class="flex flex-row items-center justify-between gap-2">
+							<audio
+								class="w-full"
+								controls
+								src="data:audio/mpeg;base64,{voiceData}" />
+							<Button class="" href="data:audio/wav;base64,{voiceData}" download
+								>Download</Button
+							>
+						</div>
+					{/each}
+				{/if}
 			</div>
 		</div>
 	</CollapsibleSidebar>

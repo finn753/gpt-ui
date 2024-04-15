@@ -27,4 +27,4 @@ export type MessageStructure = {
 
 export type ChatDataMap = Record<string, ChatStructure>;
 export type ChatContentMap = Record<string, MessageStructure[]>;
-export type GenerationHistory = { images: OpenAI.Images.Image[] };
+export type GenerationHistory = { images: OpenAI.Images.Image[]; voice: string[] };

@@ -6,6 +6,7 @@ import type { ChatCompletionMessageParam } from "openai/resources/chat/completio
 import * as errorHandler from "$lib/errorHandler";
 import * as chatOperations from "$lib/chatOperations";
 import * as templates from "$lib/templates";
+import type { SpeechCreateParams } from "openai/resources/audio/speech";
 
 const STANDARD_MODEL = "gpt-3.5-turbo";
 
@@ -91,6 +92,26 @@ export async function generateImage(prompt: string, model = "dall-e-2") {
 		return completion.data[0];
 	} catch (e: unknown) {
 		errorHandler.handleError("Failed to generate image", e);
+		return;
+	}
+}
+
+export async function generateVoice(input: string, voice: string) {
+	const openai: OpenAI | null = getOpenAI();
+	if (!openai) return;
+
+	try {
+		const mp3 = await openai.audio.speech.create(<SpeechCreateParams>{
+			model: "tts-1",
+			voice,
+			input
+		});
+
+		const buffer = await mp3.arrayBuffer();
+		const uint8Array = new Uint8Array(buffer);
+		return btoa(String.fromCharCode.apply(null, uint8Array as unknown as number[]));
+	} catch (e: unknown) {
+		errorHandler.handleError("Failed to generate voice", e);
 		return;
 	}
 }
