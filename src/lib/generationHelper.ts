@@ -7,6 +7,9 @@ import * as errorHandler from "$lib/errorHandler";
 import * as chatOperations from "$lib/chatOperations";
 import * as templates from "$lib/templates";
 import type { SpeechCreateParams } from "openai/resources/audio/speech";
+import { ChatOpenAI } from "@langchain/openai";
+import type { BaseLanguageModelInput } from "@langchain/core/language_models/base";
+import type { BaseMessageLike } from "@langchain/core/messages";
 
 const STANDARD_MODEL = "gpt-3.5-turbo";
 
@@ -18,10 +21,10 @@ export async function generateTitle(context: string) {
 		context
 	);
 
-	const openai: OpenAI | null = getOpenAI();
+	const openai: ChatOpenAI | null = getLangchainOpenAI();
 	if (!openai) return;
 
-	return (await generateChatCompletion(openai, messages))?.replace(/"/g, "");
+	return (await openai.invoke(messages)).content.toString().replace(/"/g, "");
 }
 
 export async function generateSummary(currentSummary: string, newMessages: MessageStructure[]) {
@@ -33,10 +36,10 @@ export async function generateSummary(currentSummary: string, newMessages: Messa
 		"Current summary: \n " + currentSummary + "\n\n" + "Messages: \n" + JSON.stringify(newMessages)
 	);
 
-	const openai: OpenAI | null = getOpenAI();
+	const openai: ChatOpenAI | null = getLangchainOpenAI();
 	if (!openai) return;
 
-	return await generateChatCompletion(openai, messages);
+	return (await openai.invoke(messages)).content.toString();
 }
 
 export async function* generateResponse(
@@ -54,18 +57,27 @@ export async function* generateResponse(
 
 	chatOperations.updateLastContextOfChat(get(selectedChatID) as string, context);
 
-	const messages = await chatMessagesToCompletionMessages(context, systemMessage, imageAttachments);
+	const langchainMessages = await langchainChatMessagesToCompletionMessages(
+		context,
+		systemMessage,
+		imageAttachments
+	);
 
 	const responseMessage: MessageStructure = templates.getAssistantResponseMessageFromModel(model);
 
-	const openai: OpenAI | null = getOpenAI();
+	const openai: ChatOpenAI | null = getLangchainOpenAI();
 	if (!openai) return;
 
+	openai.modelName = model;
+	openai.temperature = temperature;
+	openai.topP = top_p;
+
 	try {
-		const stream = streamChatCompletion(openai, messages, model, temperature, top_p);
+		const stream = await openai.stream(langchainMessages);
+		//const stream = streamChatCompletion(openai, messages, model, temperature, top_p);
 
 		for await (const part of stream) {
-			responseMessage.content = part;
+			responseMessage.content += part.content.toString();
 			yield responseMessage;
 		}
 
@@ -177,6 +189,22 @@ async function chatMessagesToCompletionMessages(
 	];
 }
 
+async function langchainChatMessagesToCompletionMessages(
+	chatMessages: MessageStructure[],
+	systemMessage: string,
+	imageAttachments?: File[]
+): Promise<BaseLanguageModelInput> {
+	const messages = await chatMessagesToCompletionMessages(
+		chatMessages,
+		systemMessage,
+		imageAttachments
+	);
+
+	return messages.map((message) => {
+		return [message.role, message.content] as BaseMessageLike;
+	});
+}
+
 function getOpenAI() {
 	try {
 		return new OpenAI({
@@ -189,40 +217,16 @@ function getOpenAI() {
 	}
 }
 
-async function generateChatCompletion(
-	openai: OpenAI,
-	messages: { role: string; content: string }[],
-	model = STANDARD_MODEL
-) {
-	const completion = await openai.chat.completions.create({
-		messages: messages as ChatCompletionMessageParam[],
-		model
-	});
-
-	return completion.choices[0].message.content;
-}
-
-async function* streamChatCompletion(
-	openai: OpenAI,
-	messages: ChatCompletionMessageParam[],
-	model = STANDARD_MODEL,
-	temperature = 0.5,
-	top_p = 1
-) {
-	const stream = await openai.chat.completions.create({
-		messages: messages as ChatCompletionMessageParam[],
-		model,
-		temperature,
-		top_p,
-		stream: true
-	});
-
-	let response = "";
-
-	for await (const part of stream) {
-		response = response + (part.choices[0]?.delta?.content || "");
-		yield response;
+function getLangchainOpenAI() {
+	try {
+		return new ChatOpenAI(
+			{
+				openAIApiKey: get(openaiApiKey) || ""
+			},
+			{ dangerouslyAllowBrowser: true }
+		);
+	} catch (e: unknown) {
+		errorHandler.handleError("Failed to initialize OpenAI", e);
+		return null;
 	}
-
-	return response;
 }

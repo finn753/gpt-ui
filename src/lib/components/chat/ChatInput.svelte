@@ -6,7 +6,7 @@
 	import { createEventDispatcher } from "svelte";
 	import ImageListInput from "$lib/components/chat/ImageListInput.svelte";
 
-	const dispatch = createEventDispatcher<{ submit: { value: string, images?: File[] } }>();
+	const dispatch = createEventDispatcher<{ submit: { value: string; images?: File[] } }>();
 
 	export let canAttachImages = true;
 	export let generating = false;
@@ -48,7 +48,7 @@
 	let isActionCommand = false;
 	let isActionMention = false;
 
-	$: if(!canAttachImages) imageInputFiles = [];
+	$: if (!canAttachImages) imageInputFiles = [];
 
 	function updateCursorPos() {
 		cursorPos = inputElement.selectionStart;
@@ -57,7 +57,7 @@
 	function send() {
 		if (value.trim() === "") return;
 
-		dispatch("submit", { value, images: imageInputFiles});
+		dispatch("submit", { value, images: imageInputFiles });
 	}
 
 	function onKeyDown(event: KeyboardEvent) {

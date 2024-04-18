@@ -36,7 +36,7 @@
 		}
 	}
 
-	async function onSendMessage(event: CustomEvent<{ value: string, images?: File[] }>) {
+	async function onSendMessage(event: CustomEvent<{ value: string; images?: File[] }>) {
 		generating = true;
 
 		let isNewChat = !chatID;
@@ -143,5 +143,12 @@
 			{/if}
 		</div>
 	</div>
-	<ChatInput bind:value={inputValue} on:submit={onSendMessage} {generating} canAttachImages={$chatDataMap[chatID] ? $chatDataMap[chatID].model.model === "gpt-4-turbo" : ($newChatSettings.model?.model) === "gpt-4-turbo"} />
+	<ChatInput
+		bind:value={inputValue}
+		on:submit={onSendMessage}
+		{generating}
+		canAttachImages={$chatDataMap[chatID]
+			? $chatDataMap[chatID].model.model === "gpt-4-turbo"
+			: $newChatSettings.model?.model === "gpt-4-turbo"}
+	/>
 </div>

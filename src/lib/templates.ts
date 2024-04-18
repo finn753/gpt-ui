@@ -1,4 +1,5 @@
 import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
+import type { BaseLanguageModelInput } from "@langchain/core/language_models/base";
 
 export function getAssistantResponseMessageFromModel(model: string): MessageStructure {
 	return {
@@ -9,16 +10,10 @@ export function getAssistantResponseMessageFromModel(model: string): MessageStru
 	};
 }
 
-export function getSingleTaskPromptMessages(system: string, user: string) {
+export function getSingleTaskPromptMessages(system: string, user: string): BaseLanguageModelInput {
 	return [
-		{
-			role: "system",
-			content: system
-		},
-		{
-			role: "user",
-			content: user
-		}
+		["system", system],
+		["user", user]
 	];
 }
 

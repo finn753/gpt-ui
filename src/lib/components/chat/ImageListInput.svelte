@@ -17,9 +17,15 @@
 	<div class={cn(className, "flex w-full gap-4 overflow-x-auto p-4 pt-6")}>
 		{#each imageFiles as imageFile, index}
 			<div class="relative">
-				<img class="size-24 rounded-lg object-cover" src={URL.createObjectURL(imageFile)} alt={imageFile.name} />
-				<Button class="size-6 p-1 rounded-full absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2"
-								on:click={() => removeImage(index)}>
+				<img
+					class="size-24 rounded-lg object-cover"
+					src={URL.createObjectURL(imageFile)}
+					alt={imageFile.name}
+				/>
+				<Button
+					class="absolute right-0 top-0 size-6 -translate-y-1/2 translate-x-1/2 transform rounded-full p-1"
+					on:click={() => removeImage(index)}
+				>
 					<X size={16} />
 				</Button>
 			</div>
