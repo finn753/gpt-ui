@@ -3,8 +3,8 @@
 	import { Input } from "$lib/components/ui/input";
 	import { Button } from "$lib/components/ui/button";
 	import * as Select from "$lib/components/ui/select";
-	import * as generationHelper from "$lib/generationHelper";
 	import { generationHistory } from "$lib/stores";
+	import * as modelInvoker from "$lib/modelInvoker";
 
 	let className = "";
 	export { className as class };
@@ -28,7 +28,7 @@
 
 		if (!input) return;
 
-		const generatedVoice = await generationHelper.generateVoice(input, voice);
+		const generatedVoice = await modelInvoker.generateVoice(input, voice);
 
 		if (!generatedVoice) return;
 

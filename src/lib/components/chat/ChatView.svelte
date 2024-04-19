@@ -115,9 +115,11 @@
 		let response: MessageStructure | undefined;
 		for await (const r of generationHelper.generateResponse(
 			context,
-			model,
-			temperature,
-			topP,
+			{
+				model,
+				temperature,
+				top_p: topP
+			},
 			systemMessage,
 			currentImageAttachments
 		)) {

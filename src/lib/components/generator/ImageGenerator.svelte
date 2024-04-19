@@ -2,9 +2,9 @@
 	import { cn } from "$lib/utils";
 	import { Input } from "$lib/components/ui/input";
 	import { Button } from "$lib/components/ui/button";
-	import * as Select from "$lib/components/ui/select";
-	import * as generationHelper from "$lib/generationHelper";
 	import { generationHistory } from "$lib/stores";
+	import * as Select from "$lib/components/ui/select";
+	import * as modelInvoker from "$lib/modelInvoker";
 
 	let className = "";
 	export { className as class };
@@ -24,7 +24,7 @@
 
 		if (!prompt) return;
 
-		const generatedImage = await generationHelper.generateImage(prompt, model);
+		const generatedImage = await modelInvoker.generateImage(prompt, model);
 
 		if (!generatedImage) return;
 

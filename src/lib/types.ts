@@ -18,7 +18,7 @@ export type ChatStructure = {
 
 export type MessageStructure = {
 	content: string;
-	role: "user" | "assistant" | "tool";
+	role: "user" | "assistant" | "tool" | "system";
 	model: string;
 	created_at: Date;
 	pinned?: boolean; // TODO - Include this in the type
