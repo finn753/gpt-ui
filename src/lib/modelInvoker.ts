@@ -3,6 +3,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { get } from "svelte/store";
 import { openaiApiKey } from "$lib/stores";
 import * as errorHandler from "$lib/errorHandler";
+import * as llmTools from "$lib/llmTools";
 import OpenAI from "openai";
 import type { SpeechCreateParams } from "openai/resources/audio/speech";
 import type { llmToolMap } from "$lib/llmTools";
@@ -17,16 +18,6 @@ export async function generateChatResponse(
 	return (await model.invoke(messages)).content.toString();
 }
 
-export async function streamChatResponse(
-	messages: BaseLanguageModelInput,
-	options?: { modelName?: string; temperature?: number; topP?: number }
-) {
-	const model: ChatOpenAI | null = getLangchainModel(options);
-	if (!model) return;
-
-	return await model.stream(messages);
-}
-
 export async function* streamChatResponseWithTools(
 	messages: OpenAI.Chat.ChatCompletionMessageParam[],
 	tools: llmToolMap,
@@ -34,6 +25,8 @@ export async function* streamChatResponseWithTools(
 ) {
 	const model: OpenAI | null = getOpenAI();
 	if (!model) return;
+
+	messages = [...messages];
 
 	const response = await model.chat.completions.create({
 		model: "gpt-3.5-turbo",
@@ -56,24 +49,7 @@ export async function* streamChatResponseWithTools(
 			messages.push(assistantMessage);
 
 			const toolCalls = chunk.choices[0].delta.tool_calls;
-			for (const toolCall of toolCalls) {
-				const functionName = toolCall.function?.name;
-				const functionArgs = toolCall.function?.arguments;
-				if (!functionName) continue;
-
-				try {
-					const fn = tools[functionName].function;
-					const result = await fn(JSON.parse(functionArgs || "{}"));
-
-					messages.push({
-						tool_call_id: toolCall.id as string,
-						role: "tool",
-						content: result
-					});
-				} catch (e: unknown) {
-					errorHandler.handleError("Failed to execute tool", e);
-				}
-			}
+			messages = await llmTools.executeToolCalls(toolCalls, tools, messages);
 
 			const toolResponse = await model.chat.completions.create({
 				model: "gpt-3.5-turbo",
