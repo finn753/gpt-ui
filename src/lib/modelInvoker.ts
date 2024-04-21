@@ -45,6 +45,8 @@ export async function* streamChatResponseWithTools(
 
 	for await (const chunk of response) {
 		if (chunk.choices[0].delta.tool_calls) {
+			yield chunk;
+
 			const assistantMessage: OpenAI.ChatCompletionMessageParam = {
 				role: "assistant",
 				content: "",
@@ -61,7 +63,7 @@ export async function* streamChatResponseWithTools(
 
 				try {
 					const fn = tools[functionName].function;
-					const result = fn(JSON.parse(functionArgs || "{}"));
+					const result = await fn(JSON.parse(functionArgs || "{}"));
 
 					messages.push({
 						tool_call_id: toolCall.id as string,
