@@ -1,7 +1,7 @@
 <script>
 	import { Button } from "$lib/components/ui/button";
 	import { MessagesSquare, User, Images, Brush, LayoutTemplate } from "lucide-svelte";
-	import { openaiApiKey, tavilyApiKey } from '$lib/stores';
+	import { openaiApiKey, tavilyApiKey } from "$lib/stores";
 	import { initializeModel } from "client-vector-search";
 	import { onMount } from "svelte";
 

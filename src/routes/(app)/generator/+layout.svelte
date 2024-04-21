@@ -6,9 +6,7 @@
 	import { AudioLines, History, Image, Wrench } from "lucide-svelte";
 	import { generationHistory } from "$lib/stores";
 	import { Separator } from "$lib/components/ui/separator";
-
-	const size = 24;
-	const strokeWidth = 2;
+	import SidebarButton from "$lib/components/SidebarButton.svelte";
 
 	$: currentPath = $page.url.pathname;
 
@@ -37,30 +35,18 @@
 		on:open={() => handleMobileSidebar()}
 	>
 		<div class="flex flex-col gap-2">
-			<Button
-				class="flex w-full justify-start gap-2 pl-2 text-sm font-medium text-muted-foreground"
-				variant={currentPath.startsWith("/generator/images") ? "secondary" : "ghost"}
-				href="/generator/images"
-			>
-				<Image {size} {strokeWidth} />
+			<SidebarButton path="/generator/images">
+				<Image />
 				Image Generator
-			</Button>
-			<Button
-				class="flex w-full justify-start gap-2 pl-2 text-sm font-medium text-muted-foreground"
-				variant={currentPath.startsWith("/generator/voice") ? "secondary" : "ghost"}
-				href="/generator/voice"
-			>
-				<AudioLines {size} {strokeWidth} />
+			</SidebarButton>
+			<SidebarButton path="/generator/voice">
+				<AudioLines />
 				Text To Speech
-			</Button>
-			<Button
-				class="flex w-full justify-start gap-2 pl-2 text-sm font-medium text-muted-foreground"
-				variant={currentPath.startsWith("/generator/tools") ? "secondary" : "ghost"}
-				href="/generator/tools"
-			>
-				<Wrench {size} {strokeWidth} />
+			</SidebarButton>
+			<SidebarButton path="/generator/tools">
+				<Wrench />
 				Generated Tools
-			</Button>
+			</SidebarButton>
 
 			<Separator class="my-2" />
 

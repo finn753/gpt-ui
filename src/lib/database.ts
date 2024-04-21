@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AssistantStructure, MessageStructure } from "$lib/types";
 import * as errorHandler from "$lib/errorHandler";
+import { toast } from "svelte-sonner";
 
 class Database {
 	private _supabaseClient: SupabaseClient | null = null;
@@ -144,6 +145,33 @@ class Database {
 			return false;
 		}
 
+		return true;
+	}
+
+	async changeApiKey(provider: string, value: string) {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return false;
+		}
+
+		const userId = await this._supabaseClient.auth.getUser().then((user) => user.data.user?.id);
+
+		if (!userId) {
+			toast.error("You need to be logged in to save your API key.");
+			return false;
+		}
+
+		const response = await this._supabaseClient
+			.from("Profiles")
+			.update({ [provider]: value })
+			.eq("id", userId);
+
+		if (response.error) {
+			toast.error(response.error.message);
+			return false;
+		}
+
+		toast.success("API key saved");
 		return true;
 	}
 }
