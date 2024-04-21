@@ -5,6 +5,7 @@ import { openaiApiKey } from "$lib/stores";
 import * as errorHandler from "$lib/errorHandler";
 import OpenAI from "openai";
 import type { SpeechCreateParams } from "openai/resources/audio/speech";
+import type { llmToolMap } from "$lib/llmTools";
 
 export async function generateChatResponse(
 	messages: BaseLanguageModelInput,
@@ -24,6 +25,70 @@ export async function streamChatResponse(
 	if (!model) return;
 
 	return await model.stream(messages);
+}
+
+export async function* streamChatResponseWithTools(
+	messages: OpenAI.Chat.ChatCompletionMessageParam[],
+	tools: llmToolMap,
+	options?: { model?: string; temperature?: number; topP?: number }
+) {
+	const model: OpenAI | null = getOpenAI();
+	if (!model) return;
+
+	const response = await model.chat.completions.create({
+		model: "gpt-3.5-turbo",
+		...options,
+		messages,
+		tools: Object.values(tools).map((tool) => tool.input),
+		stream: true
+	});
+
+	for await (const chunk of response) {
+		if (chunk.choices[0].delta.tool_calls) {
+			const assistantMessage: OpenAI.ChatCompletionMessageParam = {
+				role: "assistant",
+				content: "",
+				tool_calls: chunk.choices[0].delta.tool_calls as OpenAI.Chat.ChatCompletionMessageToolCall[]
+			};
+
+			messages.push(assistantMessage);
+
+			const toolCalls = chunk.choices[0].delta.tool_calls;
+			for (const toolCall of toolCalls) {
+				const functionName = toolCall.function?.name;
+				const functionArgs = toolCall.function?.arguments;
+				if (!functionName) continue;
+
+				try {
+					const fn = tools[functionName].function;
+					const result = fn(JSON.parse(functionArgs || "{}"));
+
+					messages.push({
+						tool_call_id: toolCall.id as string,
+						role: "tool",
+						content: result
+					});
+				} catch (e: unknown) {
+					errorHandler.handleError("Failed to execute tool", e);
+				}
+			}
+
+			const toolResponse = await model.chat.completions.create({
+				model: "gpt-3.5-turbo",
+				...options,
+				messages,
+				tools: Object.values(tools).map((tool) => tool.input),
+				stream: true
+			});
+
+			for await (const toolChunk of toolResponse) {
+				yield toolChunk;
+			}
+
+			break;
+		}
+		yield chunk;
+	}
 }
 
 function getLangchainModel(options?: { modelName?: string; temperature?: number; topP?: number }) {

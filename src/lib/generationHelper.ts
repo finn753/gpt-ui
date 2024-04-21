@@ -6,8 +6,7 @@ import * as errorHandler from "$lib/errorHandler";
 import * as chatOperations from "$lib/chatOperations";
 import * as templates from "$lib/templates";
 import * as modelInvoker from "$lib/modelInvoker";
-import type { BaseLanguageModelInput } from "@langchain/core/language_models/base";
-import type { BaseMessageLike } from "@langchain/core/messages";
+import { getCurrentTime, type llmToolMap } from "$lib/llmTools";
 
 const STANDARD_MODEL = "gpt-3.5-turbo";
 
@@ -44,22 +43,22 @@ export async function* generateResponse(
 
 	chatOperations.updateLastContextOfChat(get(selectedChatID) as string, context);
 
-	const langchainMessages = await langchainChatMessagesToCompletionMessages(
-		context,
-		systemMessage,
-		imageAttachments
-	);
+	const messages = await chatMessagesToCompletionMessages(context, systemMessage, imageAttachments);
 
 	const responseMessage: MessageStructure = templates.getAssistantResponseMessageFromModel(
 		options?.model || STANDARD_MODEL
 	);
 
+	const tools: llmToolMap = {
+		getCurrentTime
+	};
+
 	try {
-		const stream = await modelInvoker.streamChatResponse(langchainMessages, options);
+		const stream = modelInvoker.streamChatResponseWithTools(messages, tools, options);
 		if (!stream) throw new Error("Failed to generate response");
 
 		for await (const part of stream) {
-			responseMessage.content += part.content.toString();
+			responseMessage.content += part.choices[0].delta.content?.toString() || "";
 			yield responseMessage;
 		}
 
@@ -128,20 +127,4 @@ async function chatMessagesToCompletionMessages(
 		...(messages as ChatCompletionMessageParam[]),
 		query as ChatCompletionMessageParam
 	];
-}
-
-async function langchainChatMessagesToCompletionMessages(
-	chatMessages: MessageStructure[],
-	systemMessage: string,
-	imageAttachments?: File[]
-): Promise<BaseLanguageModelInput> {
-	const messages = await chatMessagesToCompletionMessages(
-		chatMessages,
-		systemMessage,
-		imageAttachments
-	);
-
-	return messages.map((message) => {
-		return [message.role, message.content] as BaseMessageLike;
-	});
 }
