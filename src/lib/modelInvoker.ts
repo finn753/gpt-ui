@@ -36,19 +36,30 @@ export async function* streamChatResponseWithTools(
 		stream: true
 	});
 
+	let toolCalls: OpenAI.ChatCompletionMessageToolCall[] = [];
+
 	for await (const chunk of response) {
 		if (chunk.choices[0].delta.tool_calls) {
+			if (!toolCalls.length)
+				toolCalls = chunk.choices[0].delta.tool_calls as OpenAI.ChatCompletionMessageToolCall[];
+
+			for (let i = 0; i < toolCalls.length; i++) {
+				toolCalls[i].function.arguments +=
+					chunk.choices[0].delta.tool_calls[i].function?.arguments || "";
+			}
+		}
+
+		if (chunk.choices[0].finish_reason === "tool_calls") {
 			yield chunk;
 
 			const assistantMessage: OpenAI.ChatCompletionMessageParam = {
 				role: "assistant",
 				content: "",
-				tool_calls: chunk.choices[0].delta.tool_calls as OpenAI.Chat.ChatCompletionMessageToolCall[]
+				tool_calls: toolCalls
 			};
 
 			messages.push(assistantMessage);
 
-			const toolCalls = chunk.choices[0].delta.tool_calls;
 			messages = await llmTools.executeToolCalls(toolCalls, tools, messages);
 
 			const toolResponse = await model.chat.completions.create({

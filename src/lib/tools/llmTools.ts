@@ -1,10 +1,7 @@
 import type { ChatCompletionTool } from "openai/resources/chat/completions";
 import OpenAI from "openai";
 import * as errorHandler from "$lib/errorHandler";
-import type { ChatCompletionChunk } from "openai/resources/chat/completions";
 import { runTavilySearch } from "$lib/tools/tavily";
-
-type ToolCall = ChatCompletionChunk.Choice.Delta.ToolCall;
 
 export type llmTool<T extends Record<string, unknown> = Record<string, unknown>> = {
 	input: ChatCompletionTool;
@@ -46,22 +43,28 @@ export const getTavilySearchResults: llmTool<{ query: string }> = {
 		type: "function"
 	},
 	function: async (args: { query: string }) => {
+		console.error("Args", args);
+
 		return await runTavilySearch(args.query);
 	}
 };
 
 export async function executeToolCalls(
-	toolCalls: ToolCall[],
+	toolCalls: OpenAI.ChatCompletionMessageToolCall[],
 	tools: llmToolMap,
 	messages: OpenAI.Chat.ChatCompletionMessageParam[]
 ) {
 	for (const toolCall of toolCalls) {
 		const functionName = toolCall.function?.name;
 		const functionArgs = toolCall.function?.arguments;
+
+		if (functionArgs) console.error("Function Args", functionArgs);
+
 		if (!functionName) continue;
 
 		try {
 			const fn = tools[functionName].function;
+			console.error("Executing tool", functionName, functionArgs);
 			const result = await fn(JSON.parse(functionArgs || "{}"));
 
 			messages.push({

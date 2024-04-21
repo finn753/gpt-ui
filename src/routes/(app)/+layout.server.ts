@@ -1,8 +1,9 @@
 export const load = async (event) => {
 	const supabase = event.locals.supabase;
 
-	const response = await supabase.from("Profiles").select("openai_api_key").single();
+	const response = await supabase.from("Profiles").select().single();
 	const openaiApiKey = response.data.openai_api_key || null;
+	const tavilyApiKey = response.data.tavily_api_key || null;
 
-	return { openaiApiKey };
+	return { openaiApiKey, tavilyApiKey };
 };
