@@ -40,6 +40,18 @@
 		<h3 class="text-lg font-bold">{role} {model}</h3>
 		<p class="ml-2 text-sm text-muted-foreground">{format(created_at, "PP, HH:mm")}</p>
 	</div>
+
+	{#if message.tool_calls}
+		<div>
+			<p class="text-sm text-muted-foreground">Calling tools:</p>
+			<ul>
+				{#each message.tool_calls as tool}
+					<li class="text-sm text-muted-foreground">- {tool.function.name}</li>
+				{/each}
+			</ul>
+		</div>
+	{/if}
+
 	<p
 		class="prose dark:prose-invert
   prose-h1:text-xl prose-h1:font-bold

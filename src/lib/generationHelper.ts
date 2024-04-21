@@ -6,7 +6,8 @@ import * as errorHandler from "$lib/errorHandler";
 import * as chatOperations from "$lib/chatOperations";
 import * as templates from "$lib/templates";
 import * as modelInvoker from "$lib/modelInvoker";
-import { getCurrentTime, getTavilySearchResults, type llmToolMap } from "$lib/tools/llmTools";
+import { getTavilySearchResults, type llmToolMap } from "$lib/tools/llmTools";
+import OpenAI from "openai";
 
 const STANDARD_MODEL = "gpt-3.5-turbo";
 
@@ -50,7 +51,6 @@ export async function* generateResponse(
 	);
 
 	const tools: llmToolMap = {
-		getCurrentTime,
 		getTavilySearchResults
 	};
 
@@ -60,6 +60,8 @@ export async function* generateResponse(
 
 		for await (const part of stream) {
 			responseMessage.content += part.choices[0].delta.content?.toString() || "";
+			responseMessage.tool_calls = part.choices[0].delta
+				.tool_calls as OpenAI.ChatCompletionMessageToolCall[];
 			yield responseMessage;
 		}
 

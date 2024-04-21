@@ -51,6 +51,8 @@ export async function* streamChatResponseWithTools(
 		}
 
 		if (chunk.choices[0].finish_reason === "tool_calls") {
+			chunk.choices[0].delta.tool_calls =
+				toolCalls as OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall[];
 			yield chunk;
 
 			const assistantMessage: OpenAI.ChatCompletionMessageParam = {
@@ -72,6 +74,9 @@ export async function* streamChatResponseWithTools(
 			});
 
 			for await (const toolChunk of toolResponse) {
+				toolChunk.choices[0].delta.tool_calls =
+					toolCalls as OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall[];
+
 				yield toolChunk;
 			}
 

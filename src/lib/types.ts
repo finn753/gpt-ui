@@ -21,6 +21,7 @@ export type MessageStructure = {
 	role: "user" | "assistant" | "tool" | "system";
 	model: string;
 	created_at: Date;
+	tool_calls?: OpenAI.Chat.ChatCompletionMessageToolCall[];
 	pinned?: boolean; // TODO - Include this in the type
 	failed?: boolean;
 };
