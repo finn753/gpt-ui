@@ -6,7 +6,7 @@ import * as errorHandler from "$lib/errorHandler";
 import * as chatOperations from "$lib/chatOperations";
 import * as templates from "$lib/templates";
 import * as modelInvoker from "$lib/modelInvoker";
-import { getCurrentTime, type llmToolMap } from "$lib/llmTools";
+import { getCurrentTime, getTavilySearchResults, type llmToolMap } from "$lib/tools/llmTools";
 
 const STANDARD_MODEL = "gpt-3.5-turbo";
 
@@ -50,7 +50,8 @@ export async function* generateResponse(
 	);
 
 	const tools: llmToolMap = {
-		getCurrentTime
+		getCurrentTime,
+		getTavilySearchResults
 	};
 
 	try {

@@ -2,11 +2,16 @@ import type { ChatCompletionTool } from "openai/resources/chat/completions";
 import OpenAI from "openai";
 import * as errorHandler from "$lib/errorHandler";
 import type { ChatCompletionChunk } from "openai/resources/chat/completions";
+import { runTavilySearch } from "$lib/tools/tavily";
 
 type ToolCall = ChatCompletionChunk.Choice.Delta.ToolCall;
 
-export type llmTool = { input: ChatCompletionTool; function: (args: object) => Promise<string> };
-export type llmToolMap = Record<string, llmTool>;
+export type llmTool<T extends Record<string, unknown> = Record<string, unknown>> = {
+	input: ChatCompletionTool;
+	function: (args: T) => Promise<string>;
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type llmToolMap = Record<string, llmTool<any>>;
 
 export const getCurrentTime: llmTool = {
 	input: {
@@ -18,6 +23,30 @@ export const getCurrentTime: llmTool = {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function: async () => {
 		return new Date().toLocaleTimeString();
+	}
+};
+
+export const getTavilySearchResults: llmTool<{ query: string }> = {
+	input: {
+		function: {
+			name: "getTavilySearchResults",
+			description:
+				"A search engine optimized for comprehensive, accurate, and trusted results. Useful for when you need to answer questions about current events. Input should be a search query.",
+			parameters: {
+				type: "object",
+				properties: {
+					query: {
+						type: "string",
+						description: "The search query to use"
+					}
+				},
+				required: ["query"]
+			}
+		},
+		type: "function"
+	},
+	function: async (args: { query: string }) => {
+		return await runTavilySearch(args.query);
 	}
 };
 

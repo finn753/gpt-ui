@@ -3,10 +3,10 @@ import { ChatOpenAI } from "@langchain/openai";
 import { get } from "svelte/store";
 import { openaiApiKey } from "$lib/stores";
 import * as errorHandler from "$lib/errorHandler";
-import * as llmTools from "$lib/llmTools";
+import * as llmTools from "$lib/tools/llmTools";
 import OpenAI from "openai";
 import type { SpeechCreateParams } from "openai/resources/audio/speech";
-import type { llmToolMap } from "$lib/llmTools";
+import type { llmToolMap } from "$lib/tools/llmTools";
 
 export async function generateChatResponse(
 	messages: BaseLanguageModelInput,
