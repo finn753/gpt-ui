@@ -36,20 +36,25 @@ export async function* streamChatResponseWithTools(
 		stream: true
 	});
 
-	let toolCalls: OpenAI.ChatCompletionMessageToolCall[] = [];
+	const toolCalls: OpenAI.ChatCompletionMessageToolCall[] = [];
 
 	for await (const chunk of response) {
 		if (chunk.choices[0].delta.tool_calls) {
-			if (!toolCalls.length)
-				toolCalls = chunk.choices[0].delta.tool_calls as OpenAI.ChatCompletionMessageToolCall[];
+			const currentToolCall = chunk.choices[0].delta.tool_calls[0];
 
-			for (let i = 0; i < toolCalls.length; i++) {
-				toolCalls[i].function.arguments +=
-					chunk.choices[0].delta.tool_calls[i].function?.arguments || "";
+			if (!toolCalls[currentToolCall.index]) {
+				toolCalls[currentToolCall.index] = currentToolCall as OpenAI.ChatCompletionMessageToolCall;
+			} else {
+				toolCalls[currentToolCall.index].function.arguments +=
+					currentToolCall.function?.arguments || "";
 			}
+
+			console.error("Chunk tool calls", chunk.choices[0].delta.tool_calls);
 		}
 
 		if (chunk.choices[0].finish_reason === "tool_calls") {
+			console.error("Tool calls", toolCalls);
+
 			yield chunk;
 
 			const assistantMessage: OpenAI.ChatCompletionMessageParam = {

@@ -43,8 +43,6 @@ export const getTavilySearchResults: llmTool<{ query: string }> = {
 		type: "function"
 	},
 	function: async (args: { query: string }) => {
-		console.error("Args", args);
-
 		return await runTavilySearch(args.query);
 	}
 };
@@ -57,8 +55,6 @@ export async function executeToolCalls(
 	for (const toolCall of toolCalls) {
 		const functionName = toolCall.function?.name;
 		const functionArgs = toolCall.function?.arguments;
-
-		if (functionArgs) console.error("Function Args", functionArgs);
 
 		if (!functionName) continue;
 
