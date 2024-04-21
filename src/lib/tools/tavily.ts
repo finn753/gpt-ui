@@ -7,8 +7,6 @@ export async function runTavilySearch(query: string): Promise<string> {
 		api_key: get(tavilyApiKey)
 	};
 
-	console.error("Body", body);
-
 	const response = await fetch("https://api.tavily.com/search", {
 		method: "POST",
 		headers: {

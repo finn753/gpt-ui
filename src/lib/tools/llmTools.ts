@@ -60,7 +60,6 @@ export async function executeToolCalls(
 
 		try {
 			const fn = tools[functionName].function;
-			console.error("Executing tool", functionName, functionArgs);
 			const result = await fn(JSON.parse(functionArgs || "{}"));
 
 			messages.push({

@@ -48,13 +48,9 @@ export async function* streamChatResponseWithTools(
 				toolCalls[currentToolCall.index].function.arguments +=
 					currentToolCall.function?.arguments || "";
 			}
-
-			console.error("Chunk tool calls", chunk.choices[0].delta.tool_calls);
 		}
 
 		if (chunk.choices[0].finish_reason === "tool_calls") {
-			console.error("Tool calls", toolCalls);
-
 			yield chunk;
 
 			const assistantMessage: OpenAI.ChatCompletionMessageParam = {
