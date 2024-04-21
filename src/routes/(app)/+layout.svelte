@@ -1,6 +1,6 @@
 <script>
 	import { Button } from "$lib/components/ui/button";
-	import { MessagesSquare, User, Images, Brush, LayoutTemplate } from "lucide-svelte";
+	import { MessagesSquare, User, Brush } from "lucide-svelte";
 	import { openaiApiKey, tavilyApiKey } from "$lib/stores";
 	import { initializeModel } from "client-vector-search";
 	import { onMount } from "svelte";
@@ -53,30 +53,6 @@
 				</Button>
 			</Tooltip.Trigger>
 			<Tooltip.Content>Generator</Tooltip.Content>
-		</Tooltip.Root>
-
-		<Tooltip.Root>
-			<Tooltip.Trigger>
-				<Button
-					variant={currentPath.startsWith("/gallery") ? "secondary" : "ghost"}
-					href="/gallery"
-				>
-					<Images {size} {strokeWidth} {color} />
-				</Button>
-			</Tooltip.Trigger>
-			<Tooltip.Content>Gallery</Tooltip.Content>
-		</Tooltip.Root>
-
-		<Tooltip.Root>
-			<Tooltip.Trigger>
-				<Button
-					variant={currentPath.startsWith("/templates") ? "secondary" : "ghost"}
-					href="/templates"
-				>
-					<LayoutTemplate {size} {strokeWidth} {color} />
-				</Button>
-			</Tooltip.Trigger>
-			<Tooltip.Content>Templates</Tooltip.Content>
 		</Tooltip.Root>
 
 		<div class="hidden md:block md:flex-1"></div>
