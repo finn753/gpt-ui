@@ -6,6 +6,7 @@
 	import type { MessageStructure } from "$lib/types";
 	import SvelteMarkdown from "svelte-markdown";
 	import { createEventDispatcher } from "svelte";
+	import * as Accordion from "$lib/components/ui/accordion";
 
 	const dispatch = createEventDispatcher<{ retry: { message: MessageStructure } }>();
 
@@ -41,24 +42,26 @@
 		<p class="ml-2 text-sm text-muted-foreground">{format(created_at, "PP, HH:mm")}</p>
 	</div>
 
-	{#if message.tool_calls}
-		<div>
-			<p class="text-sm text-muted-foreground">Calling tools:</p>
-			<ul>
-				{#each message.tool_calls as tool}
-					<li class="text-sm text-muted-foreground">- {tool.function.name}</li>
-				{/each}
-			</ul>
-		</div>
+	{#if role === "tool"}
+		<Accordion.Root>
+			<Accordion.Item value="item-1">
+				<Accordion.Trigger>Result</Accordion.Trigger>
+				<Accordion.Content>
+					<p
+						class="prose dark:prose-invert prose-h1:text-xl prose-h1:font-bold prose-p:text-justify prose-a:text-blue-600 prose-img:rounded-xl"
+					>
+						<SvelteMarkdown source={content} />
+					</p>
+				</Accordion.Content>
+			</Accordion.Item>
+		</Accordion.Root>
+	{:else}
+		<p
+			class="prose dark:prose-invert prose-h1:text-xl prose-h1:font-bold prose-p:text-justify prose-a:text-blue-600 prose-img:rounded-xl"
+		>
+			<SvelteMarkdown source={content} />
+		</p>
 	{/if}
-
-	<p
-		class="prose dark:prose-invert
-  prose-h1:text-xl prose-h1:font-bold
-  prose-p:text-justify prose-a:text-blue-600 prose-img:rounded-xl"
-	>
-		<SvelteMarkdown source={content} />
-	</p>
 
 	{#if failed}
 		<div class="flex justify-between text-red-500">

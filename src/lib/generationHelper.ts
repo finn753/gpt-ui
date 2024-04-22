@@ -7,7 +7,6 @@ import * as chatOperations from "$lib/chatOperations";
 import * as templates from "$lib/templates";
 import * as modelInvoker from "$lib/modelInvoker";
 import { getTavilySearchResults, type llmToolMap } from "$lib/tools/llmTools";
-import OpenAI from "openai";
 
 const STANDARD_MODEL = "gpt-3.5-turbo";
 
@@ -39,33 +38,36 @@ export async function* generateResponse(
 	options?: { model?: string; temperature?: number; top_p?: number },
 	systemMessage?: string,
 	imageAttachments?: File[]
-): AsyncGenerator<MessageStructure | undefined> {
+): AsyncGenerator<MessageStructure[] | undefined> {
 	systemMessage = systemMessage || "";
 
 	chatOperations.updateLastContextOfChat(get(selectedChatID) as string, context);
 
 	const messages = await chatMessagesToCompletionMessages(context, systemMessage, imageAttachments);
 
-	const responseMessage: MessageStructure = templates.getAssistantResponseMessageFromModel(
-		options?.model || STANDARD_MODEL
-	);
+	let responseMessages: MessageStructure[] = [];
 
 	const tools: llmToolMap = {
 		getTavilySearchResults
 	};
 
 	try {
-		const stream = modelInvoker.streamChatResponseWithTools(messages, tools, options);
+		const stream = modelInvoker.streamToolAgentResponse(messages, tools, options);
 		if (!stream) throw new Error("Failed to generate response");
 
 		for await (const part of stream) {
-			responseMessage.content += part.choices[0].delta.content?.toString() || "";
-			responseMessage.tool_calls = part.choices[0].delta
-				.tool_calls as OpenAI.ChatCompletionMessageToolCall[];
-			yield responseMessage;
+			responseMessages = part.map((message) => {
+				return {
+					content: message.content?.toString() || "",
+					role: message.role,
+					model: options?.model || STANDARD_MODEL,
+					created_at: new Date(Date.now())
+				};
+			});
+			yield responseMessages;
 		}
 
-		return responseMessage;
+		return responseMessages;
 	} catch (e: unknown) {
 		errorHandler.handleError("Failed to generate response", e);
 		return;

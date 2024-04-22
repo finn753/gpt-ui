@@ -18,7 +18,7 @@ export type ChatStructure = {
 
 export type MessageStructure = {
 	content: string;
-	role: "user" | "assistant" | "tool" | "system";
+	role: "user" | "assistant" | "tool" | "system" | "function";
 	model: string;
 	created_at: Date;
 	tool_calls?: OpenAI.Chat.ChatCompletionMessageToolCall[];

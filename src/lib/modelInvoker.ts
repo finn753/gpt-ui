@@ -36,6 +36,7 @@ export async function* streamChatResponse(
 	});
 
 	const toolCalls: OpenAI.ChatCompletionMessageToolCall[] = [];
+	let content = "";
 
 	for await (const chunk of response) {
 		if (chunk.choices[0].delta.tool_calls) {
@@ -51,6 +52,9 @@ export async function* streamChatResponse(
 
 		chunk.choices[0].delta.tool_calls =
 			toolCalls as OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall[];
+
+		content = content + chunk.choices[0].delta.content;
+		chunk.choices[0].delta.content = content;
 
 		yield chunk;
 	}
@@ -132,6 +136,7 @@ export async function* streamToolAgentResponse(
 			return [...context, ...finalContext];
 		}
 
+		chunk.choices[0].delta.role = "assistant";
 		yield [...context, chunk.choices[0].delta as ChatCompletionMessageParam];
 		last = chunk.choices[0].delta as ChatCompletionMessageParam;
 	}

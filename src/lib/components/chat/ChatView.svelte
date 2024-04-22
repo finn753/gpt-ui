@@ -19,7 +19,7 @@
 	let scrollContainer: HTMLElement;
 
 	let messages: MessageStructure[] = [];
-	let generatingProgress: MessageStructure | null;
+	let generatingProgress: MessageStructure[] | null;
 
 	$: if (chatID && Object.keys($chatContentMap).includes(chatID)) {
 		messages = $chatContentMap[chatID];
@@ -112,7 +112,7 @@
 			console.error("Failed to get context from messages", e);
 		}
 
-		let response: MessageStructure | undefined;
+		let response: MessageStructure[] | undefined;
 		for await (const r of generationHelper.generateResponse(
 			context,
 			{
@@ -129,7 +129,7 @@
 		generatingProgress = null;
 
 		if (response) {
-			await chatService.sendAssistantMessage(chatID, [response], context);
+			await chatService.sendAssistantMessage(chatID, [...response], context);
 		}
 	}
 </script>
@@ -137,11 +137,13 @@
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
 	<div class="flex-1 overflow-y-auto" bind:this={scrollContainer}>
 		<div class="flex flex-col">
-			{#each messages as message}
+			{#each messages.filter((msg) => msg.role !== "tool" && msg.content !== "") as message}
 				<ChatMessage {message} on:retry={onRetrySendMessage} />
 			{/each}
 			{#if generatingProgress}
-				<ChatMessage message={generatingProgress} />
+				{#each generatingProgress as message}
+					<ChatMessage {message} />
+				{/each}
 			{/if}
 		</div>
 	</div>
