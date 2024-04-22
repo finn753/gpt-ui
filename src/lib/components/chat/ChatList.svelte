@@ -89,12 +89,16 @@
 				</div>
 
 				<div class="py-1">
-					<p class="font-light text-muted-foreground">
-						Updated: {format(chat.updated_at, "PP, HH:mm")}
-					</p>
-					<p class="font-light text-muted-foreground">
-						Created: {format(chat.created_at, "PP, HH:mm")}
-					</p>
+					<table class="font-light text-muted-foreground">
+						<tr>
+							<td>Updated:</td>
+							<td>{format(chat.updated_at, "PP, HH:mm")}</td>
+						</tr>
+						<tr>
+							<td>Created:</td>
+							<td>{format(chat.created_at, "PP, HH:mm")}</td>
+						</tr>
+					</table>
 				</div>
 			</Button>
 			<div class="px-4 last:hidden">
