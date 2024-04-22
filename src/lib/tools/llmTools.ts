@@ -1,4 +1,7 @@
-import type { ChatCompletionTool } from "openai/resources/chat/completions";
+import type {
+	ChatCompletionMessageParam,
+	ChatCompletionTool
+} from "openai/resources/chat/completions";
 import OpenAI from "openai";
 import * as errorHandler from "$lib/errorHandler";
 import { runTavilySearch } from "$lib/tools/tavily";
@@ -36,9 +39,10 @@ export const getTavilySearchResults: llmTool<{ query: string }> = {
 
 export async function executeToolCalls(
 	toolCalls: OpenAI.ChatCompletionMessageToolCall[],
-	tools: llmToolMap,
-	messages: OpenAI.Chat.ChatCompletionMessageParam[]
+	tools: llmToolMap
 ) {
+	const context: ChatCompletionMessageParam[] = [];
+
 	for (const toolCall of toolCalls) {
 		const functionName = toolCall.function?.name;
 		const functionArgs = toolCall.function?.arguments;
@@ -49,7 +53,7 @@ export async function executeToolCalls(
 			const fn = tools[functionName].function;
 			const result = await fn(JSON.parse(functionArgs || "{}"));
 
-			messages.push({
+			context.push({
 				tool_call_id: toolCall.id as string,
 				role: "tool",
 				content: result
@@ -58,5 +62,5 @@ export async function executeToolCalls(
 			errorHandler.handleError("Failed to execute tool", e);
 		}
 	}
-	return messages;
+	return context;
 }

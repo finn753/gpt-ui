@@ -5,6 +5,7 @@ import type { ChatDataMap, MessageStructure } from "$lib/types";
 import * as generationHelper from "$lib/generationHelper";
 import * as embeddingHelper from "$lib/embeddingHelper";
 import * as templates from "$lib/templates";
+import { GPTTokens, type supportModelType } from "gpt-tokens";
 
 export async function setGeneratedTitleForChat(chatID: string) {
 	const messages = get(chatContentMap)[chatID] || [];
@@ -37,6 +38,43 @@ export async function sendUserMessage(chatID: string, message: string): Promise<
 	};
 
 	return await chatOperations.sendMessage(newMessage, chatID);
+}
+
+export async function sendAssistantMessage(
+	chatID: string,
+	messages: MessageStructure[],
+	context: MessageStructure[]
+): Promise<boolean> {
+	messages = [...messages];
+
+	let success = true;
+
+	for (let i = 0; i < messages.length; i++) {
+		const message = messages[i];
+
+		if (i === messages.length - 1) {
+			const tokens = new GPTTokens({
+				model: message.model as supportModelType,
+				messages: context.map((msg) => {
+					if (msg.role === "tool") msg.role = "user";
+
+					return {
+						role: msg.role,
+						content: msg.content
+					};
+				})
+			});
+
+			message.tokens = {
+				input: tokens.promptUsedTokens,
+				output: tokens.completionUsedTokens
+			};
+		}
+
+		success = (await chatOperations.sendMessage(message, chatID)) && success;
+	}
+
+	return success;
 }
 
 export async function getContextFromMessages(

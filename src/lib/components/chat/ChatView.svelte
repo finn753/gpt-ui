@@ -129,7 +129,7 @@
 		generatingProgress = null;
 
 		if (response) {
-			await chatOperations.sendMessage(response, chatID);
+			await chatService.sendAssistantMessage(chatID, [response], context);
 		}
 	}
 </script>

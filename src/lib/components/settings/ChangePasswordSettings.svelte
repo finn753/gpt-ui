@@ -11,7 +11,7 @@
 
 	async function onChangePassword() {
 		if (inputPassword !== inputConfirmPassword) {
-			alert(inputPassword + " | " + inputConfirmPassword)
+			alert(inputPassword + " | " + inputConfirmPassword);
 			handleError("Passwords do not match", null);
 			return;
 		}

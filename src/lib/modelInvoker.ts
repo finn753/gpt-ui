@@ -7,6 +7,7 @@ import * as llmTools from "$lib/tools/llmTools";
 import OpenAI from "openai";
 import type { SpeechCreateParams } from "openai/resources/audio/speech";
 import type { llmToolMap } from "$lib/tools/llmTools";
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 export async function generateChatResponse(
 	messages: BaseLanguageModelInput,
@@ -18,7 +19,7 @@ export async function generateChatResponse(
 	return (await model.invoke(messages)).content.toString();
 }
 
-export async function* streamChatResponseWithTools(
+export async function* streamChatResponse(
 	messages: OpenAI.Chat.ChatCompletionMessageParam[],
 	tools: llmToolMap,
 	options?: { model?: string; temperature?: number; topP?: number }
@@ -48,9 +49,24 @@ export async function* streamChatResponseWithTools(
 			}
 		}
 
-		if (chunk.choices[0].finish_reason === "tool_calls") {
-			chunk.choices[0].delta.tool_calls =
-				toolCalls as OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall[];
+		chunk.choices[0].delta.tool_calls =
+			toolCalls as OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall[];
+
+		yield chunk;
+	}
+}
+
+export async function* streamChatResponseWithTools(
+	messages: OpenAI.Chat.ChatCompletionMessageParam[],
+	tools: llmToolMap,
+	options?: { model?: string; temperature?: number; topP?: number }
+) {
+	const response = streamChatResponse(messages, tools, options);
+
+	for await (const chunk of response) {
+		const toolCalls = chunk.choices[0].delta.tool_calls as OpenAI.ChatCompletionMessageToolCall[];
+
+		if (chunk.choices[0].finish_reason === "tool_calls" && toolCalls) {
 			yield chunk;
 
 			const assistantMessage: OpenAI.ChatCompletionMessageParam = {
@@ -61,15 +77,9 @@ export async function* streamChatResponseWithTools(
 
 			messages.push(assistantMessage);
 
-			messages = await llmTools.executeToolCalls(toolCalls, tools, messages);
+			messages.push(...(await llmTools.executeToolCalls(toolCalls, tools)));
 
-			const toolResponse = await model.chat.completions.create({
-				model: "gpt-3.5-turbo",
-				...options,
-				messages,
-				tools: Object.values(tools).map((tool) => tool.input),
-				stream: true
-			});
+			const toolResponse = streamChatResponse(messages, tools, options);
 
 			for await (const toolChunk of toolResponse) {
 				toolChunk.choices[0].delta.tool_calls =
@@ -82,6 +92,52 @@ export async function* streamChatResponseWithTools(
 		}
 		yield chunk;
 	}
+}
+
+export async function* streamToolAgentResponse(
+	messages: OpenAI.Chat.ChatCompletionMessageParam[],
+	tools: llmToolMap,
+	options?: { model?: string; temperature?: number; topP?: number }
+): AsyncGenerator<ChatCompletionMessageParam[]> {
+	const context: ChatCompletionMessageParam[] = [];
+
+	const response = streamChatResponse(messages, tools, options);
+
+	let last: ChatCompletionMessageParam | undefined;
+
+	for await (const chunk of response) {
+		const toolCalls = chunk.choices[0].delta.tool_calls as OpenAI.ChatCompletionMessageToolCall[];
+
+		if (chunk.choices[0].finish_reason === "tool_calls" && toolCalls) {
+			const assistantMessage: OpenAI.ChatCompletionMessageParam = {
+				role: "assistant",
+				content: "",
+				tool_calls: toolCalls
+			};
+
+			context.push(assistantMessage);
+			yield context;
+
+			context.push(...(await llmTools.executeToolCalls(toolCalls, tools)));
+			yield context;
+
+			const toolResponse = streamToolAgentResponse([...messages, ...context], tools, options);
+
+			let finalContext: ChatCompletionMessageParam[] = [];
+			for await (const toolChunk of toolResponse) {
+				yield [...context, ...toolChunk];
+				finalContext = toolChunk;
+			}
+
+			return [...context, ...finalContext];
+		}
+
+		yield [...context, chunk.choices[0].delta as ChatCompletionMessageParam];
+		last = chunk.choices[0].delta as ChatCompletionMessageParam;
+	}
+
+	if (last) context.push(last);
+	return context;
 }
 
 function getLangchainModel(options?: { modelName?: string; temperature?: number; topP?: number }) {
