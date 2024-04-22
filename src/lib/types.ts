@@ -17,12 +17,13 @@ export type ChatStructure = {
 };
 
 export type MessageStructure = {
+	id?: string;
 	content: string;
 	role: "user" | "assistant" | "tool" | "system" | "function";
 	model: string;
 	created_at: Date;
 	tool_calls?: OpenAI.Chat.ChatCompletionMessageToolCall[];
-	pinned?: boolean; // TODO - Include this in the type
+	pinned?: boolean;
 	failed?: boolean;
 	tokens?: { input: number; output: number };
 };

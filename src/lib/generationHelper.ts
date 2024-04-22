@@ -40,6 +40,10 @@ export async function* generateResponse(
 	imageAttachments?: File[]
 ): AsyncGenerator<MessageStructure[] | undefined> {
 	systemMessage = systemMessage || "";
+	context = context.map((message) => {
+		if (message.role === "tool") message.role = "assistant";
+		return message;
+	}); // TODO - Cleaner fix
 
 	chatOperations.updateLastContextOfChat(get(selectedChatID) as string, context);
 

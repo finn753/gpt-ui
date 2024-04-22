@@ -61,7 +61,8 @@ class Database {
 			content: message.content,
 			role: message.role,
 			model: message.model,
-			created_at: message.created_at
+			created_at: message.created_at,
+			tokens: message.tokens
 		});
 
 		if (error) {

@@ -25,6 +25,7 @@ async function fetchChatMessages(
 		.select("*")
 		.eq("chat_id", chatID)
 		.order("created_at");
+
 	return data?.reduce((acc, message) => {
 		acc.push({
 			id: message.id,
@@ -32,7 +33,8 @@ async function fetchChatMessages(
 			content: message.content,
 			created_at: new Date(message.created_at),
 			role: message.role,
-			model: message.model
+			model: message.model,
+			tokens: message.tokens
 		});
 		return acc;
 	}, []);

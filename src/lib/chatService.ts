@@ -55,11 +55,14 @@ export async function sendAssistantMessage(
 		if (i === messages.length - 1) {
 			const tokens = new GPTTokens({
 				model: message.model as supportModelType,
-				messages: context.map((msg) => {
-					if (msg.role === "tool") msg.role = "user";
+				messages: [...context, ...messages].map((msg) => {
+					let role = msg.role;
+
+					if (role === "tool") role = "user";
+					if (role === "function") role = "user";
 
 					return {
-						role: msg.role,
+						role,
 						content: msg.content
 					};
 				})
