@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { format } from "date-fns";
 	import { Button } from "$lib/components/ui/button";
-	import { Clipboard } from "lucide-svelte";
+	import { Clipboard, Trash } from 'lucide-svelte';
 	import { toast } from "svelte-sonner";
 	import type { MessageStructure } from "$lib/types";
 	import SvelteMarkdown from "svelte-markdown";
@@ -29,6 +29,10 @@
 	function copyToClipboard() {
 		navigator.clipboard.writeText(content);
 		toast.success("Copied to clipboard");
+	}
+
+	async function deleteMessage() {
+
 	}
 
 	function onRetry() {
@@ -73,12 +77,18 @@
 		</div>
 	{/if}
 
-	<div class="flex flex-row items-center py-2 opacity-0 transition-opacity group-hover:opacity-100">
+	<div class="flex flex-row items-center py-2 gap-2 opacity-0 transition-opacity group-hover:opacity-100">
 		<Button
 			class="p-0 opacity-50 hover:opacity-100"
 			variant="icon"
 			size="none"
 			on:click={copyToClipboard}><Clipboard size={20} /></Button
+		>
+		<Button
+			class="p-0 opacity-50 hover:opacity-100"
+			variant="icon"
+			size="none"
+			on:click={deleteMessage}><Trash size={20} /></Button
 		>
 	</div>
 </div>

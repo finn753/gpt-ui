@@ -53,47 +53,9 @@ export async function* streamChatResponse(
 		chunk.choices[0].delta.tool_calls =
 			toolCalls as OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall[];
 
-		content = content + chunk.choices[0].delta.content;
+		content = content + (chunk.choices[0].delta.content || "");
 		chunk.choices[0].delta.content = content;
 
-		yield chunk;
-	}
-}
-
-export async function* streamChatResponseWithTools(
-	messages: OpenAI.Chat.ChatCompletionMessageParam[],
-	tools: llmToolMap,
-	options?: { model?: string; temperature?: number; topP?: number }
-) {
-	const response = streamChatResponse(messages, tools, options);
-
-	for await (const chunk of response) {
-		const toolCalls = chunk.choices[0].delta.tool_calls as OpenAI.ChatCompletionMessageToolCall[];
-
-		if (chunk.choices[0].finish_reason === "tool_calls" && toolCalls) {
-			yield chunk;
-
-			const assistantMessage: OpenAI.ChatCompletionMessageParam = {
-				role: "assistant",
-				content: "",
-				tool_calls: toolCalls
-			};
-
-			messages.push(assistantMessage);
-
-			messages.push(...(await llmTools.executeToolCalls(toolCalls, tools)));
-
-			const toolResponse = streamChatResponse(messages, tools, options);
-
-			for await (const toolChunk of toolResponse) {
-				toolChunk.choices[0].delta.tool_calls =
-					toolCalls as OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall[];
-
-				yield toolChunk;
-			}
-
-			break;
-		}
 		yield chunk;
 	}
 }
