@@ -174,6 +174,17 @@ class Database {
 		toast.success("API key saved");
 		return true;
 	}
+
+	async changePassword(newPassword: string) {
+		const response = await this._supabaseClient?.auth.updateUser({ password: newPassword });
+
+		if (response?.error) {
+			errorHandler.handleError("Failed to change password", response.error);
+			return false;
+		}
+
+		return true;
+	}
 }
 
 export const database = new Database();
