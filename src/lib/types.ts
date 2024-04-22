@@ -24,6 +24,7 @@ export type MessageStructure = {
 	tool_calls?: OpenAI.Chat.ChatCompletionMessageToolCall[];
 	pinned?: boolean; // TODO - Include this in the type
 	failed?: boolean;
+	tokens?: { input: number; output: number };
 };
 
 export type ChatDataMap = Record<string, ChatStructure>;

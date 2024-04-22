@@ -1,7 +1,7 @@
 <script lang="ts">
 	import CollapsibleSidebar from "$lib/components/CollapsibleSidebar.svelte";
 	import { onMount } from "svelte";
-	import { CircleUserRound, FileText, KeyRound, LogOut } from "lucide-svelte";
+	import { BarChart3, CircleUserRound, FileText, KeyRound, LogOut } from 'lucide-svelte';
 	import SidebarButton from "$lib/components/SidebarButton.svelte";
 
 	let sidebarOpened = false;
@@ -37,6 +37,10 @@
 				<SidebarButton path="/settings/integrations">
 					<KeyRound />
 					Integrations
+				</SidebarButton>
+				<SidebarButton path="/settings/statistics">
+					<BarChart3 />
+					Statistics
 				</SidebarButton>
 				<SidebarButton path="/settings/data">
 					<FileText />

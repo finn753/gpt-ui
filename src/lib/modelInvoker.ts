@@ -26,8 +26,6 @@ export async function* streamChatResponseWithTools(
 	const model: OpenAI | null = getOpenAI();
 	if (!model) return;
 
-	messages = [...messages];
-
 	const response = await model.chat.completions.create({
 		model: "gpt-3.5-turbo",
 		...options,
