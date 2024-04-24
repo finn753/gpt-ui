@@ -33,7 +33,7 @@
 			<Card.Description>Enter your email below to login to your account</Card.Description>
 		</Card.Header>
 		<Card.Content>
-			<div class="grid gap-4">
+			<form class="grid gap-4">
 				<div class="grid gap-2">
 					<Label for="email">Email</Label>
 					<Input
@@ -47,12 +47,12 @@
 				<div class="grid gap-2">
 					<div class="flex items-center">
 						<Label for="password">Password</Label>
-						<a href="##" class="ml-auto inline-block text-sm underline"> Forgot your password? </a>
+						<!-- <a href="##" class="ml-auto inline-block text-sm underline"> Forgot your password? </a> -->
 					</div>
 					<Input id="password" type="password" bind:value={inputPassword} required />
 				</div>
-				<Button class="w-full" on:click={signInWithEmail}>Login</Button>
-			</div>
+				<Button type="submit" class="w-full" on:click={signInWithEmail}>Login</Button>
+			</form>
 			<div class="mt-4 text-center text-sm">This is a private site, not for public interest</div>
 		</Card.Content>
 	</Card.Root>
