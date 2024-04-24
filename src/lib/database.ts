@@ -73,6 +73,22 @@ class Database {
 		return true;
 	}
 
+	async deleteMessage(messageID: string): Promise<boolean> {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return false;
+		}
+
+		const { error } = await this._supabaseClient.from("Messages").delete().match({ id: messageID });
+
+		if (error) {
+			errorHandler.handleError("Failed to delete message", error);
+			return false;
+		}
+
+		return true;
+	}
+
 	async changeTitle(chatID: string, title: string): Promise<boolean> {
 		if (!this._supabaseClient) {
 			console.error("Supabase client is not initialized");

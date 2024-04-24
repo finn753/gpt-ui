@@ -7,10 +7,12 @@
 	import SvelteMarkdown from "svelte-markdown";
 	import { createEventDispatcher } from "svelte";
 	import * as Accordion from "$lib/components/ui/accordion";
+	import * as chatOperations from "$lib/chatOperations";
 
 	const dispatch = createEventDispatcher<{ retry: { message: MessageStructure } }>();
 
 	export let message: MessageStructure;
+	export let chatID: string;
 
 	let role: string = "";
 	let model: string = "";
@@ -32,7 +34,11 @@
 	}
 
 	async function deleteMessage() {
+		if(!chatID || !message.id) return console.error("ID is missing")
 
+		if(confirm("Are you sure you want to delete this message?")) {
+			await chatOperations.deleteMessage(message.id, chatID)
+		}
 	}
 
 	function onRetry() {

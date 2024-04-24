@@ -138,11 +138,11 @@
 	<div class="flex-1 overflow-y-auto" bind:this={scrollContainer}>
 		<div class="flex flex-col">
 			{#each messages.filter((msg) => msg.role !== "tool" && msg.content !== "") as message}
-				<ChatMessage {message} on:retry={onRetrySendMessage} />
+				<ChatMessage {message} {chatID} on:retry={onRetrySendMessage} />
 			{/each}
 			{#if generatingProgress}
 				{#each generatingProgress as message}
-					<ChatMessage {message} />
+					<ChatMessage {message} {chatID} />
 				{/each}
 			{/if}
 		</div>

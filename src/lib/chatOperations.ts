@@ -77,6 +77,18 @@ export async function retrySendMessage(message: MessageStructure, chatID: string
 	return true;
 }
 
+export async function deleteMessage(messageId: string, chatID: string) {
+	const success = await database.deleteMessage(messageId);
+
+	if (!success) return;
+
+	chatContentMap.update((curr) => {
+		const chatMessages = curr;
+		chatMessages[chatID] = chatMessages[chatID].filter((msg) => msg.id !== messageId);
+		return chatMessages;
+	});
+}
+
 export async function changeTitle(chatID: string, title: string) {
 	const success = await database.changeTitle(chatID, title);
 
