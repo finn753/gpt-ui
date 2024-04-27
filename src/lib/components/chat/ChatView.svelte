@@ -115,8 +115,8 @@
 		let response: MessageStructure[] | undefined;
 		for await (const r of generationHelper.generateResponse(
 			context,
+			model || "",
 			{
-				model,
 				temperature,
 				top_p: topP
 			},
@@ -129,7 +129,7 @@
 		generatingProgress = null;
 
 		if (response) {
-			await chatService.sendAssistantMessage(chatID, [...response], context);
+			await chatService.sendAssistantMessage(chatID, [...response]);
 		}
 	}
 </script>

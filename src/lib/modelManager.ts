@@ -19,6 +19,7 @@ export async function getAvailableOpenAIModels(): Promise<ModelType[]> {
 	const openAI = new OpenAI({ apiKey: get(openaiApiKey) ?? "" });
 	return (await openAI.models.list()).data
 		.filter((model) => /ft:|gpt-/.test(model.id))
+		.filter((model) => /(gpt-3.5-turbo|gpt-4-turbo)$/.test(model.id))
 		.map((model) => ({
 			id: "openai:" + model.id,
 			name: model.id,

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import ChatView from "$lib/components/chat/ChatView.svelte";
 	import { onMount } from "svelte";
 	import { selectedChatID } from "$lib/stores";

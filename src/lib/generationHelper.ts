@@ -1,14 +1,12 @@
 import type { MessageStructure } from "$lib/types";
 import { get } from "svelte/store";
 import { selectedChatID } from "$lib/stores";
-import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import * as errorHandler from "$lib/errorHandler";
 import * as chatOperations from "$lib/chatOperations";
 import * as templates from "$lib/templates";
 import * as modelInvoker from "$lib/modelInvoker";
-import { getTavilySearchResults, type llmToolMap } from "$lib/tools/llmTools";
-
-const STANDARD_MODEL = "gpt-3.5-turbo";
+import { getTavilySearchResults } from "$lib/tools/llmTools";
+import { type MessageFormat, type ModelFunction, ModelWrapper } from "$lib/ModelWrapper";
 
 export async function generateTitle(context: string) {
 	const messages = templates.getSingleTaskPromptMessages(
@@ -35,7 +33,8 @@ export async function generateSummary(currentSummary: string, newMessages: Messa
 
 export async function* generateResponse(
 	context: MessageStructure[],
-	options?: { model?: string; temperature?: number; top_p?: number },
+	modelId: string,
+	options?: { temperature?: number; top_p?: number },
 	systemMessage?: string,
 	imageAttachments?: File[]
 ): AsyncGenerator<MessageStructure[] | undefined> {
@@ -47,16 +46,25 @@ export async function* generateResponse(
 
 	chatOperations.updateLastContextOfChat(get(selectedChatID) as string, context);
 
-	const messages = await chatMessagesToCompletionMessages(context, systemMessage, imageAttachments);
+	const messages: MessageFormat[] = await chatMessagesToCompletionMessages(
+		context,
+		systemMessage,
+		imageAttachments
+	);
 
 	let responseMessages: MessageStructure[] = [];
 
-	const tools: llmToolMap = {
-		getTavilySearchResults
+	const tools: Record<string, ModelFunction> = {
+		getTavilySearchResults: {
+			definition: getTavilySearchResults.input.function,
+			call: getTavilySearchResults.function as (args: Record<string, unknown>) => Promise<string>
+		}
 	};
 
 	try {
-		const stream = modelInvoker.streamToolAgentResponse(messages, tools, options);
+		const model = new ModelWrapper(modelId, options);
+		model.functions = tools;
+		const stream = model.streamToolAgentResponse(messages);
 		if (!stream) throw new Error("Failed to generate response");
 
 		for await (const part of stream) {
@@ -64,7 +72,7 @@ export async function* generateResponse(
 				return {
 					content: message.content?.toString() || "",
 					role: message.role,
-					model: options?.model || STANDARD_MODEL,
+					model: model.modelName,
 					created_at: new Date(Date.now())
 				};
 			});
@@ -82,15 +90,11 @@ async function chatMessagesToCompletionMessages(
 	chatMessages: MessageStructure[],
 	systemMessage: string,
 	imageAttachments?: File[]
-): Promise<ChatCompletionMessageParam[]> {
-	type ContentType =
-		| { type: "text"; text: string }
-		| { type: "image_url"; image_url: { url: string } };
-
-	const messages: { role: string; content: ContentType[] }[] = chatMessages.map((message) => {
+): Promise<MessageFormat[]> {
+	const messages: MessageFormat[] = chatMessages.map((message) => {
 		return {
-			role: message.role as string,
-			content: [{ type: "text", text: message.content as string }]
+			role: message.role,
+			content: message.content
 		};
 	});
 
@@ -119,21 +123,21 @@ async function chatMessagesToCompletionMessages(
 		}
 	}
 
-	const query = messages.pop();
+	const query = messages.pop() as MessageFormat;
 
+	const imageList: string[] = [];
 	base64Strings.forEach((image) => {
-		query?.content.push({
-			type: "image_url",
-			image_url: { url: image }
-		});
+		imageList.push(image);
 	});
+
+	query.images = imageList;
 
 	return [
 		{
 			role: "system",
 			content: systemMessage
 		},
-		...(messages as ChatCompletionMessageParam[]),
-		query as ChatCompletionMessageParam
+		...messages,
+		query
 	];
 }
