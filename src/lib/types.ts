@@ -31,3 +31,10 @@ export type MessageStructure = {
 export type ChatDataMap = Record<string, ChatStructure>;
 export type ChatContentMap = Record<string, MessageStructure[]>;
 export type GenerationHistory = { images: OpenAI.Images.Image[]; voice: string[] };
+
+export type ModelType = {
+	id: string;
+	name: string;
+	provider: string;
+	vision: boolean;
+};

@@ -1,9 +1,9 @@
 import type { BaseLanguageModelInput } from "@langchain/core/language_models/base";
-import { ChatOpenAI } from "@langchain/openai";
 import { get } from "svelte/store";
 import { openaiApiKey } from "$lib/stores";
 import * as errorHandler from "$lib/errorHandler";
 import * as llmTools from "$lib/tools/llmTools";
+import * as modelManager from "$lib/modelManager";
 import OpenAI from "openai";
 import type { SpeechCreateParams } from "openai/resources/audio/speech";
 import type { llmToolMap } from "$lib/tools/llmTools";
@@ -13,7 +13,10 @@ export async function generateChatResponse(
 	messages: BaseLanguageModelInput,
 	options?: { modelName?: string; temperature?: number; topP?: number }
 ): Promise<string | undefined> {
-	const model: ChatOpenAI | null = getLangchainModel(options);
+	const modelName = options?.modelName || "gpt-3.5-turbo";
+	options = { temperature: options?.temperature || 0.5, topP: options?.topP || 1 };
+
+	const model = modelManager.getLangchainModelById("openai:" + modelName, { ...options });
 	if (!model) return;
 
 	return (await model.invoke(messages)).content.toString();
@@ -105,26 +108,6 @@ export async function* streamToolAgentResponse(
 
 	if (last) context.push(last);
 	return context;
-}
-
-function getLangchainModel(options?: { modelName?: string; temperature?: number; topP?: number }) {
-	try {
-		const model = new ChatOpenAI(
-			{
-				openAIApiKey: get(openaiApiKey) || ""
-			},
-			{ dangerouslyAllowBrowser: true }
-		);
-
-		model.modelName = options?.modelName || "gpt-3.5-turbo";
-		model.temperature = options?.temperature || 0.5;
-		model.topP = options?.topP || 1;
-
-		return model;
-	} catch (e: unknown) {
-		errorHandler.handleError("Failed to initialize OpenAI", e);
-		return null;
-	}
 }
 
 export async function generateImage(prompt: string, model = "dall-e-2") {
