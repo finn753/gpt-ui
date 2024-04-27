@@ -5,17 +5,19 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Pencil, Sparkles, X } from "lucide-svelte";
 	import Check from "lucide-svelte/icons/check";
-	import { chatDataMap, lastContextOfChat, newChatSettings } from "$lib/stores";
+	import { availableModels, chatDataMap, lastContextOfChat, newChatSettings } from '$lib/stores';
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
 	import { changeAssistantData, changeTags, changeTitle } from "$lib/chatOperations";
 	import * as chatService from "$lib/chatService";
+	import * as modelManager from "$lib/modelManager";
+	import type { ModelType } from '$lib/types';
 
-	const modelSelection = [
-		{ value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
-		{ value: "gpt-4-turbo", label: "GPT-4 Turbo" }
-	];
+	$: modelSelection = $availableModels.map((model) => ({
+		value: model.id,
+		label: model.name,
+	}));
 
 	export let chatID: string | null;
 
@@ -23,14 +25,10 @@
 	let summary: string = "";
 	let tags: string[] = [];
 
-	let model = modelSelection[1].value;
+	let model = "";
 	let temperature = 0.5;
 	let topP = 0.5;
 	let systemMessage = "You are a helpful assistant";
-
-	let selectionModel: { value: string; label: string } = modelSelection[1];
-
-	$: model, temperature, topP, systemMessage;
 
 	$: chatData = chatID ? $chatDataMap[chatID] : null;
 	$: newChat = !chatID;
@@ -46,7 +44,7 @@
 		summary = "";
 		tags = [];
 
-		model = modelSelection[1].value;
+		model = "";
 		temperature = 0.5;
 		topP = 0.5;
 		systemMessage = "You are a helpful assistant";
@@ -218,32 +216,33 @@
 			<Card.Title>Assistant</Card.Title>
 		</Card.Header>
 		<Card.Content class="flex flex-col gap-4">
-			<Label>
-				Model
-				<Select.Root
-					selected={selectionModel}
-					onSelectedChange={async (v) => {
+			{#if modelSelection}
+				<Label>
+					Model
+					<Select.Root
+						onSelectedChange={async (v) => {
 						if(v) {
 							model = String(v.value);
 							await onSaveAssistant();
 						}
 					}}
-				>
-					<Select.Trigger class="w-full">
-						<Select.Value placeholder="Select a model" />
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Group>
-							<Select.Label>Models</Select.Label>
-							{#each modelSelection as model}
-								<Select.Item value={model.value} label={model.label}>{model.label}</Select.Item>
-							{/each}
-						</Select.Group>
-					</Select.Content>
-					<Select.Input name="selectedModel" />
-				</Select.Root>
-				<Input class="hidden" bind:value={model} />
-			</Label>
+					>
+						<Select.Trigger class="w-full">
+							<Select.Value placeholder="Select a model" />
+						</Select.Trigger>
+						<Select.Content class="max-h-64 overflow-y-auto">
+							<Select.Group>
+								<Select.Label>Models</Select.Label>
+								{#each modelSelection as model}
+									<Select.Item value={model.value} label={model.label}>{model.label}</Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+						<Select.Input name="selectedModel" />
+					</Select.Root>
+					<Input class="hidden" bind:value={model} />
+				</Label>
+			{/if}
 
 			<Label>
 				Temperature

@@ -1,7 +1,7 @@
 <script>
 	import { Button } from "$lib/components/ui/button";
 	import { MessagesSquare, User, Brush } from "lucide-svelte";
-	import { openaiApiKey, tavilyApiKey } from "$lib/stores";
+	import { availableModels, openaiApiKey, tavilyApiKey } from '$lib/stores';
 	import { initializeModel } from "client-vector-search";
 	import { onMount } from "svelte";
 
@@ -21,9 +21,10 @@
 		tavilyApiKey.set(data.tavilyApiKey);
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		try {
-			initializeModel();
+			availableModels.set(await data.availableModels);
+			await initializeModel();
 		} catch (e) {
 			console.error(e);
 		}
