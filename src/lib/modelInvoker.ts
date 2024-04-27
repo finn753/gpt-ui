@@ -8,6 +8,7 @@ import OpenAI from "openai";
 import type { SpeechCreateParams } from "openai/resources/audio/speech";
 import type { llmToolMap } from "$lib/tools/llmTools";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import { ChatOpenAI } from "@langchain/openai";
 
 export async function generateChatResponse(
 	messages: BaseLanguageModelInput,
@@ -61,6 +62,40 @@ export async function* streamChatResponse(
 
 		yield chunk;
 	}
+}
+
+export async function* streamLangchainChatResponse(
+	messages: BaseLanguageModelInput,
+	tools: llmToolMap,
+	modelId: string,
+	options?: { temperature?: number; topP?: number }
+) {
+	const model = modelManager.getLangchainModelById(modelId, options);
+	const toolInput = Object.values(tools).map((tool) => tool.input);
+	if (model instanceof ChatOpenAI) model.bind({ tools: toolInput });
+	const stream = await model.stream(messages);
+
+	const toolCalls: Record<string, OpenAI.ChatCompletionMessageToolCall> = {};
+	let content = "";
+
+	for await (const chunk of stream) {
+		if (chunk.additional_kwargs.tool_calls) {
+			const currentToolCall = chunk.additional_kwargs.tool_calls[0];
+
+			if (!toolCalls[currentToolCall.id]) {
+				toolCalls[currentToolCall.id] = currentToolCall as OpenAI.ChatCompletionMessageToolCall;
+			} else {
+				toolCalls[currentToolCall.id].function.arguments +=
+					currentToolCall.function?.arguments || "";
+			}
+		}
+
+		content = content + (chunk.content.toString() || "");
+
+		yield { content };
+	}
+
+	return { toolCalls: Object.values(toolCalls), content };
 }
 
 export async function* streamToolAgentResponse(
