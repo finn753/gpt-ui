@@ -13,7 +13,6 @@
 	import * as chatService from "$lib/chatService";
 
 	const modelSelection = [
-		{ value: "", label: "Custom" },
 		{ value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
 		{ value: "gpt-4-turbo", label: "GPT-4 Turbo" }
 	];
@@ -33,8 +32,6 @@
 
 	let unsavedAssistantChanges = false;
 	$: model, temperature, topP, systemMessage, (unsavedAssistantChanges = true);
-
-	//let contextMessages: MessageStructure[];
 
 	$: chatData = chatID ? $chatDataMap[chatID] : null;
 	$: newChat = !chatID;
@@ -244,7 +241,7 @@
 					</Select.Content>
 					<Select.Input name="selectedModel" />
 				</Select.Root>
-				<Input bind:value={model} />
+				<Input class="hidden" bind:value={model} />
 			</Label>
 
 			<Label>
