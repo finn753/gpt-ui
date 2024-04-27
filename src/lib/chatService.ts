@@ -92,7 +92,7 @@ export async function getContextFromMessages(
 
 	const queryMessage = messages.pop() as MessageStructure;
 
-	const lastMessages = messages.slice(-lastMessagesCount);
+	const lastMessages = messages.splice(-lastMessagesCount);
 
 	const similarMessages = await embeddingHelper.getSimilarMessagesToQuery(
 		messages,

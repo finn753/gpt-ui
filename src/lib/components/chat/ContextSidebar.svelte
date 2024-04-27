@@ -13,7 +13,6 @@
 	import * as chatService from "$lib/chatService";
 
 	const modelSelection = [
-		{ value: "", label: "Custom" },
 		{ value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
 		{ value: "gpt-4-turbo", label: "GPT-4 Turbo" }
 	];
@@ -31,10 +30,7 @@
 
 	let selectionModel: { value: string; label: string } = modelSelection[1];
 
-	let unsavedAssistantChanges = false;
-	$: model, temperature, topP, systemMessage, (unsavedAssistantChanges = true);
-
-	//let contextMessages: MessageStructure[];
+	$: model, temperature, topP, systemMessage;
 
 	$: chatData = chatID ? $chatDataMap[chatID] : null;
 	$: newChat = !chatID;
@@ -133,7 +129,6 @@
 	async function onSaveAssistant() {
 		if (chatID) {
 			await changeAssistantData(chatID, { model, temperature, topP, systemMessage });
-			unsavedAssistantChanges = false;
 		}
 	}
 
@@ -227,8 +222,11 @@
 				Model
 				<Select.Root
 					selected={selectionModel}
-					onSelectedChange={(v) => {
-						v && (model = String(v.value));
+					onSelectedChange={async (v) => {
+						if(v) {
+							model = String(v.value);
+							await onSaveAssistant();
+						}
 					}}
 				>
 					<Select.Trigger class="w-full">
@@ -244,29 +242,24 @@
 					</Select.Content>
 					<Select.Input name="selectedModel" />
 				</Select.Root>
-				<Input bind:value={model} />
+				<Input class="hidden" bind:value={model} />
 			</Label>
 
 			<Label>
 				Temperature
-				<Input class="w-min" type="number" min="0" max="1" step="0.01" bind:value={temperature} />
+				<Input class="w-min" type="number" min="0" max="1" step="0.01" bind:value={temperature} on:blur={onSaveAssistant}/>
 			</Label>
 
 			<Label>
 				Top-P
-				<Input class="w-min" type="number" min="0" max="1" step="0.01" bind:value={topP} />
+				<Input class="w-min" type="number" min="0" max="1" step="0.01" bind:value={topP} on:blur={onSaveAssistant} />
 			</Label>
 
 			<Label>
 				System Message
-				<Textarea class="w-full resize-none" bind:value={systemMessage} />
+				<Textarea class="w-full resize-none" bind:value={systemMessage} on:blur={onSaveAssistant} />
 			</Label>
 		</Card.Content>
-		{#if !newChat}
-			<Card.Footer class="flex justify-end">
-				<Button on:click={onSaveAssistant} disabled={!unsavedAssistantChanges}>Save</Button>
-			</Card.Footer>
-		{/if}
 	</Card.Root>
 
 	{#if chatID}

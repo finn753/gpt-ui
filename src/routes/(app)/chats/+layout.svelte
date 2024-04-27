@@ -7,8 +7,6 @@
 
 	export let data;
 
-	$: chatDataMap.set(data.chatDataMap);
-
 	let leftOpened = false;
 	let rightOpened = false;
 
@@ -22,11 +20,13 @@
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		if (window.innerWidth >= 768) {
 			leftOpened = true;
 			rightOpened = true;
 		}
+
+		chatDataMap.set(await data.chatDataMap);
 	});
 </script>
 
