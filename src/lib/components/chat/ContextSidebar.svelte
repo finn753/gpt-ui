@@ -5,18 +5,18 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Pencil, Sparkles, X } from "lucide-svelte";
 	import Check from "lucide-svelte/icons/check";
-	import { availableModels, chatDataMap, lastContextOfChat, newChatSettings } from '$lib/stores';
+	import { availableModels, chatDataMap, lastContextOfChat, newChatSettings } from "$lib/stores";
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
 	import { changeAssistantData, changeTags, changeTitle } from "$lib/chatOperations";
 	import * as chatService from "$lib/chatService";
 	import * as modelManager from "$lib/modelManager";
-	import type { ModelType } from '$lib/types';
+	import type { ModelType } from "$lib/types";
 
 	$: modelSelection = $availableModels.map((model) => ({
 		value: model.id,
-		label: model.name,
+		label: model.name
 	}));
 
 	export let chatID: string | null;
@@ -221,11 +221,11 @@
 					Model
 					<Select.Root
 						onSelectedChange={async (v) => {
-						if(v) {
-							model = String(v.value);
-							await onSaveAssistant();
-						}
-					}}
+							if (v) {
+								model = String(v.value);
+								await onSaveAssistant();
+							}
+						}}
 					>
 						<Select.Trigger class="w-full">
 							<Select.Value placeholder="Select a model" />
@@ -246,12 +246,28 @@
 
 			<Label>
 				Temperature
-				<Input class="w-min" type="number" min="0" max="1" step="0.01" bind:value={temperature} on:blur={onSaveAssistant}/>
+				<Input
+					class="w-min"
+					type="number"
+					min="0"
+					max="1"
+					step="0.01"
+					bind:value={temperature}
+					on:blur={onSaveAssistant}
+				/>
 			</Label>
 
 			<Label>
 				Top-P
-				<Input class="w-min" type="number" min="0" max="1" step="0.01" bind:value={topP} on:blur={onSaveAssistant} />
+				<Input
+					class="w-min"
+					type="number"
+					min="0"
+					max="1"
+					step="0.01"
+					bind:value={topP}
+					on:blur={onSaveAssistant}
+				/>
 			</Label>
 
 			<Label>
