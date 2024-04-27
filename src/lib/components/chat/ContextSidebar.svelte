@@ -30,8 +30,7 @@
 
 	let selectionModel: { value: string; label: string } = modelSelection[1];
 
-	let unsavedAssistantChanges = false;
-	$: model, temperature, topP, systemMessage, (unsavedAssistantChanges = true);
+	$: model, temperature, topP, systemMessage;
 
 	$: chatData = chatID ? $chatDataMap[chatID] : null;
 	$: newChat = !chatID;
@@ -130,7 +129,6 @@
 	async function onSaveAssistant() {
 		if (chatID) {
 			await changeAssistantData(chatID, { model, temperature, topP, systemMessage });
-			unsavedAssistantChanges = false;
 		}
 	}
 
@@ -224,8 +222,11 @@
 				Model
 				<Select.Root
 					selected={selectionModel}
-					onSelectedChange={(v) => {
-						v && (model = String(v.value));
+					onSelectedChange={async (v) => {
+						if(v) {
+							model = String(v.value);
+							await onSaveAssistant();
+						}
 					}}
 				>
 					<Select.Trigger class="w-full">
@@ -246,24 +247,19 @@
 
 			<Label>
 				Temperature
-				<Input class="w-min" type="number" min="0" max="1" step="0.01" bind:value={temperature} />
+				<Input class="w-min" type="number" min="0" max="1" step="0.01" bind:value={temperature} on:blur={onSaveAssistant}/>
 			</Label>
 
 			<Label>
 				Top-P
-				<Input class="w-min" type="number" min="0" max="1" step="0.01" bind:value={topP} />
+				<Input class="w-min" type="number" min="0" max="1" step="0.01" bind:value={topP} on:blur={onSaveAssistant} />
 			</Label>
 
 			<Label>
 				System Message
-				<Textarea class="w-full resize-none" bind:value={systemMessage} />
+				<Textarea class="w-full resize-none" bind:value={systemMessage} on:blur={onSaveAssistant} />
 			</Label>
 		</Card.Content>
-		{#if !newChat}
-			<Card.Footer class="flex justify-end">
-				<Button on:click={onSaveAssistant} disabled={!unsavedAssistantChanges}>Save</Button>
-			</Card.Footer>
-		{/if}
 	</Card.Root>
 
 	{#if chatID}
