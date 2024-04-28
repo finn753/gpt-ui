@@ -20,7 +20,7 @@ export function getToolSystemTemplate(functions: Record<string, ModelFunction>) 
 	You must always select one of the above tools and respond with only a JSON object matching the following schema:
 	{
 		"tool": <name of the selected tool>,
-		"tool_input": <parameters for the selected tool, matching the tool's JSON schema>
+		"tool_input": <parameters for the selected tool, matching the tool's JSON schema. Do not include anything new>
 	}`;
 }
 

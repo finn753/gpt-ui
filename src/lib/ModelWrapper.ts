@@ -32,6 +32,8 @@ export type MessageFormat = {
 	name?: string;
 };
 
+const allowOllamaFunctions: boolean = false;
+
 export class ModelWrapper {
 	public readonly modelId: string;
 	public readonly provider: string;
@@ -145,59 +147,61 @@ export class ModelWrapper {
 			};
 		});
 
-		const systemMessageContent =
-			messages.find((message) => message.role === "system")?.content || "";
+		if (allowOllamaFunctions) {
+			const systemMessageContent =
+				messages.find((message) => message.role === "system")?.content || "";
 
-		const toolSystemMessage: MessageFormat = {
-			role: "system",
-			content:
-				systemMessageContent +
-				llmTools.getToolSystemTemplate({
-					...this._functions,
-					conversationalResponse: llmTools.conversationalResponse
-				})
-		};
-
-		const toolContextMessages = [
-			toolSystemMessage,
-			...messages.filter((message) => message.role !== "system")
-		];
-
-		const toolCallResponse = await this.model.chat({
-			model: this.modelName,
-			stream: false,
-			format: "json",
-			messages: toolContextMessages.map((message) => {
-				return {
-					role: message.role,
-					content: message.content
-				};
-			})
-		});
-
-		console.error("Ollama Tool Call", toolCallResponse.message.content);
-
-		const toolCall = JSON.parse(toolCallResponse.message.content) as {
-			tool?: string;
-			tool_input?: object;
-		};
-
-		if (toolCall.tool && toolCall.tool !== "conversationalResponse") {
-			yield {
-				content: "",
-				functionCalls: [
-					{
-						id: toolCall.tool,
-						type: "function",
-						function: {
-							name: toolCall.tool,
-							arguments: JSON.stringify(toolCall.tool_input) || "{}"
-						}
-					}
-				],
-				finished: true
+			const toolSystemMessage: MessageFormat = {
+				role: "system",
+				content:
+					systemMessageContent +
+					llmTools.getToolSystemTemplate({
+						...this._functions,
+						conversationalResponse: llmTools.conversationalResponse
+					})
 			};
-			return;
+
+			const toolContextMessages = [
+				toolSystemMessage,
+				...messages.filter((message) => message.role !== "system")
+			];
+
+			const toolCallResponse = await this.model.chat({
+				model: this.modelName,
+				stream: false,
+				format: "json",
+				messages: toolContextMessages.map((message) => {
+					return {
+						role: message.role,
+						content: message.content
+					};
+				})
+			});
+
+			console.error("Ollama Tool Call", toolCallResponse.message.content);
+
+			const toolCall = JSON.parse(toolCallResponse.message.content) as {
+				tool?: string;
+				tool_input?: object;
+			};
+
+			if (toolCall.tool && toolCall.tool !== "conversationalResponse") {
+				yield {
+					content: "",
+					functionCalls: [
+						{
+							id: toolCall.tool,
+							type: "function",
+							function: {
+								name: toolCall.tool,
+								arguments: JSON.stringify(toolCall.tool_input) || "{}"
+							}
+						}
+					],
+					finished: true
+				};
+				return;
+			}
 		}
 
 		const stream = await this.model.chat({
