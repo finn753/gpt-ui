@@ -50,27 +50,31 @@ class Database {
 		return true;
 	}
 
-	async insertMessage(chatID: string, message: MessageStructure): Promise<boolean> {
+	async insertMessage(chatID: string, message: MessageStructure): Promise<string | undefined> {
 		if (!this._supabaseClient) {
 			console.error("Supabase client is not initialized");
-			return false;
+			return;
 		}
 
-		const { error } = await this._supabaseClient.from("Messages").insert({
-			chat_id: chatID,
-			content: message.content,
-			role: message.role,
-			model: message.model,
-			created_at: message.created_at,
-			tokens: message.tokens
-		});
+		const { error, data } = await this._supabaseClient
+			.from("Messages")
+			.insert({
+				chat_id: chatID,
+				content: message.content,
+				role: message.role,
+				model: message.model,
+				created_at: message.created_at,
+				tokens: message.tokens
+			})
+			.select("id")
+			.single();
 
 		if (error) {
 			errorHandler.handleError("Failed to send message", error);
-			return false;
+			return;
 		}
 
-		return true;
+		return data.id as string;
 	}
 
 	async deleteMessage(messageID: string): Promise<boolean> {
