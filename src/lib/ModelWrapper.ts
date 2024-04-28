@@ -121,7 +121,11 @@ export class ModelWrapper {
 			model: this.modelName,
 			stream: true,
 			messages: messages.map((message) => {
-				return { role: message.role, content: message.content };
+				return {
+					role: message.role,
+					content: message.content,
+					images: message.images || undefined
+				};
 			})
 		});
 
