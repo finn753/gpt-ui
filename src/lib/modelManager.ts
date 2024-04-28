@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import ollama from "ollama/browser";
-import { openaiApiKey } from "$lib/stores";
+import { availableModels, openaiApiKey } from "$lib/stores";
 import { get } from "svelte/store";
 import type { ModelType } from "$lib/types";
 import { ChatOpenAI } from "@langchain/openai";
@@ -64,4 +64,9 @@ export function getLangchainModelById(
 		default:
 			throw new Error(`Provider ${provider} not supported`);
 	}
+}
+
+export function getModelInfoById(modelId: string) {
+	const models = get(availableModels);
+	return models.find((model) => model.id === modelId);
 }

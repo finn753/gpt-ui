@@ -9,6 +9,7 @@
 	import * as chatOperations from "$lib/chatOperations";
 	import * as chatService from "$lib/chatService";
 	import * as generationHelper from "$lib/generationHelper";
+	import * as modelManager from "$lib/modelManager";
 
 	export let chatID: string;
 	export let generating = false;
@@ -151,8 +152,8 @@
 		bind:value={inputValue}
 		on:submit={onSendMessage}
 		{generating}
-		canAttachImages={$chatDataMap[chatID]
-			? $chatDataMap[chatID].model.model === "gpt-4-turbo"
-			: $newChatSettings.model?.model === "gpt-4-turbo"}
+		canAttachImages={modelManager.getModelInfoById($chatDataMap[chatID]?.model.model)?.vision ||
+			modelManager.getModelInfoById($newChatSettings?.model?.model || "")?.vision ||
+			false}
 	/>
 </div>

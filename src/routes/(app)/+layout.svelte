@@ -7,7 +7,7 @@
 
 	import { page } from "$app/stores";
 	import * as Tooltip from "$lib/components/ui/tooltip";
-	import { getAvailableModels } from '$lib/modelManager';
+	import { getAvailableModels } from "$lib/modelManager";
 
 	$: currentPath = $page.url.pathname;
 
