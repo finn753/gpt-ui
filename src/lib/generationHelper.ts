@@ -127,8 +127,6 @@ async function chatMessagesToCompletionMessages(
 
 	const imageList: string[] = [];
 	base64Strings.forEach((image) => {
-		// Strip the data URL prefix
-		image = image.replace(/^data:image\/\w+;base64,/, "");
 		imageList.push(image);
 	});
 

@@ -73,7 +73,19 @@ export class ModelWrapper {
 		const response = await this.model.chat.completions.create({
 			model: this.modelName,
 			...this._params,
-			messages: messages as ChatCompletionMessageParam[],
+			messages: messages.map((message) => {
+				const content: ChatCompletionMessageParam["content"] = [
+					{ type: "text", text: message.content }
+				];
+				message.images?.forEach((image) =>
+					content.push({ type: "image_url", image_url: { url: image } })
+				);
+
+				return {
+					role: message.role,
+					content
+				};
+			}) as ChatCompletionMessageParam[],
 			tools:
 				Object.keys(this._functions).length === 0
 					? undefined
@@ -124,7 +136,9 @@ export class ModelWrapper {
 				return {
 					role: message.role,
 					content: message.content,
-					images: message.images || undefined
+					images:
+						message.images?.map((image) => image.replace(/^data:image\/\w+;base64,/, "")) ||
+						undefined
 				};
 			})
 		});
