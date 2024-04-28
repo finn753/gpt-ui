@@ -11,20 +11,20 @@
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
 	import { changeAssistantData, changeTags, changeTitle } from "$lib/chatOperations";
 	import * as chatService from "$lib/chatService";
-	import * as modelManager from "$lib/modelManager";
-	import type { ModelType } from "$lib/types";
 
 	$: modelSelection = $availableModels.map((model) => ({
 		value: model.id,
 		label: model.name
 	}));
 
-	export let chatID: string | null;
+	export let chatID: string | undefined = undefined;
 
 	let title: string = "";
 	let summary: string = "";
 	let tags: string[] = [];
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let selectedModel: any;
 	let model = "";
 	let temperature = 0.5;
 	let topP = 0.5;
@@ -37,6 +37,11 @@
 		$newChatSettings.model = { model, temperature, topP, systemMessage };
 	}
 
+	$: if(modelSelection.length > 0 && !model) {
+		model = modelSelection[0].value;
+		selectedModel = modelSelection[0];
+	}
+
 	$: chatID, chatData, updateData();
 
 	function updateData() {
@@ -44,7 +49,7 @@
 		summary = "";
 		tags = [];
 
-		model = "";
+		model = modelSelection.length > 0 ? modelSelection[0].value : "";
 		temperature = 0.5;
 		topP = 0.5;
 		systemMessage = "You are a helpful assistant";
@@ -69,6 +74,8 @@
 				systemMessage = chatData.model.systemMessage;
 			}
 		}
+
+		selectedModel = modelSelection.find((m) => m.value === model) || null;
 	}
 
 	let addTagInput = "";
@@ -218,8 +225,8 @@
 		<Card.Content class="flex flex-col gap-4">
 			{#if modelSelection}
 				<Label>
-					Model
 					<Select.Root
+						selected={selectedModel}
 						onSelectedChange={async (v) => {
 							if (v) {
 								model = String(v.value);
