@@ -17,7 +17,7 @@ export async function getAvailableModels(): Promise<ModelType[]> {
 
 export async function getAvailableOpenAIModels(): Promise<ModelType[]> {
 	try {
-		const openAI = new OpenAI({ apiKey: get(openaiApiKey) ?? "" });
+		const openAI = new OpenAI({ apiKey: get(openaiApiKey) ?? "", dangerouslyAllowBrowser: true });
 		return (await openAI.models.list()).data
 			.filter((model) => /ft:|gpt-/.test(model.id))
 			.filter((model) => /(gpt-3.5-turbo|gpt-4-turbo)$/.test(model.id))

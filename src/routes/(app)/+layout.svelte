@@ -7,6 +7,7 @@
 
 	import { page } from "$app/stores";
 	import * as Tooltip from "$lib/components/ui/tooltip";
+	import { getAvailableModels } from '$lib/modelManager';
 
 	$: currentPath = $page.url.pathname;
 
@@ -23,7 +24,7 @@
 
 	onMount(async () => {
 		try {
-			availableModels.set(await data.availableModels);
+			availableModels.set(await getAvailableModels());
 			await initializeModel();
 		} catch (e) {
 			console.error(e);
