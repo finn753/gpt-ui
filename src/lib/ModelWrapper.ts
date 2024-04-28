@@ -25,7 +25,7 @@ export type ModelResponse = {
 export type MessageFormat = {
 	role: "user" | "assistant" | "tool" | "system" | "function";
 	content: string;
-	functionCalls?: OpenAI.Chat.ChatCompletionMessageToolCall[];
+	tool_calls?: OpenAI.Chat.ChatCompletionMessageToolCall[];
 	tool_call_id?: string;
 	images?: string[];
 };
@@ -82,8 +82,9 @@ export class ModelWrapper {
 				);
 
 				return {
-					role: message.role,
-					content
+					...message,
+					content,
+					images: undefined
 				};
 			}) as ChatCompletionMessageParam[],
 			tools:
@@ -115,6 +116,12 @@ export class ModelWrapper {
 			}
 
 			content = content + (chunk.choices[0].delta.content || "");
+
+			if (chunk.choices[0].finish_reason) {
+				console.error("Finish", chunk.choices[0].finish_reason);
+				yield { content, functionCalls: toolCalls, finished: true };
+				break;
+			}
 
 			yield { content, functionCalls: toolCalls, finished: false };
 		}
@@ -167,8 +174,10 @@ export class ModelWrapper {
 	public async *streamToolAgentResponse(
 		messages: MessageFormat[]
 	): AsyncGenerator<MessageFormat[]> {
+		messages = [...messages];
 		const context: MessageFormat[] = [];
 
+		console.error("Stream Messages", messages);
 		const response = await this.getStream(messages);
 
 		let last: MessageFormat | undefined;
@@ -176,11 +185,11 @@ export class ModelWrapper {
 		for await (const chunk of response) {
 			const toolCalls = chunk.functionCalls;
 
-			if (chunk.finished && toolCalls) {
+			if (chunk.finished && toolCalls.length > 0) {
 				const assistantMessage: MessageFormat = {
 					role: "assistant",
 					content: "",
-					functionCalls: toolCalls
+					tool_calls: toolCalls.length > 0 ? toolCalls : undefined
 				};
 
 				context.push(assistantMessage);
@@ -189,10 +198,14 @@ export class ModelWrapper {
 				context.push(...(await this.executeToolCalls(toolCalls)));
 				yield context;
 
+				console.error("Messages", messages);
+				console.error("Context", context);
+				console.error("Combined", [...messages, ...context]);
 				const toolResponse = this.streamToolAgentResponse([...messages, ...context]);
 
 				let finalContext: MessageFormat[] = [];
 				for await (const toolChunk of toolResponse) {
+					console.error("ToolChunk", toolChunk);
 					yield [...context, ...toolChunk];
 					finalContext = toolChunk;
 				}
@@ -224,6 +237,7 @@ export class ModelWrapper {
 				context.push({
 					tool_call_id: toolCall.id as string,
 					role: "tool",
+					name: functionName,
 					content: result
 				});
 			} catch (e: unknown) {
