@@ -5,16 +5,48 @@ import type {
 import OpenAI from "openai";
 import * as errorHandler from "$lib/errorHandler";
 import { runTavilySearch } from "$lib/tools/tavily";
+import type { ModelFunction } from "$lib/ModelWrapper";
 
 export type llmTool<T extends Record<string, unknown> = Record<string, unknown>> = {
-	input: ChatCompletionTool;
-	function: (args: T) => Promise<string>;
+	definition: ChatCompletionTool;
+	call: (args: T) => Promise<string>;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type llmToolMap = Record<string, llmTool<any>>;
 
+export function getToolSystemTemplate(functions: Record<string, ModelFunction>) {
+	return `You have access to the following tools:
+	${JSON.stringify(Object.values(functions).map((fn) => fn.definition))}
+	You must always select one of the above tools and respond with only a JSON object matching the following schema:
+	{
+		"tool": <name of the selected tool>,
+		"tool_input": <parameters for the selected tool, matching the tool's JSON schema>
+	}`;
+}
+
+export const conversationalResponse: ModelFunction = {
+	definition: {
+		name: "conversationalResponse",
+		description:
+			"Trigger conversational response if no other tools should be called for a given query. No input required",
+		parameters: {
+			type: "object",
+			properties: {
+				triggerResponse: {
+					type: "boolean",
+					description: "Whether to trigger the conversational response or not"
+				}
+			},
+			required: ["triggerResponse"]
+		}
+	},
+	call: async () => {
+		return "";
+	}
+};
+
 export const getTavilySearchResults: llmTool<{ query: string }> = {
-	input: {
+	definition: {
 		function: {
 			name: "getTavilySearchResults",
 			description:
@@ -32,7 +64,7 @@ export const getTavilySearchResults: llmTool<{ query: string }> = {
 		},
 		type: "function"
 	},
-	function: async (args: { query: string }) => {
+	call: async (args: { query: string }) => {
 		return await runTavilySearch(args.query);
 	}
 };
@@ -50,7 +82,7 @@ export async function executeToolCalls(
 		if (!functionName) continue;
 
 		try {
-			const fn = tools[functionName].function;
+			const fn = tools[functionName].call;
 			const result = await fn(JSON.parse(functionArgs || "{}"));
 
 			context.push({

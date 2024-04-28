@@ -56,8 +56,8 @@ export async function* generateResponse(
 
 	const tools: Record<string, ModelFunction> = {
 		getTavilySearchResults: {
-			definition: getTavilySearchResults.input.function,
-			call: getTavilySearchResults.function as (args: Record<string, unknown>) => Promise<string>
+			definition: getTavilySearchResults.definition.function,
+			call: getTavilySearchResults.call as (args: Record<string, unknown>) => Promise<string>
 		}
 	};
 

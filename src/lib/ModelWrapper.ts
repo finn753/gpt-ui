@@ -5,6 +5,7 @@ import { openaiApiKey } from "$lib/stores";
 import type { FunctionDefinition } from "openai/resources/shared";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import * as errorHandler from "$lib/errorHandler";
+import * as llmTools from "$lib/tools/llmTools";
 
 export type ModelOptions = {
 	temperature?: number;
@@ -28,6 +29,7 @@ export type MessageFormat = {
 	tool_calls?: OpenAI.Chat.ChatCompletionMessageToolCall[];
 	tool_call_id?: string;
 	images?: string[];
+	name?: string;
 };
 
 export class ModelWrapper {
@@ -136,6 +138,68 @@ export class ModelWrapper {
 	async *getOllamaStream(messages: MessageFormat[]): AsyncGenerator<ModelResponse> {
 		if (!(this.model instanceof Ollama)) throw new Error("Model is not an instance of Ollama");
 
+		messages = messages.map((message) => {
+			return {
+				...message,
+				role: message.role === "tool" ? "user" : message.role
+			};
+		});
+
+		const systemMessageContent =
+			messages.find((message) => message.role === "system")?.content || "";
+
+		const toolSystemMessage: MessageFormat = {
+			role: "system",
+			content:
+				systemMessageContent +
+				llmTools.getToolSystemTemplate({
+					...this._functions,
+					conversationalResponse: llmTools.conversationalResponse
+				})
+		};
+
+		const toolContextMessages = [
+			toolSystemMessage,
+			...messages.filter((message) => message.role !== "system")
+		];
+
+		const toolCallResponse = await this.model.chat({
+			model: this.modelName,
+			stream: false,
+			format: "json",
+			messages: toolContextMessages.map((message) => {
+				return {
+					role: message.role,
+					content: message.content
+				};
+			})
+		});
+
+		console.error("Ollama Tool Call", toolCallResponse.message.content);
+
+		const toolCall = JSON.parse(toolCallResponse.message.content) as {
+			tool?: string;
+			tool_input?: object;
+		};
+
+		if (toolCall.tool && toolCall.tool !== "conversationalResponse") {
+			yield {
+				content: "",
+				functionCalls: [
+					{
+						id: toolCall.tool,
+						type: "function",
+						function: {
+							name: toolCall.tool,
+							arguments: JSON.stringify(toolCall.tool_input) || "{}"
+						}
+					}
+				],
+				finished: true
+			};
+			return;
+		}
+
 		const stream = await this.model.chat({
 			model: this.modelName,
 			stream: true,
@@ -198,14 +262,10 @@ export class ModelWrapper {
 				context.push(...(await this.executeToolCalls(toolCalls)));
 				yield context;
 
-				console.error("Messages", messages);
-				console.error("Context", context);
-				console.error("Combined", [...messages, ...context]);
 				const toolResponse = this.streamToolAgentResponse([...messages, ...context]);
 
 				let finalContext: MessageFormat[] = [];
 				for await (const toolChunk of toolResponse) {
-					console.error("ToolChunk", toolChunk);
 					yield [...context, ...toolChunk];
 					finalContext = toolChunk;
 				}

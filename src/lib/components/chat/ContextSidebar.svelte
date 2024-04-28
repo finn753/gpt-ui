@@ -37,7 +37,7 @@
 		$newChatSettings.model = { model, temperature, topP, systemMessage };
 	}
 
-	$: if(modelSelection.length > 0 && !model) {
+	$: if (modelSelection.length > 0 && !model) {
 		model = modelSelection[0].value;
 		selectedModel = modelSelection[0];
 	}

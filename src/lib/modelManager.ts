@@ -39,7 +39,7 @@ export async function getAvailableOllamaModels(): Promise<ModelType[]> {
 			id: "ollama:" + model.name,
 			name: model.name,
 			provider: "ollama",
-			vision: model.details.families.includes("clip")
+			vision: model.details.families?.includes("clip") || false
 		}));
 	} catch (e: unknown) {
 		console.error(e);
