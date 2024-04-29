@@ -51,6 +51,12 @@ export async function sendMessage(message: MessageStructure, chatID: string): Pr
 		}
 
 		return false;
+	} else {
+		const message = get(chatContentMap)[chatID].pop();
+
+		if (message) {
+			updateChatContentMap(chatID, { ...message, id: success });
+		}
 	}
 
 	return true;

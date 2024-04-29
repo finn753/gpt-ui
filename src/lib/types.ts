@@ -31,3 +31,17 @@ export type MessageStructure = {
 export type ChatDataMap = Record<string, ChatStructure>;
 export type ChatContentMap = Record<string, MessageStructure[]>;
 export type GenerationHistory = { images: OpenAI.Images.Image[]; voice: string[] };
+
+export type ModelType = {
+	id: string;
+	name: string;
+	provider: string;
+	vision: boolean;
+};
+
+export type LiveDataSource = {
+	name: string;
+	activation: (query: string) => Promise<boolean>;
+	output: (query: string) => Promise<string>;
+	outputLocation: "system" | "user";
+};

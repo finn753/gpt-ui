@@ -26,3 +26,8 @@ export async function runTavilySearch(query: string): Promise<string> {
 	}
 	return JSON.stringify(json.results);
 }
+
+export async function getWebsiteContent(url: string): Promise<string> {
+	const response = await fetch(`https://r.jina.ai/${url}`);
+	return await response.text();
+}

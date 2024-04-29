@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { format } from "date-fns";
 	import { Button } from "$lib/components/ui/button";
-	import { Clipboard, Trash } from 'lucide-svelte';
+	import { Clipboard, Trash } from "lucide-svelte";
 	import { toast } from "svelte-sonner";
 	import type { MessageStructure } from "$lib/types";
 	import SvelteMarkdown from "svelte-markdown";
@@ -34,10 +34,10 @@
 	}
 
 	async function deleteMessage() {
-		if(!chatID || !message.id) return console.error("ID is missing")
+		if (!chatID || !message.id) return console.error("ID is missing");
 
-		if(confirm("Are you sure you want to delete this message?")) {
-			await chatOperations.deleteMessage(message.id, chatID)
+		if (confirm("Are you sure you want to delete this message?")) {
+			await chatOperations.deleteMessage(message.id, chatID);
 		}
 	}
 
@@ -83,7 +83,9 @@
 		</div>
 	{/if}
 
-	<div class="flex flex-row items-center py-2 gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+	<div
+		class="flex flex-row items-center gap-2 py-2 opacity-0 transition-opacity group-hover:opacity-100"
+	>
 		<Button
 			class="p-0 opacity-50 hover:opacity-100"
 			variant="icon"

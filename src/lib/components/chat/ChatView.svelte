@@ -9,6 +9,7 @@
 	import * as chatOperations from "$lib/chatOperations";
 	import * as chatService from "$lib/chatService";
 	import * as generationHelper from "$lib/generationHelper";
+	import * as modelManager from "$lib/modelManager";
 
 	export let chatID: string;
 	export let generating = false;
@@ -115,8 +116,8 @@
 		let response: MessageStructure[] | undefined;
 		for await (const r of generationHelper.generateResponse(
 			context,
+			model || "",
 			{
-				model,
 				temperature,
 				top_p: topP
 			},
@@ -129,7 +130,7 @@
 		generatingProgress = null;
 
 		if (response) {
-			await chatService.sendAssistantMessage(chatID, [...response], context);
+			await chatService.sendAssistantMessage(chatID, [...response]);
 		}
 	}
 </script>
@@ -137,7 +138,7 @@
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
 	<div class="flex-1 overflow-y-auto" bind:this={scrollContainer}>
 		<div class="flex flex-col">
-			{#each messages.filter((msg) => msg.role !== "tool" && msg.content !== "") as message}
+			{#each messages.filter((msg) => msg.content !== "") as message}
 				<ChatMessage {message} {chatID} on:retry={onRetrySendMessage} />
 			{/each}
 			{#if generatingProgress}
@@ -151,8 +152,8 @@
 		bind:value={inputValue}
 		on:submit={onSendMessage}
 		{generating}
-		canAttachImages={$chatDataMap[chatID]
-			? $chatDataMap[chatID].model.model === "gpt-4-turbo"
-			: $newChatSettings.model?.model === "gpt-4-turbo"}
+		canAttachImages={modelManager.getModelInfoById($chatDataMap[chatID]?.model.model)?.vision ||
+			modelManager.getModelInfoById($newChatSettings?.model?.model || "")?.vision ||
+			false}
 	/>
 </div>
