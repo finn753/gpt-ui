@@ -70,3 +70,17 @@ export function getModelInfoById(modelId: string) {
 	const models = get(availableModels);
 	return models.find((model) => model.id === modelId);
 }
+
+export function getDefaultModelId() {
+	const models = get(availableModels);
+
+	if (models.length === 0) {
+		throw new Error("No models available");
+	}
+
+	if (models.find((model) => model.id === "openai:gpt-3.5-turbo")) {
+		return "openai:gpt-3.5-turbo";
+	}
+
+	return models[0].id;
+}
