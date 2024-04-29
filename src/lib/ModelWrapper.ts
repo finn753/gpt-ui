@@ -146,6 +146,21 @@ export class ModelWrapper {
 		}
 	}
 
+	public async prompt(input: string, system?: string) {
+		const messages: MessageFormat[] = [{ role: "user", content: input }];
+
+		if (system) messages.unshift({ role: "system", content: system });
+
+		const stream = await this.getStream(messages);
+
+		let response = "";
+		for await (const chunk of stream) {
+			response = chunk.content;
+		}
+
+		return response;
+	}
+
 	public async *streamToolAgentResponse(
 		messages: MessageFormat[]
 	): AsyncGenerator<MessageFormat[]> {

@@ -1,23 +1,8 @@
-import type { BaseLanguageModelInput } from "@langchain/core/language_models/base";
 import { get } from "svelte/store";
 import { openaiApiKey } from "$lib/stores";
 import * as errorHandler from "$lib/errorHandler";
-import * as modelManager from "$lib/modelManager";
 import OpenAI from "openai";
 import type { SpeechCreateParams } from "openai/resources/audio/speech";
-
-export async function generateChatResponse(
-	messages: BaseLanguageModelInput,
-	options?: { modelName?: string; temperature?: number; topP?: number }
-): Promise<string | undefined> {
-	const modelName = options?.modelName || "gpt-3.5-turbo";
-	options = { temperature: options?.temperature || 0.5, topP: options?.topP || 1 };
-
-	const model = modelManager.getLangchainModelById("openai:" + modelName, { ...options });
-	if (!model) return;
-
-	return (await model.invoke(messages)).content.toString();
-}
 
 export async function generateImage(prompt: string, model = "dall-e-2") {
 	const openai: OpenAI | null = getOpenAI();

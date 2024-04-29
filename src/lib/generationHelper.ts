@@ -3,32 +3,32 @@ import { get } from "svelte/store";
 import { selectedChatID } from "$lib/stores";
 import * as errorHandler from "$lib/errorHandler";
 import * as chatOperations from "$lib/chatOperations";
-import * as templates from "$lib/templates";
-import * as modelInvoker from "$lib/modelInvoker";
 import { type MessageFormat, ModelWrapper } from "$lib/ModelWrapper";
 import { webSearchSource, currentTimeSource, websitePreviewSource } from "$lib/liveDataSource";
+import { getDefaultModelId } from "$lib/modelManager";
 
 export async function generateTitle(context: string) {
-	const messages = templates.getSingleTaskPromptMessages(
+	const systemPrompt =
 		"You're an AI that generates titles for chats \n Keep them short, summarise the chat, don't be too specific \n" +
-			"Don't enumerate the points, don't use the word 'chat' in the title \n" +
-			"SUMMARIZE the chat in a few words",
-		context
-	);
+		"Don't enumerate the points, don't use the word 'chat' in the title \n" +
+		"SUMMARIZE the chat in a few words";
 
-	return await modelInvoker.generateChatResponse(messages);
+	const model = new ModelWrapper(getDefaultModelId());
+	return model.prompt(context, systemPrompt);
 }
 
 export async function generateSummary(currentSummary: string, newMessages: MessageStructure[]) {
-	const messages = templates.getSingleTaskPromptMessages(
+	const systemPrompt =
 		"You're an AI that generates summaries for chats \n Keep them short, summarise the chat, don't be too specific \n" +
-			"Don't enumerate the points, don't use the word 'chat' in the summary \n" +
-			"DO NOT say 'The user said', 'The assistant said', etc. \n" +
-			"SUMMARIZE the chat in a few words, one sentence maximum \n",
-		"Current summary: \n " + currentSummary + "\n\n" + "Messages: \n" + JSON.stringify(newMessages)
-	);
+		"Don't enumerate the points, don't use the word 'chat' in the summary \n" +
+		"DO NOT say 'The user said', 'The assistant said', etc. \n" +
+		"SUMMARIZE the chat in a few words, one sentence maximum \n";
 
-	return await modelInvoker.generateChatResponse(messages);
+	const input =
+		"Current summary: \n " + currentSummary + "\n\n" + "Messages: \n" + JSON.stringify(newMessages);
+
+	const model = new ModelWrapper(getDefaultModelId());
+	return model.prompt(input, systemPrompt);
 }
 
 export async function* generateResponse(

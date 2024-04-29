@@ -3,8 +3,6 @@ import ollama from "ollama/browser";
 import { availableModels, openaiApiKey } from "$lib/stores";
 import { get } from "svelte/store";
 import type { ModelType } from "$lib/types";
-import { ChatOpenAI } from "@langchain/openai";
-import { OllamaFunctions } from "langchain/experimental/chat_models/ollama_functions";
 
 export async function getAvailableModels(): Promise<ModelType[]> {
 	const models: ModelType[] = [];
@@ -44,25 +42,6 @@ export async function getAvailableOllamaModels(): Promise<ModelType[]> {
 	} catch (e: unknown) {
 		console.error(e);
 		return [];
-	}
-}
-
-export function getLangchainModelById(
-	id: string,
-	options?: { temperature?: number; topP?: number }
-) {
-	const [provider, modelName] = id.split(":");
-
-	switch (provider) {
-		case "openai":
-			return new ChatOpenAI(
-				{ openAIApiKey: get(openaiApiKey) ?? "", modelName, ...options },
-				{ dangerouslyAllowBrowser: true }
-			);
-		case "ollama":
-			return new OllamaFunctions({ model: modelName, ...options });
-		default:
-			throw new Error(`Provider ${provider} not supported`);
 	}
 }
 
