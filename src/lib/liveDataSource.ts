@@ -1,8 +1,8 @@
 import type { LiveDataSource } from "$lib/types";
-import { runTavilySearch } from "$lib/apiWrapper/tavily";
+import { getWebsiteContent, runTavilySearch } from "$lib/apiWrapper/browsing";
 import type { MessageFormat } from "$lib/ModelWrapper";
 
-export const currentTime: LiveDataSource = {
+export const currentTimeSource: LiveDataSource = {
 	name: "Current Time",
 	activation: async (query: string) => {
 		return !!query;
@@ -18,7 +18,7 @@ export const currentTime: LiveDataSource = {
 	outputLocation: "system"
 };
 
-export const browsingTool: LiveDataSource = {
+export const webSearchSource: LiveDataSource = {
 	name: "Web Search",
 	activation: async (query: string) => {
 		query = query.toLowerCase();
@@ -36,6 +36,24 @@ export const browsingTool: LiveDataSource = {
 		const result = await runTavilySearch(query);
 
 		return "Web search results:\n´´´\n" + result + "\n´´´";
+	},
+	outputLocation: "user"
+};
+
+export const websitePreviewSource: LiveDataSource = {
+	name: "Link Preview",
+	activation: async (query: string) => {
+		const urlRegex = /(https?:\/\/[^\s]+)/g;
+		return urlRegex.test(query);
+	},
+	output: async (query: string) => {
+		const urlRegex = /(https?:\/\/[^\s]+)/g;
+		const urls = query.match(urlRegex);
+		const content = urls ? await Promise.all(urls.map((url) => getWebsiteContent(url))) : [];
+
+		if (content.length === 0) return "";
+
+		return "Website Content:\n´´´\n" + content.join("\n\n") + "\n´´´";
 	},
 	outputLocation: "user"
 };

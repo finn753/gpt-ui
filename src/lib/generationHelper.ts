@@ -6,7 +6,7 @@ import * as chatOperations from "$lib/chatOperations";
 import * as templates from "$lib/templates";
 import * as modelInvoker from "$lib/modelInvoker";
 import { type MessageFormat, ModelWrapper } from "$lib/ModelWrapper";
-import { browsingTool, currentTime } from "$lib/liveDataSource";
+import { webSearchSource, currentTimeSource, websitePreviewSource } from "$lib/liveDataSource";
 
 export async function generateTitle(context: string) {
 	const messages = templates.getSingleTaskPromptMessages(
@@ -56,7 +56,7 @@ export async function* generateResponse(
 
 	try {
 		const model = new ModelWrapper(modelId, options);
-		model.liveDataSources = [currentTime, browsingTool];
+		model.liveDataSources = [currentTimeSource, webSearchSource, websitePreviewSource];
 		const stream = model.streamToolAgentResponse(messages);
 		if (!stream) throw new Error("Failed to generate response");
 
