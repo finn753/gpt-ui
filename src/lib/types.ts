@@ -38,3 +38,10 @@ export type ModelType = {
 	provider: string;
 	vision: boolean;
 };
+
+export type LiveDataSource = {
+	name: string;
+	activation: (query: string) => Promise<boolean>;
+	output: (query: string) => Promise<string>;
+	outputLocation: "system" | "user";
+};

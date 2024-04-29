@@ -3,6 +3,8 @@ import { Ollama } from "ollama/browser";
 import { get } from "svelte/store";
 import { openaiApiKey } from "$lib/stores";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import type { LiveDataSource } from "$lib/types";
+import { injectLiveDataSourceIntoMessages } from "$lib/liveDataSource";
 
 export type ModelOptions = {
 	temperature?: number;
@@ -27,6 +29,8 @@ export class ModelWrapper {
 	private _params: ModelOptions = {};
 	private readonly model: OpenAI | Ollama;
 
+	private _liveDataSources: LiveDataSource[] = [];
+
 	constructor(modelId: string, options?: ModelOptions) {
 		this.modelId = modelId;
 		[this.provider, this.modelName] = modelId.split(":");
@@ -49,6 +53,10 @@ export class ModelWrapper {
 
 	public set params(options: ModelOptions) {
 		this._params = options;
+	}
+
+	public set liveDataSources(sources: LiveDataSource[]) {
+		this._liveDataSources = sources;
 	}
 
 	async *getOpenAIStream(messages: MessageFormat[]): AsyncGenerator<ModelResponse> {
@@ -143,6 +151,8 @@ export class ModelWrapper {
 	): AsyncGenerator<MessageFormat[]> {
 		messages = [...messages];
 		const context: MessageFormat[] = [];
+
+		messages = await injectLiveDataSourceIntoMessages(messages, this._liveDataSources);
 
 		const response = await this.getStream(messages);
 
