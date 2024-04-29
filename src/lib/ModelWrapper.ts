@@ -2,37 +2,23 @@ import OpenAI from "openai";
 import { Ollama } from "ollama/browser";
 import { get } from "svelte/store";
 import { openaiApiKey } from "$lib/stores";
-import type { FunctionDefinition } from "openai/resources/shared";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
-import * as errorHandler from "$lib/errorHandler";
-import * as llmTools from "$lib/tools/llmTools";
 
 export type ModelOptions = {
 	temperature?: number;
 	topP?: number;
 };
 
-export type ModelFunction = {
-	definition: FunctionDefinition;
-	call: (args: Record<string, unknown>) => Promise<string>;
-};
-
 export type ModelResponse = {
 	content: string;
-	functionCalls: OpenAI.Chat.ChatCompletionMessageToolCall[];
 	finished: boolean;
 };
 
 export type MessageFormat = {
 	role: "user" | "assistant" | "tool" | "system" | "function";
 	content: string;
-	tool_calls?: OpenAI.Chat.ChatCompletionMessageToolCall[];
-	tool_call_id?: string;
 	images?: string[];
-	name?: string;
 };
-
-const allowOllamaFunctions: boolean = false;
 
 export class ModelWrapper {
 	public readonly modelId: string;
@@ -40,8 +26,6 @@ export class ModelWrapper {
 	public readonly modelName: string;
 	private _params: ModelOptions = {};
 	private readonly model: OpenAI | Ollama;
-
-	private _functions: Record<string, ModelFunction> = {};
 
 	constructor(modelId: string, options?: ModelOptions) {
 		this.modelId = modelId;
@@ -61,10 +45,6 @@ export class ModelWrapper {
 			default:
 				throw new Error(`Provider ${this.provider} not supported`);
 		}
-	}
-
-	public set functions(functions: Record<string, ModelFunction>) {
-		this._functions = functions;
 	}
 
 	public set params(options: ModelOptions) {
@@ -91,48 +71,25 @@ export class ModelWrapper {
 					images: undefined
 				};
 			}) as ChatCompletionMessageParam[],
-			tools:
-				Object.keys(this._functions).length === 0
-					? undefined
-					: Object.values(this._functions).map((fn) => {
-							return {
-								type: "function",
-								function: fn.definition
-							};
-						}),
 			stream: true
 		});
 
-		const toolCalls: OpenAI.Chat.ChatCompletionMessageToolCall[] = [];
 		let content = "";
 
 		for await (const chunk of response) {
-			if (chunk.choices[0].delta.tool_calls) {
-				const currentToolCall = chunk.choices[0].delta.tool_calls[0];
-
-				if (!toolCalls[currentToolCall.index]) {
-					toolCalls[currentToolCall.index] =
-						currentToolCall as OpenAI.ChatCompletionMessageToolCall;
-				} else {
-					toolCalls[currentToolCall.index].function.arguments +=
-						currentToolCall.function?.arguments || "";
-				}
-			}
-
 			content = content + (chunk.choices[0].delta.content || "");
 
 			if (chunk.choices[0].finish_reason) {
 				console.error("Finish", chunk.choices[0].finish_reason);
-				yield { content, functionCalls: toolCalls, finished: true };
+				yield { content, finished: true };
 				break;
 			}
 
-			yield { content, functionCalls: toolCalls, finished: false };
+			yield { content, finished: false };
 		}
 
 		return {
 			content,
-			functionCalls: toolCalls,
 			finished: true
 		};
 	}
@@ -146,63 +103,6 @@ export class ModelWrapper {
 				role: message.role === "tool" ? "user" : message.role
 			};
 		});
-
-		if (allowOllamaFunctions) {
-			const systemMessageContent =
-				messages.find((message) => message.role === "system")?.content || "";
-
-			const toolSystemMessage: MessageFormat = {
-				role: "system",
-				content:
-					systemMessageContent +
-					llmTools.getToolSystemTemplate({
-						...this._functions,
-						conversationalResponse: llmTools.conversationalResponse
-					})
-			};
-
-			const toolContextMessages = [
-				toolSystemMessage,
-				...messages.filter((message) => message.role !== "system")
-			];
-
-			const toolCallResponse = await this.model.chat({
-				model: this.modelName,
-				stream: false,
-				format: "json",
-				messages: toolContextMessages.map((message) => {
-					return {
-						role: message.role,
-						content: message.content
-					};
-				})
-			});
-
-			console.error("Ollama Tool Call", toolCallResponse.message.content);
-
-			const toolCall = JSON.parse(toolCallResponse.message.content) as {
-				tool?: string;
-				tool_input?: object;
-			};
-
-			if (toolCall.tool && toolCall.tool !== "conversationalResponse") {
-				yield {
-					content: "",
-					functionCalls: [
-						{
-							id: toolCall.tool,
-							type: "function",
-							function: {
-								name: toolCall.tool,
-								arguments: JSON.stringify(toolCall.tool_input) || "{}"
-							}
-						}
-					],
-					finished: true
-				};
-				return;
-			}
-		}
 
 		const stream = await this.model.chat({
 			model: this.modelName,
@@ -218,13 +118,12 @@ export class ModelWrapper {
 			})
 		});
 
-		const toolCalls: OpenAI.Chat.ChatCompletionMessageToolCall[] = [];
 		let content = "";
 
 		for await (const chunk of stream) {
 			content = content + chunk.message.content;
 
-			yield { content, functionCalls: toolCalls, finished: false };
+			yield { content, finished: chunk.done };
 		}
 	}
 
@@ -245,69 +144,16 @@ export class ModelWrapper {
 		messages = [...messages];
 		const context: MessageFormat[] = [];
 
-		console.error("Stream Messages", messages);
 		const response = await this.getStream(messages);
 
 		let last: MessageFormat | undefined;
 
 		for await (const chunk of response) {
-			const toolCalls = chunk.functionCalls;
-
-			if (chunk.finished && toolCalls.length > 0) {
-				const assistantMessage: MessageFormat = {
-					role: "assistant",
-					content: "",
-					tool_calls: toolCalls.length > 0 ? toolCalls : undefined
-				};
-
-				context.push(assistantMessage);
-				yield context;
-
-				context.push(...(await this.executeToolCalls(toolCalls)));
-				yield context;
-
-				const toolResponse = this.streamToolAgentResponse([...messages, ...context]);
-
-				let finalContext: MessageFormat[] = [];
-				for await (const toolChunk of toolResponse) {
-					yield [...context, ...toolChunk];
-					finalContext = toolChunk;
-				}
-
-				return [...context, ...finalContext];
-			}
-
 			yield [...context, { role: "assistant", content: chunk.content }];
 			last = { role: "assistant", content: chunk.content };
 		}
 
 		if (last) context.push(last);
-		return context;
-	}
-
-	async executeToolCalls(toolCalls: OpenAI.ChatCompletionMessageToolCall[]) {
-		const context: MessageFormat[] = [];
-
-		for (const toolCall of toolCalls) {
-			const functionName = toolCall.function?.name;
-			const functionArgs = toolCall.function?.arguments;
-
-			if (!functionName) continue;
-
-			try {
-				const fn = this._functions[functionName].call;
-				const result = await fn(JSON.parse(functionArgs || "{}"));
-
-				context.push({
-					tool_call_id: toolCall.id as string,
-					role: "tool",
-					name: functionName,
-					content: result
-				});
-			} catch (e: unknown) {
-				errorHandler.handleError("Failed to execute tool", e);
-			}
-		}
 		return context;
 	}
 }

@@ -5,8 +5,7 @@ import * as errorHandler from "$lib/errorHandler";
 import * as chatOperations from "$lib/chatOperations";
 import * as templates from "$lib/templates";
 import * as modelInvoker from "$lib/modelInvoker";
-import { getTavilySearchResults } from "$lib/tools/llmTools";
-import { type MessageFormat, type ModelFunction, ModelWrapper } from "$lib/ModelWrapper";
+import { type MessageFormat, ModelWrapper } from "$lib/ModelWrapper";
 
 export async function generateTitle(context: string) {
 	const messages = templates.getSingleTaskPromptMessages(
@@ -54,16 +53,8 @@ export async function* generateResponse(
 
 	let responseMessages: MessageStructure[] = [];
 
-	const tools: Record<string, ModelFunction> = {
-		getTavilySearchResults: {
-			definition: getTavilySearchResults.definition.function,
-			call: getTavilySearchResults.call as (args: Record<string, unknown>) => Promise<string>
-		}
-	};
-
 	try {
 		const model = new ModelWrapper(modelId, options);
-		model.functions = tools;
 		const stream = model.streamToolAgentResponse(messages);
 		if (!stream) throw new Error("Failed to generate response");
 
