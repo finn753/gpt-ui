@@ -10,10 +10,6 @@ class Database {
 		this._supabaseClient = client;
 	}
 
-	get supabaseClient(): SupabaseClient | null {
-		return this._supabaseClient;
-	}
-
 	async createNewChat(): Promise<string | null> {
 		if (!this._supabaseClient) {
 			console.error("Supabase client is not initialized");

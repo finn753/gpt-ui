@@ -45,7 +45,7 @@ export async function getSimilarityFromMessagesToQuery(
 	return sum / messageSimilarities.length;
 }
 
-export function estimateTokenCount(text: string) {
+function estimateTokenCount(text: string) {
 	return Math.ceil(text.length / 4);
 }
 

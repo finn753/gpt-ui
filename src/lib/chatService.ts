@@ -3,8 +3,8 @@ import { get } from "svelte/store";
 import * as chatOperations from "$lib/chatOperations";
 import type { ChatDataMap, ChatMessageStructure } from "$lib/types";
 import * as generationHelper from "$lib/generationHelper";
-import * as embeddingHelper from "$lib/embeddingHelper";
 import * as templates from "$lib/templates";
+import { getSimilarityFromMessagesToQuery, getSimilarMessagesToQuery } from "$lib/embeddingHelper";
 
 export async function setGeneratedTitleForChat(chatID: string) {
 	const messages = get(chatContentMap)[chatID] || [];
@@ -70,7 +70,7 @@ export async function getContextFromMessages(
 
 	const lastMessages = messages.splice(-lastMessagesCount);
 
-	const similarMessages = await embeddingHelper.getSimilarMessagesToQuery(
+	const similarMessages = await getSimilarMessagesToQuery(
 		messages,
 		queryMessage.content,
 		similarityMessagesMaxTokenLimit,
@@ -112,10 +112,7 @@ async function isSummaryNeededForChat(chatID: string): Promise<boolean> {
 
 	if (!currentSummary) return true;
 
-	const similarity = await embeddingHelper.getSimilarityFromMessagesToQuery(
-		context.slice(-2),
-		currentSummary
-	);
+	const similarity = await getSimilarityFromMessagesToQuery(context.slice(-2), currentSummary);
 
 	return similarity < 0.8;
 }
