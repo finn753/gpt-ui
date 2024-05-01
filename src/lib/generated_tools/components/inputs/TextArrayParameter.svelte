@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ToolCard from "$lib/generated_tools/components/ToolCard.svelte";
 	import { Input } from "$lib/components/ui/input";
-	import { cn } from "$lib/utils";
+	import { cn } from "$lib/scripts/misc/utils";
 	import { inputStyleClasses } from "$lib/generated_tools/components/ui/input/index.js";
 
 	export let value: string[];

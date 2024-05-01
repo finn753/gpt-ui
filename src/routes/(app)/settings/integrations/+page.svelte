@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { openaiApiKey } from "$lib/stores";
-	import { tavilyApiKey } from "$lib/stores";
+	import { openaiApiKey } from "$lib/scripts/misc/stores";
+	import { tavilyApiKey } from "$lib/scripts/misc/stores";
 	import APIKeySettings from "$lib/components/settings/APIKeySettings.svelte";
 </script>
 

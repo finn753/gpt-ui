@@ -2,7 +2,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
-import { openaiApiKey } from "$lib/stores";
+import { openaiApiKey } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
 
 const outputParser = new StringOutputParser();

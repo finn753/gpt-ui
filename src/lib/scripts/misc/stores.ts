@@ -6,7 +6,7 @@ import type {
 	GenerationHistory,
 	ChatMessageStructure,
 	ModelType
-} from "$lib/types";
+} from "$lib/scripts/misc/types";
 
 export const chatDataMap = writable<ChatDataMap>({});
 export const chatContentMap = writable<ChatContentMap>({});

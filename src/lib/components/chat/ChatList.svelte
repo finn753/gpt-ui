@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { ChatDataMap, ChatStructure } from "$lib/types";
+	import type { ChatDataMap, ChatStructure } from "$lib/scripts/misc/types";
 	import { Button } from "$lib/components/ui/button";
-	import { selectedChatID } from "$lib/stores";
+	import { selectedChatID } from "$lib/scripts/misc/stores";
 	import { format } from "date-fns";
 	import { Ellipsis } from "lucide-svelte";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
@@ -9,7 +9,7 @@
 	import AlertRenameChat from "$lib/components/chat/AlertRenameChat.svelte";
 	import { Badge } from "$lib/components/ui/badge";
 	import { Input } from "$lib/components/ui/input";
-	import chatService from "$lib/chatService";
+	import chatService from "$lib/scripts/chat/chat-service";
 	import { Separator } from "$lib/components/ui/separator";
 
 	export let chatMap: ChatDataMap = {};

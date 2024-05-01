@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { AssistantStructure, ChatMessageStructure } from "$lib/types";
-import * as errorHandler from "$lib/errorHandler";
+import type { AssistantStructure, ChatMessageStructure } from "$lib/scripts/misc/types";
+import * as errorHandler from "$lib/scripts/operations/error-handler";
 import { toast } from "svelte-sonner";
 
 class Database {

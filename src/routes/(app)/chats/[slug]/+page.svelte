@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ChatView from "$lib/components/chat/ChatView.svelte";
-	import { chatContentMap, selectedChatID } from "$lib/stores";
+	import { chatContentMap, selectedChatID } from "$lib/scripts/misc/stores";
 	import { beforeNavigate } from "$app/navigation";
 	import { get } from "svelte/store";
 

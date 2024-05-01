@@ -1,8 +1,8 @@
 <script lang="ts">
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
-	import { chatDataMap } from "$lib/stores";
+	import { chatDataMap } from "$lib/scripts/misc/stores";
 	import { Input } from "$lib/components/ui/input";
-	import chatOperations from "$lib/chatOperations";
+	import chatOperations from "$lib/scripts/chat/chat-operations";
 
 	export let chatID: string;
 

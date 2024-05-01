@@ -1,4 +1,4 @@
-import type { ChatMessageStructure } from "$lib/types";
+import type { ChatMessageStructure } from "$lib/scripts/misc/types";
 import { EmbeddingIndex, getEmbedding } from "client-vector-search";
 
 export async function getSimilarMessagesToQuery(

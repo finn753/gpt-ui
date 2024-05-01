@@ -6,7 +6,7 @@ import * as pdfLib from "pdf-lib";
 import pica from "pica";
 import chroma from "chroma-js";
 import CryptoJS from "crypto-js";
-import * as errorHandler from "$lib/errorHandler";
+import * as errorHandler from "$lib/scripts/operations/error-handler";
 
 export type LoadOutput = ReturnType<typeof getToolDataFromTsCode>;
 

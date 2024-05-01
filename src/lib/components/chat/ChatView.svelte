@@ -1,15 +1,15 @@
 <script lang="ts">
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
-	import type { ChatMessageStructure } from "$lib/types";
+	import type { ChatMessageStructure } from "$lib/scripts/misc/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/stores";
+	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/scripts/misc/stores";
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
-	import { scrollToBottom } from "$lib/utils";
-	import chatOperations from "$lib/chatOperations";
-	import chatService from "$lib/chatService";
-	import { generationHelper } from "$lib/generationHelper";
-	import modelManager from "$lib/modelManager";
+	import { scrollToBottom } from "$lib/scripts/misc/utils";
+	import chatOperations from "$lib/scripts/chat/chat-operations";
+	import chatService from "$lib/scripts/chat/chat-service";
+	import { generationHelper } from "$lib/scripts/chat/generation-helper";
+	import modelManager from "$lib/scripts/chat/model-manager";
 
 	export let chatID: string;
 	export let generating = false;

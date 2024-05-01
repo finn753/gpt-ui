@@ -1,8 +1,8 @@
 import OpenAI from "openai";
 import ollama from "ollama/browser";
-import { availableModels, openaiApiKey } from "$lib/stores";
+import { availableModels, openaiApiKey } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
-import type { ModelType } from "$lib/types";
+import type { ModelType } from "$lib/scripts/misc/types";
 
 class ModelManager {
 	public async getAvailableModels(): Promise<ModelType[]> {

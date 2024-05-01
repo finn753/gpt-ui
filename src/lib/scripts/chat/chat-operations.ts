@@ -1,6 +1,10 @@
-import database from "$lib/database";
-import type { AssistantStructure, ChatStructure, ChatMessageStructure } from "$lib/types";
-import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/stores";
+import database from "$lib/scripts/operations/database";
+import type {
+	AssistantStructure,
+	ChatStructure,
+	ChatMessageStructure
+} from "$lib/scripts/misc/types";
+import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
 
 function getEmptyChat(): ChatStructure {

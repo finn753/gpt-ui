@@ -2,7 +2,7 @@
 	import { Button } from "$lib/components/ui/button";
 
 	import { Image, LoaderCircle, SendHorizontal } from "lucide-svelte";
-	import { cn } from "$lib/utils";
+	import { cn } from "$lib/scripts/misc/utils";
 	import { createEventDispatcher } from "svelte";
 	import ImageListInput from "$lib/components/chat/ImageListInput.svelte";
 

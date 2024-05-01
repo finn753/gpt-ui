@@ -3,11 +3,11 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Clipboard, Trash } from "lucide-svelte";
 	import { toast } from "svelte-sonner";
-	import type { ChatMessageStructure } from "$lib/types";
+	import type { ChatMessageStructure } from "$lib/scripts/misc/types";
 	import SvelteMarkdown from "svelte-markdown";
 	import { createEventDispatcher } from "svelte";
 	import * as Accordion from "$lib/components/ui/accordion";
-	import chatOperations from "$lib/chatOperations";
+	import chatOperations from "$lib/scripts/chat/chat-operations";
 
 	const dispatch = createEventDispatcher<{ retry: { message: ChatMessageStructure } }>();
 

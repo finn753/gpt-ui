@@ -1,5 +1,5 @@
-import type { ChatContentMap, ChatMessageStructure } from "$lib/types";
-import { chatContentMap } from "$lib/stores";
+import type { ChatContentMap, ChatMessageStructure } from "$lib/scripts/misc/types";
+import { chatContentMap } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
 import type { SupabaseClient } from "@supabase/supabase-js";
 

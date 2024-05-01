@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
-import { openaiApiKey } from "$lib/stores";
-import * as errorHandler from "$lib/errorHandler";
+import { openaiApiKey } from "$lib/scripts/misc/stores";
+import * as errorHandler from "$lib/scripts/operations/error-handler";
 import OpenAI from "openai";
 import type { SpeechCreateParams } from "openai/resources/audio/speech";
 

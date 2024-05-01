@@ -1,10 +1,10 @@
 import OpenAI from "openai";
 import { type Message, Ollama } from "ollama/browser";
 import { get } from "svelte/store";
-import { openaiApiKey } from "$lib/stores";
+import { openaiApiKey } from "$lib/scripts/misc/stores";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
-import type { LiveDataSource } from "$lib/types";
-import { injectLiveDataSourceIntoMessages } from "$lib/liveDataSource";
+import type { LiveDataSource } from "$lib/scripts/misc/types";
+import { injectLiveDataSourceIntoMessages } from "$lib/scripts/chat/live-data-sources";
 
 export type ModelOptions = {
 	temperature?: number;

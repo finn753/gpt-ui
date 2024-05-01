@@ -1,9 +1,12 @@
-import { chatContentMap, chatDataMap } from "$lib/stores";
+import { chatContentMap, chatDataMap } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
-import chatOperations from "$lib/chatOperations";
-import type { ChatDataMap, ChatMessageStructure } from "$lib/types";
-import { generationHelper } from "$lib/generationHelper";
-import { getSimilarityFromMessagesToQuery, getSimilarMessagesToQuery } from "$lib/embeddingHelper";
+import chatOperations from "$lib/scripts/chat/chat-operations";
+import type { ChatDataMap, ChatMessageStructure } from "$lib/scripts/misc/types";
+import { generationHelper } from "$lib/scripts/chat/generation-helper";
+import {
+	getSimilarityFromMessagesToQuery,
+	getSimilarMessagesToQuery
+} from "$lib/scripts/chat/embedding-helper";
 
 class ChatService {
 	public async setGeneratedTitleForChat(chatID: string) {

@@ -5,12 +5,17 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Pencil, Sparkles, X } from "lucide-svelte";
 	import Check from "lucide-svelte/icons/check";
-	import { availableModels, chatDataMap, lastContextOfChat, newChatSettings } from "$lib/stores";
+	import {
+		availableModels,
+		chatDataMap,
+		lastContextOfChat,
+		newChatSettings
+	} from "$lib/scripts/misc/stores";
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
-	import chatOperations from "$lib/chatOperations";
-	import chatService from "$lib/chatService";
+	import chatOperations from "$lib/scripts/chat/chat-operations";
+	import chatService from "$lib/scripts/chat/chat-service";
 
 	$: modelSelection = $availableModels.map((model) => ({
 		value: model.id,
