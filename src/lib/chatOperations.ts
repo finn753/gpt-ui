@@ -1,8 +1,18 @@
 import { database } from "$lib/database";
 import type { AssistantStructure, ChatStructure, ChatMessageStructure } from "$lib/types";
 import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/stores";
-import * as templates from "$lib/templates";
 import { get } from "svelte/store";
+
+function getEmptyChat(): ChatStructure {
+	return {
+		title: "",
+		tags: [],
+		summary: "",
+		model: {} as AssistantStructure,
+		created_at: new Date(),
+		updated_at: new Date()
+	};
+}
 
 class ChatOperations {
 	public async createNewChat() {
@@ -10,7 +20,7 @@ class ChatOperations {
 
 		if (!newChatID) return;
 
-		this.updateChatDataMap(newChatID, templates.getEmptyChat());
+		this.updateChatDataMap(newChatID, getEmptyChat());
 		this.moveChatToTopOfDataMap(newChatID);
 
 		return newChatID;

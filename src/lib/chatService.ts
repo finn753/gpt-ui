@@ -3,7 +3,6 @@ import { get } from "svelte/store";
 import { chatOperations } from "$lib/chatOperations";
 import type { ChatDataMap, ChatMessageStructure } from "$lib/types";
 import * as generationHelper from "$lib/generationHelper";
-import * as templates from "$lib/templates";
 import { getSimilarityFromMessagesToQuery, getSimilarMessagesToQuery } from "$lib/embeddingHelper";
 
 class ChatService {
@@ -80,7 +79,15 @@ class ChatService {
 
 		const context: ChatMessageStructure[] = [];
 
-		if (summary) context.push(templates.getUserMessageWithContent("Summary:\n" + summary));
+		if (summary) {
+			context.push({
+				content: '"Summary:\\n" + summary',
+				role: "user",
+				model: "",
+				created_at: new Date()
+			});
+		}
+
 		context.push(...similarMessages);
 		context.push(...lastMessages);
 		context.push(queryMessage);
