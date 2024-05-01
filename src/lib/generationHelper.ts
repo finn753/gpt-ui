@@ -5,7 +5,7 @@ import * as errorHandler from "$lib/errorHandler";
 import { chatOperations } from "$lib/chatOperations";
 import { type MessageFormat, ModelWrapper } from "$lib/ModelWrapper";
 import { currentTimeSource, webSearchSource, websitePreviewSource } from "$lib/liveDataSource";
-import { getDefaultModelId } from "$lib/modelManager";
+import modelManager from "$lib/modelManager";
 import { convertImageListToBase64 } from "$lib/attatchmentHandler";
 
 class GenerationHelper {
@@ -15,7 +15,7 @@ class GenerationHelper {
 			"Don't enumerate the points, don't use the word 'chat' in the title \n" +
 			"SUMMARIZE the chat in a few words";
 
-		const model = new ModelWrapper(getDefaultModelId());
+		const model = new ModelWrapper(modelManager.getDefaultModelId());
 		return model.prompt(context, systemPrompt);
 	}
 
@@ -33,7 +33,7 @@ class GenerationHelper {
 			"Messages: \n" +
 			JSON.stringify(newMessages);
 
-		const model = new ModelWrapper(getDefaultModelId());
+		const model = new ModelWrapper(modelManager.getDefaultModelId());
 		return model.prompt(input, systemPrompt);
 	}
 

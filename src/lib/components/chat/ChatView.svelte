@@ -9,7 +9,7 @@
 	import { chatOperations } from "$lib/chatOperations";
 	import { chatService } from "$lib/chatService";
 	import { generationHelper } from "$lib/generationHelper";
-	import * as modelManager from "$lib/modelManager";
+	import modelManager from "$lib/modelManager";
 
 	export let chatID: string;
 	export let generating = false;
