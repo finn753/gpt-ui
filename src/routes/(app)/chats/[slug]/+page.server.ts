@@ -1,4 +1,4 @@
-import type { ChatContentMap, MessageStructure } from "$lib/types";
+import type { ChatContentMap, ChatMessageStructure } from "$lib/types";
 import { chatContentMap } from "$lib/stores";
 import { get } from "svelte/store";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -19,7 +19,7 @@ export const load = async ({ params, locals }) => {
 async function fetchChatMessages(
 	chatID: string,
 	supabase: SupabaseClient
-): Promise<MessageStructure[]> {
+): Promise<ChatMessageStructure[]> {
 	const { data } = await supabase
 		.from("Messages")
 		.select("*")

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
-	import type { MessageStructure } from "$lib/types";
+	import type { ChatMessageStructure } from "$lib/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
 	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/stores";
 	import { goto } from "$app/navigation";
@@ -19,8 +19,8 @@
 
 	let scrollContainer: HTMLElement;
 
-	let messages: MessageStructure[] = [];
-	let generatingProgress: MessageStructure[] | null;
+	let messages: ChatMessageStructure[] = [];
+	let generatingProgress: ChatMessageStructure[] | null;
 
 	$: if (chatID && Object.keys($chatContentMap).includes(chatID)) {
 		messages = $chatContentMap[chatID];
@@ -72,7 +72,7 @@
 		await chatService.updateSummaryForChat(chatID);
 	}
 
-	async function onRetrySendMessage(event: CustomEvent<{ message: MessageStructure }>) {
+	async function onRetrySendMessage(event: CustomEvent<{ message: ChatMessageStructure }>) {
 		const { message } = event.detail;
 
 		const success = await chatOperations.retrySendMessage(message, chatID);
@@ -113,7 +113,7 @@
 			console.error("Failed to get context from messages", e);
 		}
 
-		let response: MessageStructure[] | undefined;
+		let response: ChatMessageStructure[] | undefined;
 		for await (const r of generationHelper.generateResponse(
 			context,
 			model || "",

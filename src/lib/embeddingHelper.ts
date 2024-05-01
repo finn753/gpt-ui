@@ -1,12 +1,12 @@
-import type { MessageStructure } from "$lib/types";
+import type { ChatMessageStructure } from "$lib/types";
 import { EmbeddingIndex, getEmbedding } from "client-vector-search";
 
 export async function getSimilarMessagesToQuery(
-	messages: MessageStructure[],
+	messages: ChatMessageStructure[],
 	query: string,
 	maxTokenLimit = 1000,
 	similarityThreshold = 0.9
-): Promise<MessageStructure[]> {
+): Promise<ChatMessageStructure[]> {
 	messages = [...messages];
 
 	const embeddedQuery = await getEmbedding(query);
@@ -30,7 +30,7 @@ export async function getSimilarMessagesToQuery(
 }
 
 export async function getSimilarityFromMessagesToQuery(
-	messages: MessageStructure[],
+	messages: ChatMessageStructure[],
 	query: string
 ) {
 	const embeddedQuery = await getEmbedding(query);
@@ -49,7 +49,7 @@ export function estimateTokenCount(text: string) {
 	return Math.ceil(text.length / 4);
 }
 
-async function getEmbeddingIndexOfMessages(messages: MessageStructure[]) {
+async function getEmbeddingIndexOfMessages(messages: ChatMessageStructure[]) {
 	const embeddedContextPromise = messages.map(async (message, index) => {
 		return {
 			index,

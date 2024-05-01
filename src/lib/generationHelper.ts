@@ -1,11 +1,12 @@
-import type { MessageStructure } from "$lib/types";
+import type { ChatMessageStructure } from "$lib/types";
 import { get } from "svelte/store";
 import { selectedChatID } from "$lib/stores";
 import * as errorHandler from "$lib/errorHandler";
 import * as chatOperations from "$lib/chatOperations";
 import { type MessageFormat, ModelWrapper } from "$lib/ModelWrapper";
-import { webSearchSource, currentTimeSource, websitePreviewSource } from "$lib/liveDataSource";
+import { currentTimeSource, webSearchSource, websitePreviewSource } from "$lib/liveDataSource";
 import { getDefaultModelId } from "$lib/modelManager";
+import { convertImageListToBase64 } from "$lib/attatchmentHandler";
 
 export async function generateTitle(context: string) {
 	const systemPrompt =
@@ -17,7 +18,7 @@ export async function generateTitle(context: string) {
 	return model.prompt(context, systemPrompt);
 }
 
-export async function generateSummary(currentSummary: string, newMessages: MessageStructure[]) {
+export async function generateSummary(currentSummary: string, newMessages: ChatMessageStructure[]) {
 	const systemPrompt =
 		"You're an AI that generates summaries for chats \n Keep them short, summarise the chat, don't be too specific \n" +
 		"Don't enumerate the points, don't use the word 'chat' in the summary \n" +
@@ -32,18 +33,12 @@ export async function generateSummary(currentSummary: string, newMessages: Messa
 }
 
 export async function* generateResponse(
-	context: MessageStructure[],
+	context: ChatMessageStructure[],
 	modelId: string,
 	options?: { temperature?: number; top_p?: number },
 	systemMessage?: string,
 	imageAttachments?: File[]
-): AsyncGenerator<MessageStructure[] | undefined> {
-	systemMessage = systemMessage || "";
-	context = context.map((message) => {
-		if (message.role === "tool") message.role = "assistant";
-		return message;
-	}); // TODO - Cleaner fix
-
+): AsyncGenerator<ChatMessageStructure[] | undefined> {
 	chatOperations.updateLastContextOfChat(get(selectedChatID) as string, context);
 
 	const messages: MessageFormat[] = await chatMessagesToCompletionMessages(
@@ -52,7 +47,7 @@ export async function* generateResponse(
 		imageAttachments
 	);
 
-	let responseMessages: MessageStructure[] = [];
+	let responseMessages: ChatMessageStructure[] = [];
 
 	try {
 		const model = new ModelWrapper(modelId, options);
@@ -80,57 +75,30 @@ export async function* generateResponse(
 }
 
 async function chatMessagesToCompletionMessages(
-	chatMessages: MessageStructure[],
-	systemMessage: string,
+	chatMessages: ChatMessageStructure[],
+	systemMessage: string = "",
 	imageAttachments?: File[]
 ): Promise<MessageFormat[]> {
+	if (chatMessages.length === 0) return [];
+
 	const messages: MessageFormat[] = chatMessages.map((message) => {
+		if (message.role !== "user" && message.role !== "system") {
+			message.role = "assistant";
+		}
+
 		return {
 			role: message.role,
 			content: message.content
 		};
 	});
 
-	const base64Strings: string[] = [];
-
-	if (imageAttachments) {
-		const promises = imageAttachments.map((file) => {
-			return new Promise<string>((resolve, reject) => {
-				const reader = new FileReader();
-				reader.onload = (e) => {
-					const base64 = e.target?.result as string;
-					resolve(base64);
-				};
-				reader.onerror = (e) => {
-					reject(new Error(`Failed to read file: ${e.target?.error}`));
-				};
-				reader.readAsDataURL(file);
-			});
-		});
-
-		try {
-			const results = await Promise.all(promises);
-			base64Strings.push(...results);
-		} catch (error) {
-			console.error(error);
-		}
-	}
-
-	const query = messages.pop() as MessageFormat;
-
-	const imageList: string[] = [];
-	base64Strings.forEach((image) => {
-		imageList.push(image);
-	});
-
-	query.images = imageList;
+	messages[messages.length - 1].images = await convertImageListToBase64(imageAttachments);
 
 	return [
 		{
 			role: "system",
 			content: systemMessage
 		},
-		...messages,
-		query
+		...messages
 	];
 }

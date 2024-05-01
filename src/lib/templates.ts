@@ -1,6 +1,6 @@
-import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
+import type { AssistantStructure, ChatStructure, ChatMessageStructure } from "$lib/types";
 
-export function getUserMessageWithContent(content: string): MessageStructure {
+export function getUserMessageWithContent(content: string): ChatMessageStructure {
 	return {
 		content,
 		role: "user",

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { AssistantStructure, MessageStructure } from "$lib/types";
+import type { AssistantStructure, ChatMessageStructure } from "$lib/types";
 import * as errorHandler from "$lib/errorHandler";
 import { toast } from "svelte-sonner";
 
@@ -50,7 +50,7 @@ class Database {
 		return true;
 	}
 
-	async insertMessage(chatID: string, message: MessageStructure): Promise<string | undefined> {
+	async insertMessage(chatID: string, message: ChatMessageStructure): Promise<string | undefined> {
 		if (!this._supabaseClient) {
 			console.error("Supabase client is not initialized");
 			return;

@@ -16,20 +16,19 @@ export type ChatStructure = {
 	updated_at: Date;
 };
 
-export type MessageStructure = {
+export type ChatMessageStructure = {
 	id?: string;
 	content: string;
-	role: "user" | "assistant" | "tool" | "system" | "function";
+	role: "user" | "assistant" | "system";
 	model: string;
 	created_at: Date;
-	tool_calls?: OpenAI.Chat.ChatCompletionMessageToolCall[];
 	pinned?: boolean;
 	failed?: boolean;
 	tokens?: { input: number; output: number };
 };
 
 export type ChatDataMap = Record<string, ChatStructure>;
-export type ChatContentMap = Record<string, MessageStructure[]>;
+export type ChatContentMap = Record<string, ChatMessageStructure[]>;
 export type GenerationHistory = { images: OpenAI.Images.Image[]; voice: string[] };
 
 export type ModelType = {

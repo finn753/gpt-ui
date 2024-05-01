@@ -1,7 +1,7 @@
 import { chatContentMap, chatDataMap } from "$lib/stores";
 import { get } from "svelte/store";
 import * as chatOperations from "$lib/chatOperations";
-import type { ChatDataMap, MessageStructure } from "$lib/types";
+import type { ChatDataMap, ChatMessageStructure } from "$lib/types";
 import * as generationHelper from "$lib/generationHelper";
 import * as embeddingHelper from "$lib/embeddingHelper";
 import * as templates from "$lib/templates";
@@ -29,7 +29,7 @@ export async function updateSummaryForChat(chatID: string) {
 export async function sendUserMessage(chatID: string, message: string): Promise<boolean> {
 	if (message.trim() === "") return false;
 
-	const newMessage: MessageStructure = {
+	const newMessage: ChatMessageStructure = {
 		content: message,
 		role: "user",
 		model: "",
@@ -41,7 +41,7 @@ export async function sendUserMessage(chatID: string, message: string): Promise<
 
 export async function sendAssistantMessage(
 	chatID: string,
-	messages: MessageStructure[]
+	messages: ChatMessageStructure[]
 ): Promise<boolean> {
 	messages = [...messages];
 
@@ -57,16 +57,16 @@ export async function sendAssistantMessage(
 }
 
 export async function getContextFromMessages(
-	messages: MessageStructure[],
+	messages: ChatMessageStructure[],
 	summary: string
-): Promise<MessageStructure[]> {
+): Promise<ChatMessageStructure[]> {
 	messages = [...messages];
 
 	const lastMessagesCount = 2;
 	const similarityMessagesMaxTokenLimit = 1000;
 	const similarityMessagesThreshold = 0.5;
 
-	const queryMessage = messages.pop() as MessageStructure;
+	const queryMessage = messages.pop() as ChatMessageStructure;
 
 	const lastMessages = messages.splice(-lastMessagesCount);
 
@@ -77,7 +77,7 @@ export async function getContextFromMessages(
 		similarityMessagesThreshold
 	);
 
-	const context: MessageStructure[] = [];
+	const context: ChatMessageStructure[] = [];
 
 	if (summary) context.push(templates.getUserMessageWithContent("Summary:\n" + summary));
 	context.push(...similarMessages);

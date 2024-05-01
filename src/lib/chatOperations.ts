@@ -1,5 +1,5 @@
 import { database } from "$lib/database";
-import type { AssistantStructure, ChatStructure, MessageStructure } from "$lib/types";
+import type { AssistantStructure, ChatStructure, ChatMessageStructure } from "$lib/types";
 import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/stores";
 import * as templates from "$lib/templates";
 import { get } from "svelte/store";
@@ -33,7 +33,7 @@ export async function deleteChat(chatID: string) {
 	});
 }
 
-export async function sendMessage(message: MessageStructure, chatID: string): Promise<boolean> {
+export async function sendMessage(message: ChatMessageStructure, chatID: string): Promise<boolean> {
 	updateChatContentMap(chatID, message);
 
 	const temp = { updated_at: new Date(Date.now()) };
@@ -62,7 +62,7 @@ export async function sendMessage(message: MessageStructure, chatID: string): Pr
 	return true;
 }
 
-export async function retrySendMessage(message: MessageStructure, chatID: string) {
+export async function retrySendMessage(message: ChatMessageStructure, chatID: string) {
 	const success = await database.insertMessage(chatID, message);
 
 	if (!success) return false;
@@ -126,7 +126,7 @@ export async function changeTags(chatID: string, tags: string[]) {
 	updateChatDataMap(chatID, { tags });
 }
 
-export function updateLastContextOfChat(chatID: string, context: MessageStructure[]) {
+export function updateLastContextOfChat(chatID: string, context: ChatMessageStructure[]) {
 	lastContextOfChat.update((curr) => {
 		return {
 			...curr,
@@ -147,7 +147,7 @@ function updateChatDataMap(chatID: string, update: Partial<ChatStructure>) {
 	});
 }
 
-function updateChatContentMap(chatID: string, message: MessageStructure) {
+function updateChatContentMap(chatID: string, message: ChatMessageStructure) {
 	chatContentMap.update((curr) => {
 		return {
 			...curr,
