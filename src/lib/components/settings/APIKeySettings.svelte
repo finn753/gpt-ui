@@ -3,7 +3,7 @@
 	import { Input } from "$lib/components/ui/input";
 	import { Button } from "$lib/components/ui/button";
 	import { type Writable } from "svelte/store";
-	import { database } from "$lib/database";
+	import database from "$lib/database";
 
 	export let apiKeyStore: Writable<string | null>;
 	export let label: string;

@@ -7,7 +7,7 @@
 	import SvelteMarkdown from "svelte-markdown";
 	import { createEventDispatcher } from "svelte";
 	import * as Accordion from "$lib/components/ui/accordion";
-	import { chatOperations } from "$lib/chatOperations";
+	import chatOperations from "$lib/chatOperations";
 
 	const dispatch = createEventDispatcher<{ retry: { message: ChatMessageStructure } }>();
 

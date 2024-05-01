@@ -2,7 +2,7 @@ import type { ChatMessageStructure } from "$lib/types";
 import { get } from "svelte/store";
 import { selectedChatID } from "$lib/stores";
 import * as errorHandler from "$lib/errorHandler";
-import { chatOperations } from "$lib/chatOperations";
+import chatOperations from "$lib/chatOperations";
 import { type MessageFormat, ModelWrapper } from "$lib/ModelWrapper";
 import { currentTimeSource, webSearchSource, websitePreviewSource } from "$lib/liveDataSource";
 import modelManager from "$lib/modelManager";

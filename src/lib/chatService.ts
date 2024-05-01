@@ -1,6 +1,6 @@
 import { chatContentMap, chatDataMap } from "$lib/stores";
 import { get } from "svelte/store";
-import { chatOperations } from "$lib/chatOperations";
+import chatOperations from "$lib/chatOperations";
 import type { ChatDataMap, ChatMessageStructure } from "$lib/types";
 import { generationHelper } from "$lib/generationHelper";
 import { getSimilarityFromMessagesToQuery, getSimilarMessagesToQuery } from "$lib/embeddingHelper";
@@ -126,4 +126,4 @@ class ChatService {
 	}
 }
 
-export const chatService = new ChatService();
+export default new ChatService();

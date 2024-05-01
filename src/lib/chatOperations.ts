@@ -1,4 +1,4 @@
-import { database } from "$lib/database";
+import database from "$lib/database";
 import type { AssistantStructure, ChatStructure, ChatMessageStructure } from "$lib/types";
 import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/stores";
 import { get } from "svelte/store";
@@ -180,4 +180,4 @@ class ChatOperations {
 	}
 }
 
-export const chatOperations = new ChatOperations();
+export default new ChatOperations();

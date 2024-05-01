@@ -2,7 +2,7 @@
 	import { Input } from "$lib/components/ui/input";
 	import { Label } from "$lib/components/ui/label";
 	import { Button } from "$lib/components/ui/button";
-	import { database } from "$lib/database";
+	import database from "$lib/database";
 	import { handleError } from "$lib/errorHandler";
 	import { toast } from "svelte-sonner";
 

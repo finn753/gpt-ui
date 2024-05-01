@@ -9,7 +9,7 @@
 	import AlertRenameChat from "$lib/components/chat/AlertRenameChat.svelte";
 	import { Badge } from "$lib/components/ui/badge";
 	import { Input } from "$lib/components/ui/input";
-	import { chatService } from "$lib/chatService";
+	import chatService from "$lib/chatService";
 	import { Separator } from "$lib/components/ui/separator";
 
 	export let chatMap: ChatDataMap = {};

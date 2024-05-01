@@ -6,8 +6,8 @@
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";
-	import { chatOperations } from "$lib/chatOperations";
-	import { chatService } from "$lib/chatService";
+	import chatOperations from "$lib/chatOperations";
+	import chatService from "$lib/chatService";
 	import { generationHelper } from "$lib/generationHelper";
 	import modelManager from "$lib/modelManager";
 
