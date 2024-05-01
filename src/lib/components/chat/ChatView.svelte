@@ -18,6 +18,7 @@
 	let currentImageAttachments: File[] = [];
 
 	let scrollContainer: HTMLElement;
+	let isUserAtBottomOfScrollContainer = true;
 
 	let messages: ChatMessageStructure[] = [];
 	let generatingProgress: ChatMessageStructure[] | null;
@@ -35,6 +36,10 @@
 				await scrollToBottom(scrollContainer, "instant");
 			})();
 		}
+	}
+
+	$: if (generatingProgress && isUserAtBottomOfScrollContainer) {
+		scrollToBottom(scrollContainer);
 	}
 
 	async function onSendMessage(event: CustomEvent<{ value: string; images?: File[] }>) {
@@ -60,7 +65,6 @@
 		if (!success) return;
 
 		await generateResponse();
-		await scrollToBottom(scrollContainer);
 
 		generating = false;
 
@@ -80,7 +84,6 @@
 		if (!success || message.role === "assistant") return;
 
 		await generateResponse();
-		await scrollToBottom(scrollContainer);
 
 		generating = false;
 	}
@@ -136,7 +139,14 @@
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
-	<div class="flex-1 overflow-y-auto" bind:this={scrollContainer}>
+	<div
+		class="flex-1 overflow-y-auto"
+		bind:this={scrollContainer}
+		on:scroll={() => {
+			isUserAtBottomOfScrollContainer =
+				scrollContainer.scrollTop + scrollContainer.clientHeight + 16 >= scrollContainer.scrollHeight;
+		}}
+	>
 		<div class="flex flex-col">
 			{#each messages.filter((msg) => msg.content !== "") as message}
 				<ChatMessage {message} {chatID} on:retry={onRetrySendMessage} />
