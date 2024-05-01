@@ -1,6 +1,6 @@
 import { chatContentMap, chatDataMap } from "$lib/stores";
 import { get } from "svelte/store";
-import * as chatOperations from "$lib/chatOperations";
+import { chatOperations } from "$lib/chatOperations";
 import type { ChatDataMap, ChatMessageStructure } from "$lib/types";
 import * as generationHelper from "$lib/generationHelper";
 import * as templates from "$lib/templates";

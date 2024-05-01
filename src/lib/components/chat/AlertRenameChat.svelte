@@ -2,14 +2,14 @@
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
 	import { chatDataMap } from "$lib/stores";
 	import { Input } from "$lib/components/ui/input";
-	import { changeTitle } from "$lib/chatOperations";
+	import { chatOperations } from "$lib/chatOperations";
 
 	export let chatID: string;
 
 	let value = $chatDataMap[chatID]?.title ?? "";
 
 	async function onRenameChat() {
-		await changeTitle(chatID, value);
+		await chatOperations.changeTitle(chatID, value);
 	}
 </script>
 
