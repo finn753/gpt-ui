@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button } from "$lib/components/ui/button";
+	import autosize from "svelte-autosize";
 
 	import { Image, LoaderCircle, SendHorizontal } from "lucide-svelte";
 	import { cn } from "$lib/scripts/misc/utils";
@@ -97,10 +98,9 @@
 			</Button>
 		</div>
 		<textarea
-			class="max-h-[25dvh] min-h-0 flex-1 resize-none rounded-2lg border-none bg-background p-4 pl-0 leading-normal outline-none placeholder:text-muted-foreground"
-			style="height: calc({rows} * 1.5em + 2rem);"
+			class="max-h-[25dvh] h-[calc(1.5em+2rem)] min-h-0 flex-1 resize-none rounded-2lg border-none bg-background p-4 pl-0 leading-normal outline-none placeholder:text-muted-foreground"
 			bind:value
-			bind:this={inputElement}
+			use:autosize
 			on:click={updateCursorPos}
 			on:keyup={updateCursorPos}
 			on:keydown={onKeyDown}
