@@ -2,7 +2,7 @@ import { chatContentMap, chatDataMap } from "$lib/stores";
 import { get } from "svelte/store";
 import { chatOperations } from "$lib/chatOperations";
 import type { ChatDataMap, ChatMessageStructure } from "$lib/types";
-import * as generationHelper from "$lib/generationHelper";
+import { generationHelper } from "$lib/generationHelper";
 import { getSimilarityFromMessagesToQuery, getSimilarMessagesToQuery } from "$lib/embeddingHelper";
 
 class ChatService {

@@ -8,7 +8,7 @@
 	import { scrollToBottom } from "$lib/utils";
 	import { chatOperations } from "$lib/chatOperations";
 	import { chatService } from "$lib/chatService";
-	import * as generationHelper from "$lib/generationHelper";
+	import { generationHelper } from "$lib/generationHelper";
 	import * as modelManager from "$lib/modelManager";
 
 	export let chatID: string;
