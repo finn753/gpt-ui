@@ -10,7 +10,7 @@
 	import { Input } from "$lib/components/ui/input";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
 	import { chatOperations } from "$lib/chatOperations";
-	import * as chatService from "$lib/chatService";
+	import { chatService } from "$lib/chatService";
 
 	$: modelSelection = $availableModels.map((model) => ({
 		value: model.id,

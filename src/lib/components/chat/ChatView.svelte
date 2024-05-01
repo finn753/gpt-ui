@@ -7,7 +7,7 @@
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";
 	import { chatOperations } from "$lib/chatOperations";
-	import * as chatService from "$lib/chatService";
+	import { chatService } from "$lib/chatService";
 	import * as generationHelper from "$lib/generationHelper";
 	import * as modelManager from "$lib/modelManager";
 
