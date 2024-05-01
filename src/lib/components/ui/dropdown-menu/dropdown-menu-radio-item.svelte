@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
 	import Circle from "lucide-svelte/icons/circle";
-	import { cn } from "$lib/utils.js";
+	import { cn } from "$lib/scripts/misc/utils.js";
 
 	type $$Props = DropdownMenuPrimitive.RadioItemProps;
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,5 +1,5 @@
 import type { LayoutServerLoad } from "../../../../.svelte-kit/types/src/routes/$types";
-import type { ChatDataMap } from "$lib/types";
+import type { ChatDataMap } from "$lib/scripts/misc/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const load: LayoutServerLoad = async (event) => {

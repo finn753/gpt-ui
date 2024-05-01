@@ -4,7 +4,7 @@
 	import { Button } from "$lib/components/ui/button";
 	import { page } from "$app/stores";
 	import { AudioLines, History, Image, Wrench } from "lucide-svelte";
-	import { generationHistory } from "$lib/stores";
+	import { generationHistory } from "$lib/scripts/misc/stores";
 	import { Separator } from "$lib/components/ui/separator";
 	import SidebarButton from "$lib/components/SidebarButton.svelte";
 

@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { AssistantStructure, MessageStructure } from "$lib/types";
-import * as errorHandler from "$lib/errorHandler";
+import type { AssistantStructure, ChatMessageStructure } from "$lib/scripts/misc/types";
+import * as errorHandler from "$lib/scripts/operations/error-handler";
 import { toast } from "svelte-sonner";
 
 class Database {
@@ -8,10 +8,6 @@ class Database {
 
 	set supabaseClient(client: SupabaseClient) {
 		this._supabaseClient = client;
-	}
-
-	get supabaseClient(): SupabaseClient | null {
-		return this._supabaseClient;
 	}
 
 	async createNewChat(): Promise<string | null> {
@@ -50,7 +46,7 @@ class Database {
 		return true;
 	}
 
-	async insertMessage(chatID: string, message: MessageStructure): Promise<string | undefined> {
+	async insertMessage(chatID: string, message: ChatMessageStructure): Promise<string | undefined> {
 		if (!this._supabaseClient) {
 			console.error("Supabase client is not initialized");
 			return;
@@ -208,4 +204,4 @@ class Database {
 	}
 }
 
-export const database = new Database();
+export default new Database();

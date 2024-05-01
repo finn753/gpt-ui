@@ -1,6 +1,6 @@
-import type { LiveDataSource } from "$lib/types";
-import { getWebsiteContent, runTavilySearch } from "$lib/apiWrapper/browsing";
-import type { MessageFormat } from "$lib/ModelWrapper";
+import type { LiveDataSource } from "$lib/scripts/misc/types";
+import { getWebsiteContent, runTavilySearch } from "$lib/scripts/api-wrapper/browsing";
+import type { MessageFormat } from "$lib/scripts/api-wrapper/ModelWrapper";
 
 export const currentTimeSource: LiveDataSource = {
 	name: "Current Time",

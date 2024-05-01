@@ -5,12 +5,17 @@
 	import { Button } from "$lib/components/ui/button";
 	import { Pencil, Sparkles, X } from "lucide-svelte";
 	import Check from "lucide-svelte/icons/check";
-	import { availableModels, chatDataMap, lastContextOfChat, newChatSettings } from "$lib/stores";
+	import {
+		availableModels,
+		chatDataMap,
+		lastContextOfChat,
+		newChatSettings
+	} from "$lib/scripts/misc/stores";
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
-	import { changeAssistantData, changeTags, changeTitle } from "$lib/chatOperations";
-	import * as chatService from "$lib/chatService";
+	import chatOperations from "$lib/scripts/chat/chat-operations";
+	import chatService from "$lib/scripts/chat/chat-service";
 
 	$: modelSelection = $availableModels.map((model) => ({
 		value: model.id,
@@ -119,7 +124,7 @@
 
 	async function onAcceptTitle() {
 		if (chatID && editTitleInput !== title) {
-			await changeTitle(chatID, editTitleInput);
+			await chatOperations.changeTitle(chatID, editTitleInput);
 		}
 
 		editingTitle = false;
@@ -133,13 +138,13 @@
 
 	async function onSaveAssistant() {
 		if (chatID) {
-			await changeAssistantData(chatID, { model, temperature, topP, systemMessage });
+			await chatOperations.changeAssistantData(chatID, { model, temperature, topP, systemMessage });
 		}
 	}
 
 	async function saveTags() {
 		if (chatID) {
-			await changeTags(chatID, tags);
+			await chatOperations.changeTags(chatID, tags);
 		}
 	}
 </script>

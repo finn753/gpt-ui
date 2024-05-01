@@ -1,13 +1,13 @@
 <script lang="ts">
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
-	import { chatDataMap } from "$lib/stores";
-	import { deleteChat } from "$lib/chatOperations";
+	import { chatDataMap } from "$lib/scripts/misc/stores";
+	import chatOperations from "$lib/scripts/chat/chat-operations";
 	import { goto } from "$app/navigation";
 
 	export let chatID: string;
 
 	async function onDeleteChat() {
-		await deleteChat(chatID);
+		await chatOperations.deleteChat(chatID);
 		await goto("/chats");
 	}
 </script>

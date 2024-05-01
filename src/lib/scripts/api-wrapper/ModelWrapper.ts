@@ -1,10 +1,10 @@
 import OpenAI from "openai";
-import { Ollama } from "ollama/browser";
+import { type Message, Ollama } from "ollama/browser";
 import { get } from "svelte/store";
-import { openaiApiKey } from "$lib/stores";
+import { openaiApiKey } from "$lib/scripts/misc/stores";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
-import type { LiveDataSource } from "$lib/types";
-import { injectLiveDataSourceIntoMessages } from "$lib/liveDataSource";
+import type { LiveDataSource } from "$lib/scripts/misc/types";
+import { injectLiveDataSourceIntoMessages } from "$lib/scripts/chat/live-data-sources";
 
 export type ModelOptions = {
 	temperature?: number;
@@ -17,7 +17,7 @@ export type ModelResponse = {
 };
 
 export type MessageFormat = {
-	role: "user" | "assistant" | "tool" | "system" | "function";
+	role: "user" | "assistant" | "system";
 	content: string;
 	images?: string[];
 };
@@ -65,20 +65,7 @@ export class ModelWrapper {
 		const response = await this.model.chat.completions.create({
 			model: this.modelName,
 			...this._params,
-			messages: messages.map((message) => {
-				const content: ChatCompletionMessageParam["content"] = [
-					{ type: "text", text: message.content }
-				];
-				message.images?.forEach((image) =>
-					content.push({ type: "image_url", image_url: { url: image } })
-				);
-
-				return {
-					...message,
-					content,
-					images: undefined
-				};
-			}) as ChatCompletionMessageParam[],
+			messages: this.messagesToOpenAIFormat(messages),
 			stream: true
 		});
 
@@ -88,7 +75,6 @@ export class ModelWrapper {
 			content = content + (chunk.choices[0].delta.content || "");
 
 			if (chunk.choices[0].finish_reason) {
-				console.error("Finish", chunk.choices[0].finish_reason);
 				yield { content, finished: true };
 				break;
 			}
@@ -105,25 +91,10 @@ export class ModelWrapper {
 	async *getOllamaStream(messages: MessageFormat[]): AsyncGenerator<ModelResponse> {
 		if (!(this.model instanceof Ollama)) throw new Error("Model is not an instance of Ollama");
 
-		messages = messages.map((message) => {
-			return {
-				...message,
-				role: message.role === "tool" ? "user" : message.role
-			};
-		});
-
 		const stream = await this.model.chat({
 			model: this.modelName,
 			stream: true,
-			messages: messages.map((message) => {
-				return {
-					role: message.role,
-					content: message.content,
-					images:
-						message.images?.map((image) => image.replace(/^data:image\/\w+;base64,/, "")) ||
-						undefined
-				};
-			})
+			messages: this.messagesToOllamaFormat(messages)
 		});
 
 		let content = "";
@@ -180,5 +151,33 @@ export class ModelWrapper {
 
 		if (last) context.push(last);
 		return context;
+	}
+
+	private messagesToOpenAIFormat(messages: MessageFormat[]): ChatCompletionMessageParam[] {
+		return messages.map((message) => {
+			const content: ChatCompletionMessageParam["content"] = [
+				{ type: "text", text: message.content }
+			];
+			message.images?.forEach((image) =>
+				content.push({ type: "image_url", image_url: { url: image } })
+			);
+
+			return {
+				...message,
+				content,
+				images: undefined
+			};
+		}) as ChatCompletionMessageParam[];
+	}
+
+	private messagesToOllamaFormat(messages: MessageFormat[]): Message[] {
+		return messages.map((message) => {
+			return {
+				role: message.role,
+				content: message.content,
+				images:
+					message.images?.map((image) => image.replace(/^data:image\/\w+;base64,/, "")) || undefined
+			};
+		});
 	}
 }

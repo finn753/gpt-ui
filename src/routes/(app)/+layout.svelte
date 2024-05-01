@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { Button } from "$lib/components/ui/button";
 	import { MessagesSquare, User, Brush } from "lucide-svelte";
-	import { availableModels, openaiApiKey, tavilyApiKey } from "$lib/stores";
+	import { availableModels, openaiApiKey, tavilyApiKey } from "$lib/scripts/misc/stores";
 	import { initializeModel } from "client-vector-search";
 	import { onMount } from "svelte";
 
 	import { page } from "$app/stores";
 	import * as Tooltip from "$lib/components/ui/tooltip";
-	import { getAvailableModels } from "$lib/modelManager";
+	import modelManager from "$lib/scripts/chat/model-manager";
 
 	$: currentPath = $page.url.pathname;
 
@@ -24,7 +24,7 @@
 
 	onMount(async () => {
 		try {
-			availableModels.set(await getAvailableModels());
+			availableModels.set(await modelManager.getAvailableModels());
 			await initializeModel();
 		} catch (e) {
 			console.error(e);

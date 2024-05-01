@@ -1,15 +1,15 @@
 <script lang="ts">
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
-	import type { MessageStructure } from "$lib/types";
+	import type { ChatMessageStructure } from "$lib/scripts/misc/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/stores";
+	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/scripts/misc/stores";
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
-	import { scrollToBottom } from "$lib/utils";
-	import * as chatOperations from "$lib/chatOperations";
-	import * as chatService from "$lib/chatService";
-	import * as generationHelper from "$lib/generationHelper";
-	import * as modelManager from "$lib/modelManager";
+	import { scrollToBottom } from "$lib/scripts/misc/utils";
+	import chatOperations from "$lib/scripts/chat/chat-operations";
+	import chatService from "$lib/scripts/chat/chat-service";
+	import { generationHelper } from "$lib/scripts/chat/generation-helper";
+	import modelManager from "$lib/scripts/chat/model-manager";
 
 	export let chatID: string;
 	export let generating = false;
@@ -18,9 +18,10 @@
 	let currentImageAttachments: File[] = [];
 
 	let scrollContainer: HTMLElement;
+	let isUserAtBottomOfScrollContainer = true;
 
-	let messages: MessageStructure[] = [];
-	let generatingProgress: MessageStructure[] | null;
+	let messages: ChatMessageStructure[] = [];
+	let generatingProgress: ChatMessageStructure[] | null;
 
 	$: if (chatID && Object.keys($chatContentMap).includes(chatID)) {
 		messages = $chatContentMap[chatID];
@@ -35,6 +36,10 @@
 				await scrollToBottom(scrollContainer, "instant");
 			})();
 		}
+	}
+
+	$: if (generatingProgress && isUserAtBottomOfScrollContainer) {
+		scrollToBottom(scrollContainer);
 	}
 
 	async function onSendMessage(event: CustomEvent<{ value: string; images?: File[] }>) {
@@ -60,7 +65,6 @@
 		if (!success) return;
 
 		await generateResponse();
-		await scrollToBottom(scrollContainer);
 
 		generating = false;
 
@@ -72,7 +76,7 @@
 		await chatService.updateSummaryForChat(chatID);
 	}
 
-	async function onRetrySendMessage(event: CustomEvent<{ message: MessageStructure }>) {
+	async function onRetrySendMessage(event: CustomEvent<{ message: ChatMessageStructure }>) {
 		const { message } = event.detail;
 
 		const success = await chatOperations.retrySendMessage(message, chatID);
@@ -80,7 +84,6 @@
 		if (!success || message.role === "assistant") return;
 
 		await generateResponse();
-		await scrollToBottom(scrollContainer);
 
 		generating = false;
 	}
@@ -113,7 +116,7 @@
 			console.error("Failed to get context from messages", e);
 		}
 
-		let response: MessageStructure[] | undefined;
+		let response: ChatMessageStructure[] | undefined;
 		for await (const r of generationHelper.generateResponse(
 			context,
 			model || "",
@@ -136,7 +139,14 @@
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
-	<div class="flex-1 overflow-y-auto" bind:this={scrollContainer}>
+	<div
+		class="flex-1 overflow-y-auto"
+		bind:this={scrollContainer}
+		on:scroll={() => {
+			isUserAtBottomOfScrollContainer =
+				scrollContainer.scrollTop + scrollContainer.clientHeight + 16 >= scrollContainer.scrollHeight;
+		}}
+	>
 		<div class="flex flex-col">
 			{#each messages.filter((msg) => msg.content !== "") as message}
 				<ChatMessage {message} {chatID} on:retry={onRetrySendMessage} />

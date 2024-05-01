@@ -2,8 +2,8 @@
 	import { Input } from "$lib/components/ui/input";
 	import { Label } from "$lib/components/ui/label";
 	import { Button } from "$lib/components/ui/button";
-	import { database } from "$lib/database";
-	import { handleError } from "$lib/errorHandler";
+	import database from "$lib/scripts/operations/database";
+	import { handleError } from "$lib/scripts/operations/error-handler";
 	import { toast } from "svelte-sonner";
 
 	let inputPassword = "";

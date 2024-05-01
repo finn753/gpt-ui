@@ -1,7 +1,7 @@
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public";
 import type { LayoutLoad } from "./$types";
 import { createBrowserClient, isBrowser, parse } from "@supabase/ssr";
-import { database } from "$lib/database";
+import database from "$lib/scripts/operations/database";
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	depends("supabase:auth");

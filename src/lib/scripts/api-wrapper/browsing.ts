@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { tavilyApiKey } from "$lib/stores";
+import { tavilyApiKey } from "$lib/scripts/misc/stores";
 
 export async function runTavilySearch(query: string): Promise<string> {
 	const body: Record<string, unknown> = {

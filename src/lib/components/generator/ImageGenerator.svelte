@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { cn } from "$lib/utils";
+	import { cn } from "$lib/scripts/misc/utils";
 	import { Input } from "$lib/components/ui/input";
 	import { Button } from "$lib/components/ui/button";
-	import { generationHistory } from "$lib/stores";
+	import { generationHistory } from "$lib/scripts/misc/stores";
 	import * as Select from "$lib/components/ui/select";
-	import * as modelInvoker from "$lib/modelInvoker";
+	import * as modelInvoker from "$lib/scripts/api-wrapper/model-invoker";
 
 	let className = "";
 	export { className as class };

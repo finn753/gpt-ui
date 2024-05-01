@@ -4,14 +4,14 @@ import type {
 	ChatDataMap,
 	ChatStructure,
 	GenerationHistory,
-	MessageStructure,
+	ChatMessageStructure,
 	ModelType
-} from "$lib/types";
+} from "$lib/scripts/misc/types";
 
 export const chatDataMap = writable<ChatDataMap>({});
 export const chatContentMap = writable<ChatContentMap>({});
 export const selectedChatID = writable<string | null>();
-export const lastContextOfChat = writable<Record<string, MessageStructure[]>>({});
+export const lastContextOfChat = writable<Record<string, ChatMessageStructure[]>>({});
 export const newChatSettings = writable<Partial<ChatStructure>>({});
 export const generationHistory = writable<GenerationHistory>({ images: [], voice: [] });
 

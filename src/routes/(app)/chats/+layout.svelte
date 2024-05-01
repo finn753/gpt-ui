@@ -2,7 +2,7 @@
 	import CollapsibleSidebar from "$lib/components/CollapsibleSidebar.svelte";
 	import { onMount } from "svelte";
 	import ContextSidebar from "$lib/components/chat/ContextSidebar.svelte";
-	import { chatDataMap, selectedChatID } from "$lib/stores";
+	import { chatDataMap, selectedChatID } from "$lib/scripts/misc/stores";
 	import ChatList from "$lib/components/chat/ChatList.svelte";
 
 	export let data;

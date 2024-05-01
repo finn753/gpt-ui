@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Label as LabelPrimitive } from "bits-ui";
-	import { cn } from "$lib/utils";
+	import { cn } from "$lib/scripts/misc/utils";
 
 	type $$Props = LabelPrimitive.Props;
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { Button } from "$lib/components/ui/button";
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	const autosize = require("svelte-autosize");
 
 	import { Image, LoaderCircle, SendHorizontal } from "lucide-svelte";
-	import { cn } from "$lib/utils";
+	import { cn } from "$lib/scripts/misc/utils";
 	import { createEventDispatcher } from "svelte";
 	import ImageListInput from "$lib/components/chat/ImageListInput.svelte";
 
@@ -11,8 +13,6 @@
 	export let canAttachImages = true;
 	export let generating = false;
 	export let value = "";
-	let rows = 1;
-	$: rows = value.split("\n").length;
 
 	let inputElement: HTMLTextAreaElement;
 	let fileInputElement: HTMLInputElement;
@@ -97,10 +97,9 @@
 			</Button>
 		</div>
 		<textarea
-			class="max-h-[25dvh] min-h-0 flex-1 resize-none rounded-2lg border-none bg-background p-4 pl-0 leading-normal outline-none placeholder:text-muted-foreground"
-			style="height: calc({rows} * 1.5em + 2rem);"
+			class="h-[calc(1.5em+2rem)] max-h-[25dvh] min-h-0 flex-1 resize-none rounded-2lg border-none bg-background p-4 pl-0 leading-normal outline-none placeholder:text-muted-foreground"
 			bind:value
-			bind:this={inputElement}
+			use:autosize
 			on:click={updateCursorPos}
 			on:keyup={updateCursorPos}
 			on:keydown={onKeyDown}
