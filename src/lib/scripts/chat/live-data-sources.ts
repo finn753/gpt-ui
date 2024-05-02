@@ -74,18 +74,24 @@ export async function injectLiveDataSourceIntoMessages(
 
 	const queryMessage: MessageFormat = messages.pop() as MessageFormat;
 
+	const systemOutputs: string[] = [];
+	const userOutputs: string[] = [];
+
 	for (const source of sources) {
 		if (await source.activation(queryMessage.content)) {
 			const output = await source.output(queryMessage.content);
 
 			if (source.outputLocation === "system") {
-				systemMessage.content += "\n" + output;
+				systemOutputs.push(output);
 			}
 
 			if (source.outputLocation === "user") {
-				queryMessage.content += "\n" + output;
+				userOutputs.push(output);
 			}
 		}
+
+		systemMessage.content += "\n\n" + systemOutputs.join("\n\n");
+		queryMessage.content += "\n\n" + userOutputs.join("\n\n");
 	}
 
 	return [systemMessage, ...messages, queryMessage];
