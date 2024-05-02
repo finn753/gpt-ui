@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from "$lib/components/ui/button";
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
-	const autosize = require("svelte-autosize");
+	// @ts-expect-error - svelte-autosize doesn't have types
+	import autosize from "svelte-autosize"
 
 	import { Image, LoaderCircle, SendHorizontal } from "lucide-svelte";
 	import { cn } from "$lib/scripts/misc/utils";
