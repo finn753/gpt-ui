@@ -2,6 +2,7 @@ import type { ChatContentMap, ChatMessageStructure } from "$lib/scripts/misc/typ
 import { chatContentMap } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { redirect } from "@sveltejs/kit";
 
 export const load = async ({ params, locals }) => {
 	const chatID = params.slug;
@@ -25,6 +26,11 @@ async function fetchChatMessages(
 		.select("*")
 		.eq("chat_id", chatID)
 		.order("created_at");
+
+	// if no data is returned, redirect to /chats
+	if (!data) {
+		throw redirect(303, "/chats");
+	}
 
 	return data?.reduce((acc, message) => {
 		acc.push({
