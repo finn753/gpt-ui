@@ -16,6 +16,11 @@ export type ChatStructure = {
 	updated_at: Date;
 };
 
+export type NewChatSettings = {
+	model?: AssistantStructure;
+	images?: File[];
+};
+
 export type ChatMessageStructure = {
 	id?: string;
 	content: string;

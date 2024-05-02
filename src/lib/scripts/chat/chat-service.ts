@@ -84,7 +84,7 @@ class ChatService {
 
 		if (summary) {
 			context.push({
-				content: '"Summary:\\n" + summary',
+				content: "Summary:\n" + summary,
 				role: "user",
 				model: "",
 				created_at: new Date()

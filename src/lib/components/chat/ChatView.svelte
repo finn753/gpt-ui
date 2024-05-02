@@ -53,6 +53,8 @@
 				generating = false;
 				return;
 			}
+
+			$newChatSettings.images = event.detail.images || [];
 		}
 
 		inputValue = "";
