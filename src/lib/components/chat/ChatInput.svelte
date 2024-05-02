@@ -99,6 +99,7 @@
 		<textarea
 			class="h-[calc(1.5em+2rem)] max-h-[25dvh] min-h-0 flex-1 resize-none rounded-2lg border-none bg-background p-4 pl-0 leading-normal outline-none placeholder:text-muted-foreground"
 			bind:value
+			bind:this={inputElement}
 			use:autosize
 			on:click={updateCursorPos}
 			on:keyup={updateCursorPos}
