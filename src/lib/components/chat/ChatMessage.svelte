@@ -19,6 +19,7 @@
 	let content: string = "";
 	let created_at: Date = new Date(Date.now());
 	let failed = false;
+	let attachmentCounts: Record<string, number> = {};
 
 	$: {
 		role = message.role;
@@ -26,6 +27,13 @@
 		content = message.content;
 		created_at = message.created_at;
 		failed = message.failed || false;
+
+		if (message.attachments) {
+			// For every key that has an array of attachments, get the length of the array
+			attachmentCounts = Object.fromEntries(
+				Object.entries(message.attachments).map(([key, value]) => [key, value.length])
+			);
+		}
 	}
 
 	function copyToClipboard() {
@@ -71,6 +79,16 @@
 		>
 			<SvelteMarkdown source={content} />
 		</p>
+	{/if}
+
+	{#if Object.keys(attachmentCounts).length > 0}
+		<div class="mt-2 flex flex-row items-center gap-2">
+			{#each Object.entries(attachmentCounts) as [key, value]}
+				<p class="text-sm text-muted-foreground">
+					{key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}: {value}
+				</p>
+			{/each}
+		</div>
 	{/if}
 
 	{#if failed}

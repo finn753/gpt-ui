@@ -29,14 +29,19 @@ class ChatService {
 		await chatOperations.changeSummary(chatID, newSummary);
 	}
 
-	public async sendUserMessage(chatID: string, message: string): Promise<boolean> {
+	public async sendUserMessage(
+		chatID: string,
+		message: string,
+		attachments: object = {}
+	): Promise<boolean> {
 		if (message.trim() === "") return false;
 
 		const newMessage: ChatMessageStructure = {
 			content: message,
 			role: "user",
 			model: "",
-			created_at: new Date(Date.now())
+			created_at: new Date(Date.now()),
+			attachments
 		};
 
 		return await chatOperations.sendMessage(newMessage, chatID);

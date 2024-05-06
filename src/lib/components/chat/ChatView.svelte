@@ -60,7 +60,11 @@
 		inputValue = "";
 		currentImageAttachments = event.detail.images || [];
 
-		const success = await chatService.sendUserMessage(chatID, event.detail.value);
+		const attachments = {
+			images: currentImageAttachments.map((file) => file.name)
+		};
+
+		const success = await chatService.sendUserMessage(chatID, event.detail.value, attachments);
 
 		await scrollToBottom(scrollContainer);
 

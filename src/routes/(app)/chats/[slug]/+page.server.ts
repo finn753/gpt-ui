@@ -27,7 +27,6 @@ async function fetchChatMessages(
 		.eq("chat_id", chatID)
 		.order("created_at");
 
-	// if no data is returned, redirect to /chats
 	if (!data) {
 		throw redirect(303, "/chats");
 	}
@@ -40,7 +39,8 @@ async function fetchChatMessages(
 			created_at: new Date(message.created_at),
 			role: message.role,
 			model: message.model,
-			tokens: message.tokens
+			tokens: message.tokens,
+			attachments: message.attachments
 		});
 		return acc;
 	}, []);

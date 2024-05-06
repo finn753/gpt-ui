@@ -32,6 +32,7 @@ export type ChatMessageStructure = {
 	pinned?: boolean;
 	failed?: boolean;
 	tokens?: { input: number; output: number };
+	attachments?: object;
 };
 
 export type ChatDataMap = Record<string, ChatStructure>;
