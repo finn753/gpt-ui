@@ -16,6 +16,8 @@
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
 	import chatOperations from "$lib/scripts/chat/chat-operations";
 	import chatService from "$lib/scripts/chat/chat-service";
+	import { liveDataSourceMap } from "$lib/scripts/chat/live-data-sources";
+	import { Switch } from "$lib/components/ui/switch";
 
 	$: modelSelection = $availableModels.map((model) => ({
 		value: model.id,
@@ -35,11 +37,14 @@
 	let topP = 0.5;
 	let systemMessage = "You are a helpful assistant";
 
+	let tools: Record<string, object> = {};
+
 	$: chatData = chatID ? $chatDataMap[chatID] : null;
 	$: newChat = !chatID;
 
 	$: if (newChat) {
 		$newChatSettings.model = { model, temperature, topP, systemMessage };
+		$newChatSettings.tools = tools;
 	}
 
 	$: if (modelSelection.length > 0 && !model) {
@@ -59,7 +64,10 @@
 		topP = 0.5;
 		systemMessage = "You are a helpful assistant";
 
+		tools = {};
+
 		$newChatSettings.model = { model, systemMessage, temperature, topP };
+		$newChatSettings.tools = tools;
 
 		if (chatData) {
 			title = chatData.title;
@@ -77,6 +85,10 @@
 				temperature = chatData.model.temperature;
 				topP = chatData.model.topP;
 				systemMessage = chatData.model.systemMessage;
+			}
+
+			if (chatData.tools) {
+				tools = chatData.tools;
 			}
 		}
 
@@ -139,6 +151,18 @@
 	async function onSaveAssistant() {
 		if (chatID) {
 			await chatOperations.changeAssistantData(chatID, { model, temperature, topP, systemMessage });
+		}
+	}
+
+	async function onToolToggle(toolKey: string) {
+		if (tools[toolKey]) {
+			delete tools[toolKey];
+		} else {
+			tools[toolKey] = { enabled: true };
+		}
+
+		if (chatID) {
+			await chatOperations.changeTools(chatID, tools);
 		}
 	}
 
@@ -286,6 +310,25 @@
 				System Message
 				<Textarea class="w-full resize-none" bind:value={systemMessage} on:blur={onSaveAssistant} />
 			</Label>
+		</Card.Content>
+	</Card.Root>
+
+	<Card.Root class="min-h-0">
+		<Card.Header>
+			<Card.Title>Live Data Sources</Card.Title>
+		</Card.Header>
+		<Card.Content class="flex flex-col gap-4">
+			{#each Object.entries(liveDataSourceMap) as [key, liveDataSource]}
+				<Label>
+					{liveDataSource.name}
+					<Switch
+						checked={key in tools}
+						on:click={() => {
+							onToolToggle(key);
+						}}
+					/>
+				</Label>
+			{/each}
 		</Card.Content>
 	</Card.Root>
 

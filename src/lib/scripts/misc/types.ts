@@ -12,8 +12,15 @@ export type ChatStructure = {
 	tags: string[];
 	summary: string;
 	model: AssistantStructure;
+	tools: Record<string, object>;
 	created_at: Date;
 	updated_at: Date;
+};
+
+export type NewChatSettings = {
+	model?: AssistantStructure;
+	images?: File[];
+	tools?: Record<string, object>;
 };
 
 export type ChatMessageStructure = {
@@ -25,6 +32,7 @@ export type ChatMessageStructure = {
 	pinned?: boolean;
 	failed?: boolean;
 	tokens?: { input: number; output: number };
+	attachments?: object;
 };
 
 export type ChatDataMap = Record<string, ChatStructure>;

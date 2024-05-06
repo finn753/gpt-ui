@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { cn } from "$lib/scripts/misc/utils";
 	import { Input } from "$lib/components/ui/input";
 	import { Button } from "$lib/components/ui/button";
 	import type { LoadOutput } from "$lib/generated_tools/codeHelper";
@@ -7,9 +6,6 @@
 	import * as toolGenerator from "$lib/generated_tools/toolGenerator";
 	import * as codeHelper from "$lib/generated_tools/codeHelper";
 	import Tool from "$lib/generated_tools/components/Tool.svelte";
-
-	let className = "";
-	export { className as class };
 
 	let inputValue = "";
 	let toolData: LoadOutput;
@@ -23,7 +19,7 @@
 	}
 </script>
 
-<div class={cn("flex flex-col gap-2 p-4 px-8", className)}>
+<div class="flex flex-col gap-2 p-4 px-8">
 	<h1 class="text-2xl font-bold">Generated Tools</h1>
 
 	<div class="flex w-full gap-2">

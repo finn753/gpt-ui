@@ -32,6 +32,11 @@ export class ModelWrapper {
 	private _liveDataSources: LiveDataSource[] = [];
 
 	constructor(modelId: string, options?: ModelOptions) {
+		options = {
+			temperature: Number(options?.temperature) || undefined,
+			topP: Number(options?.topP) || undefined
+		};
+
 		this.modelId = modelId;
 		[this.provider, this.modelName] = modelId.split(":");
 		this._params = options || this._params;

@@ -23,6 +23,7 @@ function fetchChatList(supabase: SupabaseClient): Promise<ChatDataMap> {
 						tags: chat.tags && Object.keys(chat.tags).includes("tags") ? chat.tags["tags"] : [],
 						summary: chat.summary,
 						model: chat.model,
+						tools: chat.tools,
 						created_at: new Date(chat.created_at),
 						updated_at: new Date(chat.updated_at)
 					};

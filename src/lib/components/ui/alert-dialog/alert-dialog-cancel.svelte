@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
 	import { buttonVariants } from "$lib/components/ui/button/index.js";
-	import { cn } from "$lib/scripts/misc/utils.js";
+	import { cn } from "$lib/utils.js";
 
 	type $$Props = AlertDialogPrimitive.CancelProps;
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

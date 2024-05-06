@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn } from "$lib/scripts/misc/utils";
+	import { cn } from "$lib/utils";
 	import { Input } from "$lib/components/ui/input";
 	import { Button } from "$lib/components/ui/button";
 	import * as Select from "$lib/components/ui/select";

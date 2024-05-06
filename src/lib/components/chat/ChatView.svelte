@@ -5,7 +5,7 @@
 	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/scripts/misc/stores";
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
-	import { scrollToBottom } from "$lib/scripts/misc/utils";
+	import { scrollToBottom } from "$lib/utils";
 	import chatOperations from "$lib/scripts/chat/chat-operations";
 	import chatService from "$lib/scripts/chat/chat-service";
 	import { generationHelper } from "$lib/scripts/chat/generation-helper";
@@ -53,12 +53,18 @@
 				generating = false;
 				return;
 			}
+
+			$newChatSettings.images = event.detail.images || [];
 		}
 
 		inputValue = "";
 		currentImageAttachments = event.detail.images || [];
 
-		const success = await chatService.sendUserMessage(chatID, event.detail.value);
+		const attachments = {
+			images: currentImageAttachments.map((file) => file.name)
+		};
+
+		const success = await chatService.sendUserMessage(chatID, event.detail.value, attachments);
 
 		await scrollToBottom(scrollContainer);
 
@@ -97,17 +103,23 @@
 			await chatOperations.changeAssistantData(chatID, $newChatSettings.model);
 		}
 
+		if ($newChatSettings.tools) {
+			await chatOperations.changeTools(chatID, $newChatSettings.tools);
+		}
+
 		return true;
 	}
 
 	async function generateResponse() {
-		let model, temperature, topP, systemMessage;
+		let model, temperature, topP, systemMessage, tools;
 
 		try {
 			({ model, temperature, topP, systemMessage } = $chatDataMap[chatID].model);
 		} catch (e: unknown) {
 			console.log("Defaulting to standard assistant model");
 		}
+
+		tools = $chatDataMap[chatID].tools || {};
 
 		let context = messages;
 		try {
@@ -125,7 +137,8 @@
 				top_p: topP
 			},
 			systemMessage,
-			currentImageAttachments
+			currentImageAttachments,
+			tools
 		)) {
 			response = r;
 			generatingProgress = response || null;
@@ -144,7 +157,8 @@
 		bind:this={scrollContainer}
 		on:scroll={() => {
 			isUserAtBottomOfScrollContainer =
-				scrollContainer.scrollTop + scrollContainer.clientHeight + 16 >= scrollContainer.scrollHeight;
+				scrollContainer.scrollTop + scrollContainer.clientHeight + 16 >=
+				scrollContainer.scrollHeight;
 		}}
 	>
 		<div class="flex flex-col">
