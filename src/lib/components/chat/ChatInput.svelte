@@ -60,6 +60,9 @@
 		dispatch("submit", { value, images: imageInputFiles });
 
 		imageInputFiles = [];
+
+		// Set height of textarea to h-[calc(1.5em+2rem)]
+		inputElement.style.height = "calc(1.5em + 2rem)";
 	}
 
 	function onKeyDown(event: KeyboardEvent) {

@@ -29,9 +29,10 @@
 		failed = message.failed || false;
 
 		if (message.attachments) {
-			// For every key that has an array of attachments, get the length of the array
 			attachmentCounts = Object.fromEntries(
-				Object.entries(message.attachments).map(([key, value]) => [key, value.length])
+				Object.entries(message.attachments)
+					.filter(([, value]) => Array.isArray(value) && value.length > 0)
+					.map(([key, value]) => [key, value.length])
 			);
 		}
 	}
