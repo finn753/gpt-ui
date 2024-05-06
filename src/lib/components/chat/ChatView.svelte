@@ -107,13 +107,15 @@
 	}
 
 	async function generateResponse() {
-		let model, temperature, topP, systemMessage;
+		let model, temperature, topP, systemMessage, tools;
 
 		try {
 			({ model, temperature, topP, systemMessage } = $chatDataMap[chatID].model);
 		} catch (e: unknown) {
 			console.log("Defaulting to standard assistant model");
 		}
+
+		tools = $chatDataMap[chatID].tools || {};
 
 		let context = messages;
 		try {
@@ -131,7 +133,8 @@
 				top_p: topP
 			},
 			systemMessage,
-			currentImageAttachments
+			currentImageAttachments,
+			tools
 		)) {
 			response = r;
 			generatingProgress = response || null;
