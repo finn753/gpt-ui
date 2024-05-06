@@ -58,6 +58,8 @@
 		if (value.trim() === "") return;
 
 		dispatch("submit", { value, images: imageInputFiles });
+
+		imageInputFiles = [];
 	}
 
 	function onKeyDown(event: KeyboardEvent) {
