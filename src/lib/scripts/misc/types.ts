@@ -12,6 +12,7 @@ export type ChatStructure = {
 	tags: string[];
 	summary: string;
 	model: AssistantStructure;
+	tools: Record<string, object>;
 	created_at: Date;
 	updated_at: Date;
 };
@@ -19,6 +20,7 @@ export type ChatStructure = {
 export type NewChatSettings = {
 	model?: AssistantStructure;
 	images?: File[];
+	tools?: Record<string, object>;
 };
 
 export type ChatMessageStructure = {

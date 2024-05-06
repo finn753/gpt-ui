@@ -5,7 +5,7 @@
 	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/scripts/misc/stores";
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
-	import { scrollToBottom } from "$lib/scripts/misc/utils";
+	import { scrollToBottom } from "$lib/utils";
 	import chatOperations from "$lib/scripts/chat/chat-operations";
 	import chatService from "$lib/scripts/chat/chat-service";
 	import { generationHelper } from "$lib/scripts/chat/generation-helper";
@@ -99,6 +99,10 @@
 			await chatOperations.changeAssistantData(chatID, $newChatSettings.model);
 		}
 
+		if ($newChatSettings.tools) {
+			await chatOperations.changeTools(chatID, $newChatSettings.tools);
+		}
+
 		return true;
 	}
 
@@ -146,7 +150,8 @@
 		bind:this={scrollContainer}
 		on:scroll={() => {
 			isUserAtBottomOfScrollContainer =
-				scrollContainer.scrollTop + scrollContainer.clientHeight + 16 >= scrollContainer.scrollHeight;
+				scrollContainer.scrollTop + scrollContainer.clientHeight + 16 >=
+				scrollContainer.scrollHeight;
 		}}
 	>
 		<div class="flex flex-col">

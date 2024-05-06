@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn } from "$lib/scripts/misc/utils";
+	import { cn } from "$lib/utils";
 	import { Button } from "$lib/components/ui/button";
 	import { X } from "lucide-svelte";
 

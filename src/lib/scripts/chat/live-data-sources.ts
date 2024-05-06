@@ -58,6 +58,12 @@ export const websitePreviewSource: LiveDataSource = {
 	outputLocation: "user"
 };
 
+export const liveDataSourceMap: Record<string, LiveDataSource> = {
+	"current-time": currentTimeSource,
+	"web-search": webSearchSource,
+	"link-preview": websitePreviewSource
+};
+
 export async function injectLiveDataSourceIntoMessages(
 	messages: MessageFormat[],
 	sources: LiveDataSource[]

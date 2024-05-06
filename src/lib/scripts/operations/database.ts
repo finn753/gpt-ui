@@ -202,6 +202,25 @@ class Database {
 
 		return true;
 	}
+
+	async changeTools(chatID: string, tools: Record<string, object>) {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return false;
+		}
+
+		const { error } = await this._supabaseClient
+			.from("Chats")
+			.update({ tools })
+			.match({ id: chatID });
+
+		if (error) {
+			errorHandler.handleError("Failed to change tools", error);
+			return false;
+		}
+
+		return true;
+	}
 }
 
 export default new Database();

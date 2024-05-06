@@ -13,6 +13,7 @@ function getEmptyChat(): ChatStructure {
 		tags: [],
 		summary: "",
 		model: {} as AssistantStructure,
+		tools: {},
 		created_at: new Date(),
 		updated_at: new Date()
 	};
@@ -139,6 +140,14 @@ class ChatOperations {
 		if (!success) return;
 
 		this.updateChatDataMap(chatID, { tags });
+	}
+
+	public async changeTools(chatID: string, tools: Record<string, object>) {
+		const success = await database.changeTools(chatID, tools);
+
+		if (!success) return;
+
+		this.updateChatDataMap(chatID, { tools });
 	}
 
 	public updateLastContextOfChat(chatID: string, context: ChatMessageStructure[]) {
