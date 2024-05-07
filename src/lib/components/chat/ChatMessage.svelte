@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { format } from "date-fns";
 	import { Button } from "$lib/components/ui/button";
-	import { Clipboard, FastForward, Trash } from "lucide-svelte";
+	import { Clipboard, FastForward, Square, Trash, Volume2 } from 'lucide-svelte';
 	import { toast } from "svelte-sonner";
 	import type { ChatMessageStructure } from "$lib/scripts/misc/types";
 	import SvelteMarkdown from "svelte-markdown";
@@ -10,7 +10,7 @@
 	import chatOperations from "$lib/scripts/chat/chat-operations";
 	import chatService from "$lib/scripts/chat/chat-service";
 	import { get } from 'svelte/store';
-	import { chatContentMap, chatDataMap } from '$lib/scripts/misc/stores';
+	import { chatContentMap, chatDataMap, currentTTSMessageID } from '$lib/scripts/misc/stores';
 	import { generationHelper } from '$lib/scripts/chat/generation-helper';
 	import database from '$lib/scripts/operations/database';
 
@@ -94,6 +94,26 @@
 		await database.updateMessage(message.id, message);
 	}
 
+	function textToSpeech() {
+		if(!message.id) return console.error("ID is missing");
+
+		const utterance = new SpeechSynthesisUtterance(content);
+		utterance.lang = "en-US";
+		speechSynthesis.cancel();
+		speechSynthesis.speak(utterance);
+
+		utterance.onend = () => {
+			if ($currentTTSMessageID === message.id) $currentTTSMessageID = "";
+		};
+
+		$currentTTSMessageID = message.id;
+	}
+
+	function endTextToSpeech() {
+		speechSynthesis.cancel();
+		$currentTTSMessageID = "";
+	}
+
 	function onRetry() {
 		dispatch("retry", { message });
 	}
@@ -169,5 +189,18 @@
 			size="none"
 			on:click={deleteMessage}><Trash size={20} /></Button
 		>
+		{#if $currentTTSMessageID !== message.id}
+			<Button
+				class="p-0 opacity-50 hover:opacity-100"
+				variant="icon"
+				size="none"
+				on:click={textToSpeech}><Volume2 size={20}/></Button>
+		{:else}
+			<Button
+				class="p-0 opacity-50 hover:opacity-100"
+				variant="icon"
+				size="none"
+				on:click={endTextToSpeech}><Square size={20}/></Button>
+		{/if}
 	</div>
 </div>
