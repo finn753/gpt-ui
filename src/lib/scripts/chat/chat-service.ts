@@ -105,6 +105,7 @@ class ChatService {
 
 	public searchChats(chatMap: ChatDataMap, query: string): ChatDataMap {
 		const lowerCaseQuery = query.toLowerCase();
+		const lowerCaseQueryWords = lowerCaseQuery.split(" ");
 
 		const filteredChats = Object.entries(chatMap).filter(([, chat]) => {
 			const lowerCaseTitle = chat.title.toLowerCase();
@@ -114,7 +115,9 @@ class ChatService {
 			return (
 				lowerCaseTitle.includes(lowerCaseQuery) ||
 				lowerCaseSummary.includes(lowerCaseQuery) ||
-				lowerCaseTags.includes(lowerCaseQuery)
+				lowerCaseQueryWords.some((queryWord) =>
+					lowerCaseTags.some((tag) => tag.includes(queryWord))
+				)
 			);
 		});
 
