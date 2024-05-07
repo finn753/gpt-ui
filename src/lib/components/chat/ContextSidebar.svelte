@@ -179,7 +179,7 @@
 			<Card.Header>
 				<Card.Title class="flex justify-between gap-2 text-lg tracking-normal">
 					{#if !editingTitle}
-						<h3 class="">{title}</h3>
+						<h3 class="overflow-x-auto">{title}</h3>
 						<div class="min-w-fit space-x-2">
 							<Button variant="icon" size="none" on:click={() => (editingTitle = true)}>
 								<Pencil size={16} />
@@ -213,7 +213,7 @@
 					{/if}
 				</Card.Title>
 				<Card.Description>
-					<div class="flex w-full flex-wrap gap-1">
+					<div class="flex w-full flex-wrap overflow-x-auto gap-1">
 						{#each tags as tag}
 							<Badge
 								>{tag}

@@ -39,7 +39,7 @@
 				href="/chats/{chatID}"
 			>
 				<div class="flex w-full flex-row items-start justify-between">
-					<h3 class="whitespace-normal break-words text-base font-bold">
+					<h3 class="whitespace-normal overflow-x-auto text-base font-bold">
 						{chat.title.trim() === "" ? "Untitled" : chat.title}
 					</h3>
 					<DropdownMenu.Root>
@@ -78,11 +78,11 @@
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 				</div>
-				<p class="whitespace-normal break-words text-base text-muted-foreground">
+				<p class="whitespace-normal text-base text-muted-foreground">
 					{chat.summary.trim() === "" ? "No summary" : chat.summary}
 				</p>
 
-				<div class="flex w-full flex-wrap gap-1 py-2">
+				<div class="flex w-full flex-wrap overflow-x-auto gap-1 py-2">
 					{#each chat.tags as tag}
 						<Badge>{tag}</Badge>
 					{/each}
