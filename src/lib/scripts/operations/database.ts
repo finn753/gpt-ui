@@ -89,6 +89,31 @@ class Database {
 		return true;
 	}
 
+	async updateMessage(messageID: string, message: ChatMessageStructure): Promise<boolean> {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return false;
+		}
+
+		const { error } = await this._supabaseClient
+			.from("Messages")
+			.update({
+				content: message.content,
+				role: message.role,
+				model: message.model,
+				created_at: message.created_at,
+				tokens: message.tokens
+			})
+			.match({ id: messageID });
+
+		if (error) {
+			errorHandler.handleError("Failed to update message", error);
+			return false;
+		}
+
+		return true;
+	}
+
 	async changeTitle(chatID: string, title: string): Promise<boolean> {
 		if (!this._supabaseClient) {
 			console.error("Supabase client is not initialized");

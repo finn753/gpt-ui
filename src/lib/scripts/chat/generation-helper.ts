@@ -42,7 +42,7 @@ class GenerationHelper {
 		modelId: string,
 		options?: { temperature?: number; top_p?: number },
 		systemMessage?: string,
-		imageAttachments?: File[],
+		imageAttachments: File[] = [],
 		tools: Record<string, object> = {}
 	): AsyncGenerator<ChatMessageStructure[] | undefined> {
 		chatOperations.updateLastContextOfChat(get(selectedChatID) as string, context);
@@ -80,6 +80,31 @@ class GenerationHelper {
 		} catch (e: unknown) {
 			errorHandler.handleError("Failed to generate response", e);
 			return;
+		}
+	}
+
+	public async *continueResponse(
+		context: ChatMessageStructure[],
+		modelId: string,
+		options?: { temperature?: number; top_p?: number },
+		systemMessage?: string
+	): AsyncGenerator<ChatMessageStructure[] | undefined> {
+		const continuedMessage = context[context.length - 1];
+		context.push({
+			content: "continue",
+			role: "user",
+			model: modelId,
+			created_at: new Date(Date.now())
+		});
+
+		if (!continuedMessage || continuedMessage.role !== "assistant") return;
+
+		const continuedStream = this.generateResponse(context, modelId, options, systemMessage);
+
+		for await (const part of continuedStream) {
+			if (!part) continue;
+
+			yield part;
 		}
 	}
 
