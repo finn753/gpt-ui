@@ -42,12 +42,11 @@
 	$: chatData = chatID ? $chatDataMap[chatID] : null;
 	$: newChat = !chatID;
 
-	$: if (newChat) {
-		$newChatSettings.model = { model, temperature, topP, systemMessage };
-		$newChatSettings.tools = tools;
-	} else {
-		$newChatSettings.model = undefined;
-		$newChatSettings.tools = undefined;
+	$: if ($newChatSettings.model && newChat) {
+		model = $newChatSettings.model.model;
+		temperature = $newChatSettings.model.temperature;
+		topP = $newChatSettings.model.topP;
+		systemMessage = $newChatSettings.model.systemMessage;
 	}
 
 	$: if (modelSelection.length > 0 && !model) {
@@ -72,6 +71,9 @@
 		if (newChat) {
 			$newChatSettings.model = { model, systemMessage, temperature, topP };
 			$newChatSettings.tools = tools;
+		} else {
+			$newChatSettings.model = undefined;
+			$newChatSettings.tools = undefined;
 		}
 
 		if (chatData) {
