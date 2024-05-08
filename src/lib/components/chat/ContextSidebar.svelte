@@ -69,7 +69,7 @@
 
 		tools = {};
 
-		if(newChat) {
+		if (newChat) {
 			$newChatSettings.model = { model, systemMessage, temperature, topP };
 			$newChatSettings.tools = tools;
 		}
@@ -218,7 +218,7 @@
 					{/if}
 				</Card.Title>
 				<Card.Description>
-					<div class="flex w-full flex-wrap overflow-x-auto gap-1">
+					<div class="flex w-full flex-wrap gap-1 overflow-x-auto">
 						{#each tags as tag}
 							<Badge
 								>{tag}
