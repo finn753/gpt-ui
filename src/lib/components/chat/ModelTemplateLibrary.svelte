@@ -1,12 +1,21 @@
 <script lang="ts">
-	import { newChatSettings } from "$lib/scripts/misc/stores";
+	import { availableModels, newChatSettings } from '$lib/scripts/misc/stores';
 	import { type ModelTemplate, modelTemplates } from "$lib/scripts/misc/model-templates";
 	import { Button } from "$lib/components/ui/button";
+	import { handleError } from '$lib/scripts/operations/error-handler';
 
 	function setNewChatSettings(template: ModelTemplate) {
 		if (!$newChatSettings.model) return;
 
-		$newChatSettings.model.model = template.settings.modelIDs[0];
+		template.settings.modelIDs.forEach((modelID) => {
+			if ($availableModels.find((model) => model.id === modelID) && $newChatSettings.model) {
+				$newChatSettings.model.model = modelID;
+				return;
+			}
+
+			handleError("Model not found", `Model with ID ${modelID} not found in available models.`)
+		});
+
 		$newChatSettings.model.systemMessage = template.settings.systemMessage;
 		$newChatSettings.model.temperature = template.settings.temperature;
 		$newChatSettings.model.topP = template.settings.topP;
