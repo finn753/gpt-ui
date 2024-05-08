@@ -45,6 +45,9 @@
 	$: if (newChat) {
 		$newChatSettings.model = { model, temperature, topP, systemMessage };
 		$newChatSettings.tools = tools;
+	} else {
+		$newChatSettings.model = undefined;
+		$newChatSettings.tools = undefined;
 	}
 
 	$: if (modelSelection.length > 0 && !model) {
@@ -66,8 +69,10 @@
 
 		tools = {};
 
-		$newChatSettings.model = { model, systemMessage, temperature, topP };
-		$newChatSettings.tools = tools;
+		if(newChat) {
+			$newChatSettings.model = { model, systemMessage, temperature, topP };
+			$newChatSettings.tools = tools;
+		}
 
 		if (chatData) {
 			title = chatData.title;
@@ -91,9 +96,9 @@
 				tools = chatData.tools;
 			}
 		}
-
-		selectedModel = modelSelection.find((m) => m.value === model) || null;
 	}
+
+	$: selectedModel = modelSelection.find((m) => m.value === model) || null;
 
 	let addTagInput = "";
 	let editingTitle = false;
