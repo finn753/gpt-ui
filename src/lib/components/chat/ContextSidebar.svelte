@@ -49,6 +49,10 @@
 		systemMessage = $newChatSettings.model.systemMessage;
 	}
 
+	$: if ($newChatSettings.tools && newChat) {
+		tools = $newChatSettings.tools;
+	}
+
 	$: if (modelSelection.length > 0 && !model) {
 		model = modelSelection[0].value;
 		selectedModel = modelSelection[0];

@@ -11,7 +11,7 @@
 		$newChatSettings.model.temperature = template.settings.temperature;
 		$newChatSettings.model.topP = template.settings.topP;
 
-		newChatSettings.set($newChatSettings);
+		$newChatSettings.tools = template.tools;
 	}
 
 	function isSelected(template: ModelTemplate) {

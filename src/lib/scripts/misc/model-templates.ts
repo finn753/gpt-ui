@@ -7,6 +7,7 @@ export type ModelTemplate = {
 		temperature: number;
 		topP: number;
 	};
+	tools: Record<string, object>;
 };
 
 const casualChatTemplate: ModelTemplate = {
@@ -17,7 +18,8 @@ const casualChatTemplate: ModelTemplate = {
 		systemMessage: "You are a helpful assistant",
 		temperature: 0.5,
 		topP: 0.5
-	}
+	},
+	tools: { "current-time": {}, "web-search": {}, "link-preview": {} }
 };
 
 const creativeWritingTemplate: ModelTemplate = {
@@ -28,7 +30,8 @@ const creativeWritingTemplate: ModelTemplate = {
 		systemMessage: "You are a creative writer",
 		temperature: 0.7,
 		topP: 0.8
-	}
+	},
+	tools: {}
 };
 
 const codeGenerationTemplate: ModelTemplate = {
@@ -39,7 +42,8 @@ const codeGenerationTemplate: ModelTemplate = {
 		systemMessage: "You are a code generator",
 		temperature: 0.1,
 		topP: 0.2
-	}
+	},
+	tools: {}
 };
 
 const codeExplorerTemplate: ModelTemplate = {
@@ -50,7 +54,8 @@ const codeExplorerTemplate: ModelTemplate = {
 		systemMessage: "You are a code explainer",
 		temperature: 0.6,
 		topP: 0.7
-	}
+	},
+	tools: {}
 };
 
 export const modelTemplates: ModelTemplate[] = [
