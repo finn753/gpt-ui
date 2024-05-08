@@ -24,7 +24,7 @@
 
 <div
 	class={cn(
-		"pointer-events-none absolute col-span-1 flex size-full h-[calc(100dvh-4rem)] md:relative md:h-dvh md:w-auto",
+		"pointer-events-none absolute col-span-1 flex size-full h-[calc(100dvh-4rem)] overflow-x-hidden md:relative md:h-dvh md:w-auto",
 		isRight ? "flex-row-reverse space-x-reverse" : "",
 		isOpen ? "z-10" : "",
 		className
@@ -34,7 +34,7 @@
 		class={cn(
 			"pointer-events-auto flex size-full flex-col overflow-hidden rounded-r-2lg bg-level-two shadow-lg transition-all duration-500",
 			isRight ? "rounded-l-2lg rounded-r-none" : "",
-			!isOpen ? "w-0" : ""
+			!isOpen ? (isRight ? "translate-x-full" : "-translate-x-full") : "translate-x-0"
 		)}
 	>
 		<div class="flex flex-row items-center justify-between bg-background p-4 shadow-lg">
@@ -46,7 +46,10 @@
 	</div>
 	<Button
 		variant="link"
-		class="pointer-events-auto h-16 px-1 transition-all duration-500"
+		class={cn(
+			"pointer-events-auto h-16 px-1 transition-all duration-500",
+			!isOpen ? "absolute " + (isRight ? "right-0" : "left-0") : ""
+		)}
 		on:click={() => {
 			isOpen = !isOpen;
 		}}

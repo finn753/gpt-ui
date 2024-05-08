@@ -10,6 +10,7 @@
 	import chatService from "$lib/scripts/chat/chat-service";
 	import { generationHelper } from "$lib/scripts/chat/generation-helper";
 	import modelManager from "$lib/scripts/chat/model-manager";
+	import ModelTemplateLibrary from "$lib/components/chat/ModelTemplateLibrary.svelte";
 
 	export let chatID: string;
 	export let generating = false;
@@ -22,6 +23,8 @@
 
 	let messages: ChatMessageStructure[] = [];
 	let generatingProgress: ChatMessageStructure[] | null;
+
+	$: isNewChat = !chatID;
 
 	$: if (chatID && Object.keys($chatContentMap).includes(chatID)) {
 		messages = $chatContentMap[chatID];
@@ -44,8 +47,6 @@
 
 	async function onSendMessage(event: CustomEvent<{ value: string; images?: File[] }>) {
 		generating = true;
-
-		let isNewChat = !chatID;
 
 		if (isNewChat) {
 			const success = await createNewChat();
@@ -172,6 +173,11 @@
 			{/if}
 		</div>
 	</div>
+
+	{#if isNewChat}
+		<ModelTemplateLibrary />
+	{/if}
+
 	<ChatInput
 		bind:value={inputValue}
 		on:submit={onSendMessage}

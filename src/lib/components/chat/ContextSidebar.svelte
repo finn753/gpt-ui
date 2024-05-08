@@ -42,9 +42,15 @@
 	$: chatData = chatID ? $chatDataMap[chatID] : null;
 	$: newChat = !chatID;
 
-	$: if (newChat) {
-		$newChatSettings.model = { model, temperature, topP, systemMessage };
-		$newChatSettings.tools = tools;
+	$: if ($newChatSettings.model && newChat) {
+		model = $newChatSettings.model.model;
+		temperature = $newChatSettings.model.temperature;
+		topP = $newChatSettings.model.topP;
+		systemMessage = $newChatSettings.model.systemMessage;
+	}
+
+	$: if ($newChatSettings.tools && newChat) {
+		tools = $newChatSettings.tools;
 	}
 
 	$: if (modelSelection.length > 0 && !model) {
@@ -66,8 +72,13 @@
 
 		tools = {};
 
-		$newChatSettings.model = { model, systemMessage, temperature, topP };
-		$newChatSettings.tools = tools;
+		if (newChat) {
+			$newChatSettings.model = { model, systemMessage, temperature, topP };
+			$newChatSettings.tools = tools;
+		} else {
+			$newChatSettings.model = undefined;
+			$newChatSettings.tools = undefined;
+		}
 
 		if (chatData) {
 			title = chatData.title;
@@ -91,9 +102,9 @@
 				tools = chatData.tools;
 			}
 		}
-
-		selectedModel = modelSelection.find((m) => m.value === model) || null;
 	}
+
+	$: selectedModel = modelSelection.find((m) => m.value === model) || null;
 
 	let addTagInput = "";
 	let editingTitle = false;
@@ -179,7 +190,7 @@
 			<Card.Header>
 				<Card.Title class="flex justify-between gap-2 text-lg tracking-normal">
 					{#if !editingTitle}
-						<h3 class="">{title}</h3>
+						<h3 class="overflow-x-auto">{title}</h3>
 						<div class="min-w-fit space-x-2">
 							<Button variant="icon" size="none" on:click={() => (editingTitle = true)}>
 								<Pencil size={16} />
@@ -213,7 +224,7 @@
 					{/if}
 				</Card.Title>
 				<Card.Description>
-					<div class="flex w-full flex-wrap gap-1">
+					<div class="flex w-full flex-wrap gap-1 overflow-x-auto">
 						{#each tags as tag}
 							<Badge
 								>{tag}
