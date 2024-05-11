@@ -41,7 +41,7 @@
 </script>
 
 {#key $newChatSettings}
-	<div class="flex size-full flex-col items-center justify-center gap-2 lg:p-4">
+	<div class="flex size-full flex-col items-center justify-center overflow-y-auto gap-2 py-2 lg:p-4">
 		<h2 class="text-2xl font-bold">Templates</h2>
 		<div class="grid grid-cols-1 gap-2 lg:grid-cols-2">
 			{#each modelTemplates as modelTemplate}
