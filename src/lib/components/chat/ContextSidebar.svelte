@@ -7,10 +7,10 @@
 	import Check from "lucide-svelte/icons/check";
 	import {
 		availableModels,
-		chatDataMap,
+		chatDataMap, currentModelTemplate,
 		lastContextOfChat,
 		newChatSettings
-	} from "$lib/scripts/misc/stores";
+	} from '$lib/scripts/misc/stores';
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
 	import { Textarea } from "$lib/components/ui/textarea/index.js";
@@ -42,7 +42,11 @@
 	$: chatData = chatID ? $chatDataMap[chatID] : null;
 	$: newChat = !chatID;
 
-	$: if ($newChatSettings.model && newChat) {
+	$: $currentModelTemplate, updateAfterTemplateChange();
+
+	function updateAfterTemplateChange() {
+		if(!$newChatSettings.model) return;
+
 		model = $newChatSettings.model.model;
 		temperature = $newChatSettings.model.temperature;
 		topP = $newChatSettings.model.topP;
@@ -56,6 +60,10 @@
 	$: if (modelSelection.length > 0 && !model) {
 		model = modelSelection[0].value;
 		selectedModel = modelSelection[0];
+
+		if(newChat) {
+			$newChatSettings.model = { model, systemMessage, temperature, topP };
+		}
 	}
 
 	$: chatID, chatData, updateData();
@@ -162,6 +170,8 @@
 	async function onSaveAssistant() {
 		if (chatID) {
 			await chatOperations.changeAssistantData(chatID, { model, temperature, topP, systemMessage });
+		} else {
+			$newChatSettings.model = { model, temperature, topP, systemMessage };
 		}
 	}
 
@@ -174,6 +184,8 @@
 
 		if (chatID) {
 			await chatOperations.changeTools(chatID, tools);
+		} else {
+			$newChatSettings.tools = tools;
 		}
 	}
 

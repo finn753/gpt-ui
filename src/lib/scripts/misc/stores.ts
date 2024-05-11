@@ -13,6 +13,7 @@ export const chatContentMap = writable<ChatContentMap>({});
 export const selectedChatID = writable<string | null>();
 export const lastContextOfChat = writable<Record<string, ChatMessageStructure[]>>({});
 export const newChatSettings = writable<NewChatSettings>({});
+export const currentModelTemplate = writable<string>("");
 export const generationHistory = writable<GenerationHistory>({ images: [], voice: [] });
 
 export const currentTTSMessageID = writable<string | null>();

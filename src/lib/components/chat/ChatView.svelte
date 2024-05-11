@@ -48,12 +48,16 @@
 	async function onSendMessage(event: CustomEvent<{ value: string; images?: File[] }>) {
 		generating = true;
 
+		let startedNewChat = false;
+
 		if (isNewChat) {
 			const success = await createNewChat();
 			if (!success) {
 				generating = false;
 				return;
 			}
+
+			startedNewChat = true;
 
 			$newChatSettings.images = event.detail.images || [];
 		}
@@ -75,7 +79,7 @@
 
 		generating = false;
 
-		if (isNewChat) await goto(`/chats/${chatID}`);
+		if (startedNewChat) await goto(`/chats/${chatID}`);
 
 		if (!$chatDataMap[chatID].title) {
 			await chatService.setGeneratedTitleForChat(chatID);

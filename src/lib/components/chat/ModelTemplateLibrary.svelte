@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { availableModels, newChatSettings } from '$lib/scripts/misc/stores';
+	import { availableModels, currentModelTemplate, newChatSettings } from '$lib/scripts/misc/stores';
 	import { type ModelTemplate, modelTemplates } from "$lib/scripts/misc/model-templates";
 	import { Button } from "$lib/components/ui/button";
 	import { handleError } from '$lib/scripts/operations/error-handler';
@@ -21,6 +21,8 @@
 		$newChatSettings.model.topP = template.settings.topP;
 
 		$newChatSettings.tools = template.tools;
+
+		$currentModelTemplate = template.name;
 	}
 
 	function isSelected(template: ModelTemplate) {
@@ -39,19 +41,19 @@
 </script>
 
 {#key $newChatSettings}
-	<div class="flex size-full flex-col items-center justify-center gap-2">
+	<div class="flex size-full flex-col items-center justify-center gap-2 lg:p-4">
 		<h2 class="text-2xl font-bold">Templates</h2>
 		<div class="grid grid-cols-1 gap-2 lg:grid-cols-2">
 			{#each modelTemplates as modelTemplate}
 				<Button
 					variant={isSelected(modelTemplate) ? "default" : "glass"}
 					size="none"
-					class="p-2"
+					class="p-4"
 					on:click={() => setNewChatSettings(modelTemplate)}
 				>
 					<div class="flex flex-col">
 						<h3 class="text-xl">{modelTemplate.name}</h3>
-						<p class="opacity-75">{modelTemplate.description}</p>
+						<p class="opacity-75 break-words text-wrap">{modelTemplate.description}</p>
 					</div>
 				</Button>
 			{/each}
