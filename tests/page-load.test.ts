@@ -6,7 +6,6 @@ import ChatsPage from "../src/routes/(app)/chats/+page.svelte";
 
 import ImageGeneratorPage from "../src/routes/(app)/generator/images/+page.svelte";
 import VoiceGeneratorPage from "../src/routes/(app)/generator/voice/+page.svelte";
-import ToolsGeneratorPage from "../src/routes/(app)/generator/tools/+page.svelte";
 
 import AccountSettingsPage from "../src/routes/(app)/settings/account/+page.svelte";
 import DataSettingsPage from "../src/routes/(app)/settings/data/+page.svelte";
@@ -21,8 +20,7 @@ test("no page render errors", async () => {
 		IntegrationsSettingsPage,
 		StatisticsSettingsPage,
 		ImageGeneratorPage,
-		VoiceGeneratorPage,
-		ToolsGeneratorPage
+		VoiceGeneratorPage
 	];
 
 	pages.forEach((page) => {

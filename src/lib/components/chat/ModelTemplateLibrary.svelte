@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { availableModels, currentModelTemplate, newChatSettings } from '$lib/scripts/misc/stores';
+	import { availableModels, currentModelTemplate, newChatSettings } from "$lib/scripts/misc/stores";
 	import { type ModelTemplate, modelTemplates } from "$lib/scripts/misc/model-templates";
 	import { Button } from "$lib/components/ui/button";
-	import { handleError } from '$lib/scripts/operations/error-handler';
+	import { handleError } from "$lib/scripts/operations/error-handler";
 
 	function setNewChatSettings(template: ModelTemplate) {
 		if (!$newChatSettings.model) return;
@@ -13,7 +13,7 @@
 				return;
 			}
 
-			handleError("Model not found", `Model with ID ${modelID} not found in available models.`)
+			handleError("Model not found", `Model with ID ${modelID} not found in available models.`);
 		});
 
 		$newChatSettings.model.systemMessage = template.settings.systemMessage;
@@ -41,7 +41,9 @@
 </script>
 
 {#key $newChatSettings}
-	<div class="flex size-full flex-col items-center justify-center overflow-y-auto gap-2 py-2 lg:p-4">
+	<div
+		class="flex size-full flex-col items-center justify-center gap-2 overflow-y-auto py-2 lg:p-4"
+	>
 		<h2 class="text-2xl font-bold">Templates</h2>
 		<div class="grid grid-cols-1 gap-2 lg:grid-cols-2">
 			{#each modelTemplates as modelTemplate}
@@ -53,7 +55,7 @@
 				>
 					<div class="flex flex-col">
 						<h3 class="text-xl">{modelTemplate.name}</h3>
-						<p class="opacity-75 break-words text-wrap">{modelTemplate.description}</p>
+						<p class="text-wrap break-words opacity-75">{modelTemplate.description}</p>
 					</div>
 				</Button>
 			{/each}

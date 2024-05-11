@@ -3,7 +3,7 @@
 	import { onMount } from "svelte";
 	import { Button } from "$lib/components/ui/button";
 	import { page } from "$app/stores";
-	import { AudioLines, History, Image, Wrench } from "lucide-svelte";
+	import { AudioLines, History, Image } from "lucide-svelte";
 	import { generationHistory } from "$lib/scripts/misc/stores";
 	import { Separator } from "$lib/components/ui/separator";
 	import SidebarButton from "$lib/components/SidebarButton.svelte";
@@ -42,10 +42,6 @@
 			<SidebarButton path="/generator/voice">
 				<AudioLines />
 				Text To Speech
-			</SidebarButton>
-			<SidebarButton path="/generator/tools">
-				<Wrench />
-				Generated Tools
 			</SidebarButton>
 
 			<Separator class="my-2" />
