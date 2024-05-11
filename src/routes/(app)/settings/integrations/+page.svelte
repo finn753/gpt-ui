@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { openaiApiKey } from "$lib/scripts/misc/stores";
-	import { tavilyApiKey } from "$lib/scripts/misc/stores";
 	import APIKeySettings from "$lib/components/settings/APIKeySettings.svelte";
 </script>
 
@@ -10,6 +9,5 @@
 
 	<div class="flex flex-col gap-8">
 		<APIKeySettings label="OpenAI" slug="openai_api_key" apiKeyStore={openaiApiKey} />
-		<APIKeySettings label="Tavily" slug="tavily_api_key" apiKeyStore={tavilyApiKey} />
 	</div>
 </div>
