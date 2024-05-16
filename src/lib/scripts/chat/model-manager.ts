@@ -1,10 +1,17 @@
 import OpenAI from "openai";
 import ollama from "ollama/browser";
-import { availableModels, groqApiKey, mistralApiKey, openaiApiKey } from "$lib/scripts/misc/stores";
+import {
+	anthropicApiKey,
+	availableModels,
+	groqApiKey,
+	mistralApiKey,
+	openaiApiKey
+} from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
 import MistralClient from "@mistralai/mistralai";
 import Groq from "groq-sdk";
 import type { ModelType } from "$lib/scripts/misc/types";
+import Anthropic from "@anthropic-ai/sdk";
 
 class ModelManager {
 	public async getAvailableModels(): Promise<ModelType[]> {
@@ -84,6 +91,12 @@ class ModelManager {
 			console.error(e);
 			return [];
 		}
+	}
+
+	public async getAvailableAnthropicModels(): Promise<ModelType[]> {
+		const anthropic = new Anthropic({ apiKey: get(anthropicApiKey) });
+
+		return [];
 	}
 
 	public getModelInfoById(modelId: string) {
