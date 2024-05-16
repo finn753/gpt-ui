@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { openaiApiKey } from "$lib/scripts/misc/stores";
+	import {
+		anthropicApiKey,
+		groqApiKey,
+		mistralApiKey,
+		openaiApiKey
+	} from "$lib/scripts/misc/stores";
 	import APIKeySettings from "$lib/components/settings/APIKeySettings.svelte";
 </script>
 
@@ -9,5 +14,8 @@
 
 	<div class="flex flex-col gap-8">
 		<APIKeySettings label="OpenAI" slug="openai_api_key" apiKeyStore={openaiApiKey} />
+		<APIKeySettings label="Mistral" slug="mistral_api_key" apiKeyStore={mistralApiKey} />
+		<APIKeySettings label="Anthropic" slug="anthropic_api_key" apiKeyStore={anthropicApiKey} />
+		<APIKeySettings label="Groq" slug="groq_api_key" apiKeyStore={groqApiKey} />
 	</div>
 </div>

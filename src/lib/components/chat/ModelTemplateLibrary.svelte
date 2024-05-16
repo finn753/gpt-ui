@@ -7,14 +7,14 @@
 	function setNewChatSettings(template: ModelTemplate) {
 		if (!$newChatSettings.model) return;
 
-		template.settings.modelIDs.forEach((modelID) => {
+		for (const modelID of template.settings.modelIDs) {
 			if ($availableModels.find((model) => model.id === modelID) && $newChatSettings.model) {
 				$newChatSettings.model.model = modelID;
-				return;
+				break;
 			}
 
 			handleError("Model not found", `Model with ID ${modelID} not found in available models.`);
-		});
+		}
 
 		$newChatSettings.model.systemMessage = template.settings.systemMessage;
 		$newChatSettings.model.temperature = template.settings.temperature;

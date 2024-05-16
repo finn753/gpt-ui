@@ -19,12 +19,12 @@ class ModelManager {
 			const openAI = new OpenAI({ apiKey: get(openaiApiKey) ?? "", dangerouslyAllowBrowser: true });
 			return (await openAI.models.list()).data
 				.filter((model) => /ft:|gpt-/.test(model.id))
-				.filter((model) => /(gpt-3.5-turbo|gpt-4-turbo)$/.test(model.id))
+				.filter((model) => /(gpt-3.5-turbo|gpt-4-turbo|gpt-4o)$/.test(model.id))
 				.map((model) => ({
 					id: "openai:" + model.id,
 					name: model.id,
 					provider: "openai",
-					vision: model.id.includes("vision") || model.id === "gpt-4-turbo"
+					vision: model.id.includes("vision") || model.id === "gpt-4-turbo" || model.id === "gpt-4o"
 				}));
 		} catch (e: unknown) {
 			console.error(e);
