@@ -1,8 +1,9 @@
 import OpenAI from "openai";
 import ollama from "ollama/browser";
-import { availableModels, mistralApiKey, openaiApiKey } from "$lib/scripts/misc/stores";
+import { availableModels, groqApiKey, mistralApiKey, openaiApiKey } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
 import MistralClient from "@mistralai/mistralai";
+import Groq from "groq-sdk";
 import type { ModelType } from "$lib/scripts/misc/types";
 
 class ModelManager {
@@ -12,6 +13,7 @@ class ModelManager {
 		models.push(...(await this.getAvailableOllamaModels()));
 		models.push(...(await this.getAvailableOpenAIModels()));
 		models.push(...(await this.getAvailableMistralModels()));
+		models.push(...(await this.getAvailableGroqModels()));
 
 		return models;
 	}
@@ -53,12 +55,29 @@ class ModelManager {
 			const mistral = new MistralClient(get(mistralApiKey) ?? "");
 			const models = await mistral.listModels();
 
-			console.error(models);
-
 			return models.data.map((model) => ({
 				id: "mistral:" + model.id,
 				name: model.id,
 				provider: "mistral",
+				vision: false
+			}));
+		} catch (e: unknown) {
+			console.error(e);
+			return [];
+		}
+	}
+
+	public async getAvailableGroqModels(): Promise<ModelType[]> {
+		try {
+			const groq = new Groq({ apiKey: get(groqApiKey) ?? "", dangerouslyAllowBrowser: true });
+			const models = await groq.models.list();
+
+			if (!models.data) return [];
+
+			return models.data.map((model) => ({
+				id: "groq:" + model.id,
+				name: model.id || "",
+				provider: "groq",
 				vision: false
 			}));
 		} catch (e: unknown) {
