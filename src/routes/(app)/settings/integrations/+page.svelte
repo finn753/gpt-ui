@@ -1,6 +1,5 @@
 <script lang="ts">
 	import {
-		anthropicApiKey,
 		groqApiKey,
 		mistralApiKey,
 		openaiApiKey
@@ -15,7 +14,6 @@
 	<div class="flex flex-col gap-8">
 		<APIKeySettings label="OpenAI" slug="openai_api_key" apiKeyStore={openaiApiKey} />
 		<APIKeySettings label="Mistral" slug="mistral_api_key" apiKeyStore={mistralApiKey} />
-		<APIKeySettings label="Anthropic" slug="anthropic_api_key" apiKeyStore={anthropicApiKey} />
 		<APIKeySettings label="Groq" slug="groq_api_key" apiKeyStore={groqApiKey} />
 	</div>
 </div>
