@@ -1,7 +1,8 @@
 import OpenAI from "openai";
 import ollama from "ollama/browser";
-import { availableModels, openaiApiKey } from "$lib/scripts/misc/stores";
+import { availableModels, mistralApiKey, openaiApiKey } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
+import MistralClient from "@mistralai/mistralai";
 import type { ModelType } from "$lib/scripts/misc/types";
 
 class ModelManager {
@@ -10,6 +11,7 @@ class ModelManager {
 
 		models.push(...(await this.getAvailableOllamaModels()));
 		models.push(...(await this.getAvailableOpenAIModels()));
+		models.push(...(await this.getAvailableMistralModels()));
 
 		return models;
 	}
@@ -39,6 +41,25 @@ class ModelManager {
 				name: model.name,
 				provider: "ollama",
 				vision: model.details.families?.includes("clip") || false
+			}));
+		} catch (e: unknown) {
+			console.error(e);
+			return [];
+		}
+	}
+
+	public async getAvailableMistralModels(): Promise<ModelType[]> {
+		try {
+			const mistral = new MistralClient(get(mistralApiKey) ?? "");
+			const models = await mistral.listModels();
+
+			console.error(models);
+
+			return models.data.map((model) => ({
+				id: "mistral:" + model.id,
+				name: model.id,
+				provider: "mistral",
+				vision: false
 			}));
 		} catch (e: unknown) {
 			console.error(e);
