@@ -22,3 +22,6 @@ export const availableModels = writable<ModelType[]>([]);
 
 export const openaiApiKey = writable<string | null>();
 export const tavilyApiKey = writable<string | null>();
+export const groqApiKey = writable<string | null>();
+export const mistralApiKey = writable<string | null>();
+export const anthropicApiKey = writable<string | null>();

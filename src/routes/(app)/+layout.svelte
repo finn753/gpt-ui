@@ -1,7 +1,14 @@
 <script lang="ts">
 	import { Button } from "$lib/components/ui/button";
 	import { MessagesSquare, User, Brush } from "lucide-svelte";
-	import { availableModels, openaiApiKey, tavilyApiKey } from "$lib/scripts/misc/stores";
+	import {
+		anthropicApiKey,
+		availableModels,
+		groqApiKey,
+		mistralApiKey,
+		openaiApiKey,
+		tavilyApiKey
+	} from "$lib/scripts/misc/stores";
 	import { initializeModel } from "client-vector-search";
 	import { onMount } from "svelte";
 
@@ -20,6 +27,9 @@
 	$: if (data) {
 		openaiApiKey.set(data.openaiApiKey);
 		tavilyApiKey.set(data.tavilyApiKey);
+		groqApiKey.set(data.groqApiKey);
+		mistralApiKey.set(data.mistralApiKey);
+		anthropicApiKey.set(data.anthropicApiKey);
 	}
 
 	onMount(async () => {

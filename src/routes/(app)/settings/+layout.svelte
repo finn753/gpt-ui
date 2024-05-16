@@ -38,9 +38,9 @@
 					<KeyRound />
 					Integrations
 				</SidebarButton>
-				<SidebarButton path="/settings/statistics">
+				<SidebarButton path="/settings/lds">
 					<BarChart3 />
-					Statistics
+					Live Data Sources
 				</SidebarButton>
 				<SidebarButton path="/settings/data">
 					<FileText />

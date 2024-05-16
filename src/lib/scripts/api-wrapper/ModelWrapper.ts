@@ -1,10 +1,16 @@
 import OpenAI from "openai";
-import { type Message, Ollama } from "ollama/browser";
+import { type Message as OllamaMessage, Ollama } from "ollama/browser";
 import { get } from "svelte/store";
-import { openaiApiKey } from "$lib/scripts/misc/stores";
+import { groqApiKey, mistralApiKey, openaiApiKey } from "$lib/scripts/misc/stores";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import type { LiveDataSource } from "$lib/scripts/misc/types";
 import { injectLiveDataSourceIntoMessages } from "$lib/scripts/chat/live-data-sources";
+import MistralClient, { type Message as MistralMessage } from "@mistralai/mistralai";
+import Groq from "groq-sdk";
+
+// @ts-expect-error Module not found
+import type { ChatCompletion } from "groq-sdk/resources/chat";
+type GroqMessage = ChatCompletion.Choice.Message;
 
 export type ModelOptions = {
 	temperature?: number;
@@ -27,7 +33,7 @@ export class ModelWrapper {
 	public readonly provider: string;
 	public readonly modelName: string;
 	private _params: ModelOptions = {};
-	private readonly model: OpenAI | Ollama;
+	private readonly model: OpenAI | Ollama | MistralClient | Groq;
 
 	private _liveDataSources: LiveDataSource[] = [];
 
@@ -50,6 +56,12 @@ export class ModelWrapper {
 				break;
 			case "ollama":
 				this.model = new Ollama();
+				break;
+			case "mistral":
+				this.model = new MistralClient(get(mistralApiKey) ?? "");
+				break;
+			case "groq":
+				this.model = new Groq({ apiKey: get(groqApiKey) ?? "", dangerouslyAllowBrowser: true });
 				break;
 			default:
 				throw new Error(`Provider ${this.provider} not supported`);
@@ -99,7 +111,10 @@ export class ModelWrapper {
 		const stream = await this.model.chat({
 			model: this.modelName,
 			stream: true,
-			messages: this.messagesToOllamaFormat(messages)
+			messages: this.messagesToOllamaFormat(messages),
+			options: {
+				...this._params
+			}
 		});
 
 		let content = "";
@@ -111,12 +126,54 @@ export class ModelWrapper {
 		}
 	}
 
+	async *getMistralStream(messages: MessageFormat[]): AsyncGenerator<ModelResponse> {
+		if (!(this.model instanceof MistralClient))
+			throw new Error("Model is not an instance of Mistral");
+
+		const stream = this.model.chatStream({
+			messages: this.messagesToMistralFormat(messages),
+			model: this.modelName,
+			...this._params
+		});
+
+		let content = "";
+
+		for await (const chunk of stream) {
+			content = content + chunk.choices[0].delta.content;
+
+			yield { content, finished: chunk.choices[0].finish_reason !== undefined };
+		}
+	}
+
+	async *getGroqStream(messages: MessageFormat[]): AsyncGenerator<ModelResponse> {
+		if (!(this.model instanceof Groq)) throw new Error("Model is not an instance of Groq");
+
+		const stream = await this.model.chat.completions.create({
+			model: this.modelName,
+			...this._params,
+			messages: this.messagesToGroqFormat(messages),
+			stream: true
+		});
+
+		let content = "";
+
+		for await (const chunk of stream) {
+			content = content + chunk.choices[0].delta.content;
+
+			yield { content, finished: chunk.choices[0].finish_reason !== undefined };
+		}
+	}
+
 	async getStream(messages: MessageFormat[]) {
 		switch (this.provider) {
 			case "openai":
 				return this.getOpenAIStream(messages);
 			case "ollama":
 				return this.getOllamaStream(messages);
+			case "mistral":
+				return this.getMistralStream(messages);
+			case "groq":
+				return this.getGroqStream(messages);
 			default:
 				throw new Error(`Provider ${this.provider} not supported`);
 		}
@@ -175,13 +232,31 @@ export class ModelWrapper {
 		}) as ChatCompletionMessageParam[];
 	}
 
-	private messagesToOllamaFormat(messages: MessageFormat[]): Message[] {
+	private messagesToOllamaFormat(messages: MessageFormat[]): OllamaMessage[] {
 		return messages.map((message) => {
 			return {
 				role: message.role,
 				content: message.content,
 				images:
 					message.images?.map((image) => image.replace(/^data:image\/\w+;base64,/, "")) || undefined
+			};
+		});
+	}
+
+	private messagesToMistralFormat(messages: MessageFormat[]): MistralMessage[] {
+		return messages.map((message) => {
+			return {
+				role: message.role,
+				content: message.content
+			};
+		});
+	}
+
+	private messagesToGroqFormat(messages: MessageFormat[]): GroqMessage[] {
+		return messages.map((message) => {
+			return {
+				role: message.role,
+				content: message.content
 			};
 		});
 	}
