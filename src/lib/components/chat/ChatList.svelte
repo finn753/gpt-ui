@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ChatDataMap, ChatStructure } from "$lib/scripts/misc/types";
 	import { Button } from "$lib/components/ui/button";
-	import { selectedChatID } from "$lib/scripts/misc/stores";
+	import { hiddenTags, selectedChatID } from "$lib/scripts/misc/stores";
 	import { format } from "date-fns";
 	import { Ellipsis } from "lucide-svelte";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
@@ -19,7 +19,9 @@
 	let chatEntries: [string, ChatStructure][] = Object.entries(chatMap);
 
 	$: {
-		chatEntries = Object.entries(chatMap);
+		chatEntries = Object.entries(chatMap).filter(([, chat]) => {
+			return chat.tags.every((tag) => !$hiddenTags.includes(tag));
+		});
 
 		if (searchQuery.trim() !== "") {
 			chatEntries = Object.entries(chatService.searchChats(chatMap, searchQuery.trim()));

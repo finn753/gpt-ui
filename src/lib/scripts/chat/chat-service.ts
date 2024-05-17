@@ -1,4 +1,4 @@
-import { chatContentMap, chatDataMap } from "$lib/scripts/misc/stores";
+import { chatContentMap, chatDataMap, hiddenTags } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
 import chatOperations from "$lib/scripts/chat/chat-operations";
 import type { ChatDataMap, ChatMessageStructure } from "$lib/scripts/misc/types";
@@ -112,12 +112,19 @@ class ChatService {
 			const lowerCaseSummary = chat.summary.toLowerCase();
 			const lowerCaseTags = chat.tags.map((tag) => tag.toLowerCase());
 
+			const isTagHidden = get(hiddenTags).some(
+				(hiddenTag) =>
+					lowerCaseTags.includes(hiddenTag.toLowerCase()) &&
+					!lowerCaseQueryWords.includes(hiddenTag)
+			);
+
 			return (
-				lowerCaseTitle.includes(lowerCaseQuery) ||
-				lowerCaseSummary.includes(lowerCaseQuery) ||
-				lowerCaseQueryWords.some((queryWord) =>
-					lowerCaseTags.some((tag) => tag.includes(queryWord))
-				)
+				!isTagHidden &&
+				(lowerCaseTitle.includes(lowerCaseQuery) ||
+					lowerCaseSummary.includes(lowerCaseQuery) ||
+					lowerCaseQueryWords.some((queryWord) =>
+						lowerCaseTags.some((tag) => tag.includes(queryWord))
+					))
 			);
 		});
 

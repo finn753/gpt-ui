@@ -27,3 +27,5 @@ export const mistralApiKey = writable<string | null>();
 export const anthropicApiKey = writable<string | null>();
 export const perplexityApiKey = writable<string | null>();
 export const geminiApiKey = writable<string | null>();
+
+export const hiddenTags = writable<string[]>([]);

@@ -21,9 +21,7 @@
 <Card.Root>
 	<Card.Header>
 		<Card.Title>{label}</Card.Title>
-		<Card.Description>
-			Put in your API Key to access the service
-		</Card.Description>
+		<Card.Description>Put in your API Key to access the service</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<form>
@@ -34,4 +32,3 @@
 		<Button class="w-min" on:click={saveApiKey}>Save</Button>
 	</Card.Footer>
 </Card.Root>
-

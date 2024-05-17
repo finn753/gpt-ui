@@ -1,6 +1,6 @@
 <script>
-	import { openaiApiKey } from '$lib/scripts/misc/stores';
-	import APIKeySettings from '$lib/components/settings/APIKeySettings.svelte';
+	import { openaiApiKey } from "$lib/scripts/misc/stores";
+	import APIKeySettings from "$lib/components/settings/APIKeySettings.svelte";
 </script>
 
 <div class="flex flex-col gap-2">

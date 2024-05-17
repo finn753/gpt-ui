@@ -1,6 +1,6 @@
 <script>
-	import { groqApiKey } from '$lib/scripts/misc/stores';
-	import APIKeySettings from '$lib/components/settings/APIKeySettings.svelte';
+	import { groqApiKey } from "$lib/scripts/misc/stores";
+	import APIKeySettings from "$lib/components/settings/APIKeySettings.svelte";
 </script>
 
 <div class="flex flex-col gap-2">
