@@ -30,9 +30,7 @@
 <Card.Root>
 	<Card.Header>
 		<Card.Title>Change Password</Card.Title>
-		<Card.Description>
-			Change your password here
-		</Card.Description>
+		<Card.Description>Change your password here</Card.Description>
 	</Card.Header>
 	<form on:submit={onChangePassword}>
 		<Card.Content class="flex flex-col gap-4">

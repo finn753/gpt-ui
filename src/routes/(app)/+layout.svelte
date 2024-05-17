@@ -3,12 +3,15 @@
 	import { MessagesSquare, User, Brush } from "lucide-svelte";
 	import {
 		anthropicApiKey,
-		availableModels, geminiApiKey,
+		availableModels,
+		geminiApiKey,
 		groqApiKey,
+		hiddenTags,
 		mistralApiKey,
-		openaiApiKey, perplexityApiKey,
+		openaiApiKey,
+		perplexityApiKey,
 		tavilyApiKey
-	} from '$lib/scripts/misc/stores';
+	} from "$lib/scripts/misc/stores";
 	import { initializeModel } from "client-vector-search";
 	import { onMount } from "svelte";
 
@@ -32,6 +35,8 @@
 		anthropicApiKey.set(data.anthropicApiKey);
 		perplexityApiKey.set(data.perplexityApiKey);
 		geminiApiKey.set(data.geminiApiKey);
+
+		hiddenTags.set(data.hiddenTags);
 	}
 
 	onMount(async () => {

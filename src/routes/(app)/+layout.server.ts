@@ -10,6 +10,8 @@ export const load = async (event) => {
 	const perplexityApiKey = response.data.perplexity_api_key || null;
 	const geminiApiKey = response.data.gemini_api_key || null;
 
+	const hiddenTags = response.data.hidden_tags || [];
+
 	return {
 		openaiApiKey,
 		tavilyApiKey,
@@ -17,6 +19,7 @@ export const load = async (event) => {
 		mistralApiKey,
 		anthropicApiKey,
 		perplexityApiKey,
-		geminiApiKey
+		geminiApiKey,
+		hiddenTags
 	};
 };

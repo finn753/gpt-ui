@@ -13,7 +13,7 @@ import OpenAISettingsPage from "../src/routes/(app)/settings/provider/openai/+pa
 import OllamaSettingsPage from "../src/routes/(app)/settings/provider/ollama/+page.svelte";
 import MistralSettingsPage from "../src/routes/(app)/settings/provider/mistral/+page.svelte";
 import GroqSettingsPage from "../src/routes/(app)/settings/provider/groq/+page.svelte";
-import LiveDataSourceSettingsPage from "../src/routes/(app)/settings/lds/+page.svelte";
+import LiveDataSourceSettingsPage from "../src/routes/(app)/settings/chat/lds/+page.svelte";
 
 test("no page render errors", async () => {
 	const pages = [
