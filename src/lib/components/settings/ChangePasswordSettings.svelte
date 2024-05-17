@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Input } from "$lib/components/ui/input";
-	import { Label } from "$lib/components/ui/label";
 	import { Button } from "$lib/components/ui/button";
+	import * as Card from "$lib/components/ui/card";
 	import database from "$lib/scripts/operations/database";
 	import { handleError } from "$lib/scripts/operations/error-handler";
 	import { toast } from "svelte-sonner";
@@ -27,15 +27,20 @@
 	}
 </script>
 
-<h2 class="text-lg font-bold">Change Password</h2>
-<form class="flex flex-col gap-2" on:submit={onChangePassword}>
-	<Label>
-		New Password
-		<Input type="password" class="max-w-sm" bind:value={inputPassword} />
-	</Label>
-	<Label>
-		Confirm New Password
-		<Input type="password" class="max-w-sm" bind:value={inputConfirmPassword} />
-	</Label>
-	<Button class="max-w-sm" type="submit">Change Password</Button>
-</form>
+<Card.Root>
+	<Card.Header>
+		<Card.Title>Change Password</Card.Title>
+		<Card.Description>
+			Change your password here
+		</Card.Description>
+	</Card.Header>
+	<form on:submit={onChangePassword}>
+		<Card.Content class="flex flex-col gap-4">
+			<Input type="password" placeholder="New password" bind:value={inputPassword} />
+			<Input type="password" placeholder="Confirm new password" bind:value={inputConfirmPassword} />
+		</Card.Content>
+		<Card.Footer class="border-t px-6 py-4">
+			<Button type="submit">Change Password</Button>
+		</Card.Footer>
+	</form>
+</Card.Root>
