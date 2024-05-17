@@ -54,7 +54,7 @@
 			</SidebarButton>
 		</div>
 	</CollapsibleSidebar>
-	<div class="col-span-1 h-full max-h-full min-h-0 p-4 px-8 md:col-span-2 lg:col-span-3">
+	<div class="col-span-1 h-full max-h-full overflow-y-auto min-h-0 p-4 px-8 md:col-span-2 lg:col-span-3">
 		<slot />
 	</div>
 </div>

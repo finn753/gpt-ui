@@ -14,7 +14,12 @@ const casualChatTemplate: ModelTemplate = {
 	name: "Casual Chat",
 	description: "A casual, all purpose chat model",
 	settings: {
-		modelIDs: ["ollama:llama3", "ollama:llama2", "openai:gpt-4o", "openai:gpt-3.5-turbo"],
+		modelIDs: [
+			"ollama:llama3:latest",
+			"ollama:llama2:latest",
+			"openai:gpt-4o",
+			"openai:gpt-3.5-turbo"
+		],
 		systemMessage: "You are a helpful assistant",
 		temperature: 0.5,
 		topP: 0.5
@@ -53,8 +58,8 @@ const socraticTutorTemplate: ModelTemplate = {
 	description: "Ask questions to guide learning",
 	settings: {
 		modelIDs: [
-			"ollama:llama3",
-			"ollama:llama2",
+			"ollama:llama3:latest",
+			"ollama:llama2:latest",
 			"openai:gpt-4o",
 			"openai:gpt-4-turbo",
 			"openai:gpt-3.5-turbo"
@@ -72,8 +77,8 @@ const timeManagementCoachTemplate: ModelTemplate = {
 	description: "Helps managing your time effectively",
 	settings: {
 		modelIDs: [
-			"ollama:llama3",
-			"ollama:llama2",
+			"ollama:llama3:latest",
+			"ollama:llama2:latest",
 			"openai:gpt-4o",
 			"openai:gpt-4-turbo",
 			"openai:gpt-3.5-turbo"
