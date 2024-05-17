@@ -2,7 +2,6 @@
 	import { availableModels, currentModelTemplate, newChatSettings } from "$lib/scripts/misc/stores";
 	import { type ModelTemplate, modelTemplates } from "$lib/scripts/misc/model-templates";
 	import { Button } from "$lib/components/ui/button";
-	import { handleError } from "$lib/scripts/operations/error-handler";
 
 	function setNewChatSettings(template: ModelTemplate) {
 		if (!$newChatSettings.model) return;
@@ -12,8 +11,6 @@
 				$newChatSettings.model.model = modelID;
 				break;
 			}
-
-			handleError("Model not found", `Model with ID ${modelID} not found in available models.`);
 		}
 
 		$newChatSettings.model.systemMessage = template.settings.systemMessage;

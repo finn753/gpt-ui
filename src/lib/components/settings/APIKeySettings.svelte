@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
 	import { Button } from "$lib/components/ui/button";
+	import * as Card from "$lib/components/ui/card";
 	import { type Writable } from "svelte/store";
 	import database from "$lib/scripts/operations/database";
 
@@ -18,10 +18,20 @@
 	}
 </script>
 
-<div class="flex flex-col gap-2">
-	<Label>
-		<h3 class="text-lg">{label}</h3>
-		<Input type="password" class="max-w-sm" placeholder="Your API key..." bind:value={inputValue} />
-	</Label>
-	<Button class="w-min" on:click={saveApiKey}>Save</Button>
-</div>
+<Card.Root>
+	<Card.Header>
+		<Card.Title>{label}</Card.Title>
+		<Card.Description>
+			Put in your API Key to access the service
+		</Card.Description>
+	</Card.Header>
+	<Card.Content>
+		<form>
+			<Input type="password" placeholder="Your API key..." bind:value={inputValue} />
+		</form>
+	</Card.Content>
+	<Card.Footer class="border-t px-6 py-4">
+		<Button class="w-min" on:click={saveApiKey}>Save</Button>
+	</Card.Footer>
+</Card.Root>
+
