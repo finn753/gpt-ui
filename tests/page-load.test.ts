@@ -9,7 +9,10 @@ import VoiceGeneratorPage from "../src/routes/(app)/generator/voice/+page.svelte
 
 import AccountSettingsPage from "../src/routes/(app)/settings/account/+page.svelte";
 import DataSettingsPage from "../src/routes/(app)/settings/data/+page.svelte";
-import IntegrationsSettingsPage from "../src/routes/(app)/settings/integrations/+page.svelte";
+import OpenAISettingsPage from "../src/routes/(app)/settings/provider/openai/+page.svelte";
+import OllamaSettingsPage from "../src/routes/(app)/settings/provider/ollama/+page.svelte";
+import MistralSettingsPage from "../src/routes/(app)/settings/provider/mistral/+page.svelte";
+import GroqSettingsPage from "../src/routes/(app)/settings/provider/groq/+page.svelte";
 import LiveDataSourceSettingsPage from "../src/routes/(app)/settings/lds/+page.svelte";
 
 test("no page render errors", async () => {
@@ -17,7 +20,10 @@ test("no page render errors", async () => {
 		ChatsPage,
 		AccountSettingsPage,
 		DataSettingsPage,
-		IntegrationsSettingsPage,
+		OpenAISettingsPage,
+		OllamaSettingsPage,
+		MistralSettingsPage,
+		GroqSettingsPage,
 		LiveDataSourceSettingsPage,
 		ImageGeneratorPage,
 		VoiceGeneratorPage
