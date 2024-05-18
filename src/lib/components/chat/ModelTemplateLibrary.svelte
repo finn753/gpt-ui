@@ -1,32 +1,16 @@
 <script lang="ts">
 	import {
-		availableModels,
 		currentModelTemplate,
 		customModelTemplates,
 		newChatSettings
 	} from "$lib/scripts/misc/stores";
-	import { type ModelTemplate, defaultModelTemplates } from "$lib/scripts/misc/model-templates";
+	import {
+		type ModelTemplate,
+		defaultModelTemplates,
+		applyModelTemplate
+	} from "$lib/scripts/misc/model-templates";
 	import { Button } from "$lib/components/ui/button";
 	import AlertAddCustomModelTemplate from "$lib/components/chat/AlertAddCustomModelTemplate.svelte";
-
-	function setNewChatSettings(template: ModelTemplate) {
-		if (!$newChatSettings.model) return;
-
-		for (const modelID of template.settings.modelIDs) {
-			if ($availableModels.find((model) => model.id === modelID) && $newChatSettings.model) {
-				$newChatSettings.model.model = modelID;
-				break;
-			}
-		}
-
-		$newChatSettings.model.systemMessage = template.settings.systemMessage;
-		$newChatSettings.model.temperature = template.settings.temperature;
-		$newChatSettings.model.topP = template.settings.topP;
-
-		$newChatSettings.tools = template.tools;
-
-		$currentModelTemplate = template.name;
-	}
 
 	function isSelected(template: ModelTemplate) {
 		if (!$newChatSettings.model) return false;
@@ -54,7 +38,7 @@
 					variant={isSelected(modelTemplate) ? "default" : "glass"}
 					size="none"
 					class="p-4"
-					on:click={() => setNewChatSettings(modelTemplate)}
+					on:click={() => applyModelTemplate(modelTemplate)}
 				>
 					<div class="flex flex-col">
 						<h3 class="text-xl">{modelTemplate.name}</h3>

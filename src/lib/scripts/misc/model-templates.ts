@@ -1,4 +1,10 @@
-import { customModelTemplates } from "$lib/scripts/misc/stores";
+import {
+	availableModels,
+	currentModelTemplate,
+	customModelTemplates,
+	newChatSettings,
+	selectedChatID
+} from "$lib/scripts/misc/stores";
 import database from "$lib/scripts/operations/database";
 import { get } from "svelte/store";
 
@@ -135,6 +141,39 @@ export const defaultModelTemplates: ModelTemplate[] = [
 	timeManagementCoachTemplate,
 	personalFinanceAdvisorTemplate
 ];
+
+export function applyModelTemplate(template: ModelTemplate) {
+	const currentChatID = get(selectedChatID);
+	if (!currentChatID) {
+		if (!get(newChatSettings).model) return;
+
+		for (const modelID of template.settings.modelIDs) {
+			if (get(availableModels).find((model) => model.id === modelID)) {
+				newChatSettings.update((settings) => {
+					if (!settings.model) return settings;
+
+					settings.model.model = modelID;
+					return settings;
+				});
+				break;
+			}
+		}
+
+		newChatSettings.update((settings) => {
+			if (!settings.model) return settings;
+
+			settings.model.systemMessage = template.settings.systemMessage;
+			settings.model.temperature = template.settings.temperature;
+			settings.model.topP = template.settings.topP;
+
+			settings.tools = template.tools;
+
+			return settings;
+		});
+
+		currentModelTemplate.set(template.name);
+	}
+}
 
 export async function addCustomModelTemplate(template: ModelTemplate) {
 	customModelTemplates.update((templates) => {
