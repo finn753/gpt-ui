@@ -1,5 +1,6 @@
 import {
 	availableModels,
+	chatDataMap,
 	currentModelTemplate,
 	customModelTemplates,
 	newChatSettings,
@@ -170,9 +171,33 @@ export function applyModelTemplate(template: ModelTemplate) {
 
 			return settings;
 		});
+	} else {
+		for (const modelID of template.settings.modelIDs) {
+			if (get(availableModels).find((model) => model.id === modelID)) {
+				chatDataMap.update((settings) => {
+					if (!settings[currentChatID].model) return settings;
 
-		currentModelTemplate.set(template.name);
+					settings[currentChatID].model.model = modelID;
+					return settings;
+				});
+				break;
+			}
+		}
+
+		chatDataMap.update((settings) => {
+			if (!settings[currentChatID].model) return settings;
+
+			settings[currentChatID].model.systemMessage = template.settings.systemMessage;
+			settings[currentChatID].model.temperature = template.settings.temperature;
+			settings[currentChatID].model.topP = template.settings.topP;
+
+			settings[currentChatID].tools = template.tools;
+
+			return settings;
+		});
 	}
+
+	currentModelTemplate.set(template.name);
 }
 
 export async function addCustomModelTemplate(template: ModelTemplate) {
