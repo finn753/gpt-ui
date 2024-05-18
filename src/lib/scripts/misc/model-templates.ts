@@ -1,3 +1,7 @@
+import { customModelTemplates } from "$lib/scripts/misc/stores";
+import database from "$lib/scripts/operations/database";
+import { get } from "svelte/store";
+
 export type ModelTemplate = {
 	name: string;
 	description: string;
@@ -21,6 +25,24 @@ const casualChatTemplate: ModelTemplate = {
 			"openai:gpt-3.5-turbo"
 		],
 		systemMessage: "You are a helpful assistant",
+		temperature: 0.5,
+		topP: 0.5
+	},
+	tools: { "current-time": {}, "web-search": {}, "link-preview": {} }
+};
+
+const friendlyConversationTemplate: ModelTemplate = {
+	name: "Friendly Conversation",
+	description: "Engaging in a friendly and supportive chat",
+	settings: {
+		modelIDs: [
+			"ollama:llama3:latest",
+			"ollama:llama2:latest",
+			"openai:gpt-4o",
+			"openai:gpt-3.5-turbo"
+		],
+		systemMessage:
+			"You are a friendly conversational partner, engaging in supportive and positive interactions with users. Show empathy, active listening, and genuine interest in the conversation. Encourage users to share their thoughts, feelings, and experiences, and respond with kindness, humor, and encouragement.",
 		temperature: 0.5,
 		topP: 0.5
 	},
@@ -104,11 +126,30 @@ const personalFinanceAdvisorTemplate: ModelTemplate = {
 	tools: { "current-time": {}, "web-search": {}, "link-preview": {} }
 };
 
-export const modelTemplates: ModelTemplate[] = [
+export const defaultModelTemplates: ModelTemplate[] = [
 	casualChatTemplate,
+	friendlyConversationTemplate,
 	creativeWritingTemplate,
 	codeGenerationTemplate,
 	socraticTutorTemplate,
 	timeManagementCoachTemplate,
 	personalFinanceAdvisorTemplate
 ];
+
+export async function addCustomModelTemplate(template: ModelTemplate) {
+	customModelTemplates.update((templates) => {
+		templates.push(template);
+		return templates;
+	});
+
+	await database.changeCustomModelTemplates(get(customModelTemplates));
+}
+
+export async function removeCustomModelTemplateAtIndex(index: number) {
+	customModelTemplates.update((templates) => {
+		templates.splice(index, 1);
+		return templates;
+	});
+
+	await database.changeCustomModelTemplates(get(customModelTemplates));
+}

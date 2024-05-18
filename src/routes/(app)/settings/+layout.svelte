@@ -50,6 +50,7 @@
 				<div class="flex flex-col gap-1">
 					<h2 class="text-lg font-semibold text-muted-foreground">Chat</h2>
 					<SidebarButton path="/settings/chat/general">General</SidebarButton>
+					<SidebarButton path="/settings/chat/templates">Templates</SidebarButton>
 					<SidebarButton path="/settings/chat/lds">Live Data Sources</SidebarButton>
 				</div>
 

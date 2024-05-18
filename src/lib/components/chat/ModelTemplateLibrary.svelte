@@ -1,7 +1,13 @@
 <script lang="ts">
-	import { availableModels, currentModelTemplate, newChatSettings } from "$lib/scripts/misc/stores";
-	import { type ModelTemplate, modelTemplates } from "$lib/scripts/misc/model-templates";
+	import {
+		availableModels,
+		currentModelTemplate,
+		customModelTemplates,
+		newChatSettings
+	} from "$lib/scripts/misc/stores";
+	import { type ModelTemplate, defaultModelTemplates } from "$lib/scripts/misc/model-templates";
 	import { Button } from "$lib/components/ui/button";
+	import AlertAddCustomModelTemplate from "$lib/components/chat/AlertAddCustomModelTemplate.svelte";
 
 	function setNewChatSettings(template: ModelTemplate) {
 		if (!$newChatSettings.model) return;
@@ -33,7 +39,7 @@
 
 		if ($newChatSettings.model.topP !== template.settings.topP) return false;
 
-		return true;
+		return $currentModelTemplate === template.name;
 	}
 </script>
 
@@ -43,7 +49,7 @@
 	>
 		<h2 class="text-2xl font-bold">Templates</h2>
 		<div class="grid grid-cols-1 gap-2 lg:grid-cols-2">
-			{#each modelTemplates as modelTemplate}
+			{#each [...defaultModelTemplates, ...$customModelTemplates] as modelTemplate}
 				<Button
 					variant={isSelected(modelTemplate) ? "default" : "glass"}
 					size="none"
@@ -56,6 +62,7 @@
 					</div>
 				</Button>
 			{/each}
+			<AlertAddCustomModelTemplate></AlertAddCustomModelTemplate>
 		</div>
 	</div>
 {/key}

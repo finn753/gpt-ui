@@ -278,6 +278,7 @@
 		<Card.Content class="flex flex-col gap-4">
 			{#if modelSelection}
 				<Label>
+					Model
 					<Select.Root
 						selected={selectedModel}
 						onSelectedChange={async (v) => {
@@ -332,7 +333,7 @@
 
 			<Label>
 				System Message
-				<Textarea class="w-full resize-none" bind:value={systemMessage} on:blur={onSaveAssistant} />
+				<Textarea class="w-full resize-y" bind:value={systemMessage} on:blur={onSaveAssistant} />
 			</Label>
 		</Card.Content>
 	</Card.Root>

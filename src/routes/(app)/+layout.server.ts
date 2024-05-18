@@ -11,6 +11,7 @@ export const load = async (event) => {
 	const geminiApiKey = response.data.gemini_api_key || null;
 
 	const hiddenTags = response.data.hidden_tags || [];
+	const customModelTemplates = response.data.custom_model_templates || [];
 
 	return {
 		openaiApiKey,
@@ -20,6 +21,7 @@ export const load = async (event) => {
 		anthropicApiKey,
 		perplexityApiKey,
 		geminiApiKey,
-		hiddenTags
+		hiddenTags,
+		customModelTemplates
 	};
 };

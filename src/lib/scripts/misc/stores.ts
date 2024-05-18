@@ -7,6 +7,7 @@ import type {
 	ModelType,
 	NewChatSettings
 } from "$lib/scripts/misc/types";
+import type { ModelTemplate } from "$lib/scripts/misc/model-templates";
 
 export const chatDataMap = writable<ChatDataMap>({});
 export const chatContentMap = writable<ChatContentMap>({});
@@ -29,3 +30,4 @@ export const perplexityApiKey = writable<string | null>();
 export const geminiApiKey = writable<string | null>();
 
 export const hiddenTags = writable<string[]>([]);
+export const customModelTemplates = writable<ModelTemplate[]>([]);
