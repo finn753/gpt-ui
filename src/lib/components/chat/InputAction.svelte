@@ -17,6 +17,8 @@
 
 	$: if (filteredElements.length > selectedElementIndex && filteredElements[selectedElementIndex]) {
 		selectedElement = filteredElements[selectedElementIndex].element;
+	} else {
+		selectedElement = undefined;
 	}
 
 	$: selectedElementIndex = Math.max(0,Math.min(selectedElementIndex, filteredElements.length - 1));
