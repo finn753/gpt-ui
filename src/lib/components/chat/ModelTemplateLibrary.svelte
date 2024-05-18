@@ -1,26 +1,16 @@
 <script lang="ts">
-	import { availableModels, currentModelTemplate, newChatSettings } from "$lib/scripts/misc/stores";
-	import { type ModelTemplate, modelTemplates } from "$lib/scripts/misc/model-templates";
+	import {
+		currentModelTemplate,
+		customModelTemplates,
+		newChatSettings
+	} from "$lib/scripts/misc/stores";
+	import {
+		type ModelTemplate,
+		defaultModelTemplates,
+		applyModelTemplate
+	} from "$lib/scripts/misc/model-templates";
 	import { Button } from "$lib/components/ui/button";
-
-	function setNewChatSettings(template: ModelTemplate) {
-		if (!$newChatSettings.model) return;
-
-		for (const modelID of template.settings.modelIDs) {
-			if ($availableModels.find((model) => model.id === modelID) && $newChatSettings.model) {
-				$newChatSettings.model.model = modelID;
-				break;
-			}
-		}
-
-		$newChatSettings.model.systemMessage = template.settings.systemMessage;
-		$newChatSettings.model.temperature = template.settings.temperature;
-		$newChatSettings.model.topP = template.settings.topP;
-
-		$newChatSettings.tools = template.tools;
-
-		$currentModelTemplate = template.name;
-	}
+	import AlertAddCustomModelTemplate from "$lib/components/chat/AlertAddCustomModelTemplate.svelte";
 
 	function isSelected(template: ModelTemplate) {
 		if (!$newChatSettings.model) return false;
@@ -33,7 +23,7 @@
 
 		if ($newChatSettings.model.topP !== template.settings.topP) return false;
 
-		return true;
+		return $currentModelTemplate === template.name;
 	}
 </script>
 
@@ -43,12 +33,12 @@
 	>
 		<h2 class="text-2xl font-bold">Templates</h2>
 		<div class="grid grid-cols-1 gap-2 lg:grid-cols-2">
-			{#each modelTemplates as modelTemplate}
+			{#each [...defaultModelTemplates, ...$customModelTemplates] as modelTemplate}
 				<Button
 					variant={isSelected(modelTemplate) ? "default" : "glass"}
 					size="none"
 					class="p-4"
-					on:click={() => setNewChatSettings(modelTemplate)}
+					on:click={() => applyModelTemplate(modelTemplate)}
 				>
 					<div class="flex flex-col">
 						<h3 class="text-xl">{modelTemplate.name}</h3>
@@ -56,6 +46,7 @@
 					</div>
 				</Button>
 			{/each}
+			<AlertAddCustomModelTemplate></AlertAddCustomModelTemplate>
 		</div>
 	</div>
 {/key}

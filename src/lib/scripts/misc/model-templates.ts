@@ -1,3 +1,14 @@
+import {
+	availableModels,
+	chatDataMap,
+	currentModelTemplate,
+	customModelTemplates,
+	newChatSettings,
+	selectedChatID
+} from "$lib/scripts/misc/stores";
+import database from "$lib/scripts/operations/database";
+import { get } from "svelte/store";
+
 export type ModelTemplate = {
 	name: string;
 	description: string;
@@ -21,6 +32,24 @@ const casualChatTemplate: ModelTemplate = {
 			"openai:gpt-3.5-turbo"
 		],
 		systemMessage: "You are a helpful assistant",
+		temperature: 0.5,
+		topP: 0.5
+	},
+	tools: { "current-time": {}, "web-search": {}, "link-preview": {} }
+};
+
+const friendlyConversationTemplate: ModelTemplate = {
+	name: "Friendly Conversation",
+	description: "Engaging in a friendly and supportive chat",
+	settings: {
+		modelIDs: [
+			"ollama:llama3:latest",
+			"ollama:llama2:latest",
+			"openai:gpt-4o",
+			"openai:gpt-3.5-turbo"
+		],
+		systemMessage:
+			"You are a friendly conversational partner, engaging in supportive and positive interactions with users. Show empathy, active listening, and genuine interest in the conversation. Encourage users to share their thoughts, feelings, and experiences, and respond with kindness, humor, and encouragement.",
 		temperature: 0.5,
 		topP: 0.5
 	},
@@ -104,11 +133,87 @@ const personalFinanceAdvisorTemplate: ModelTemplate = {
 	tools: { "current-time": {}, "web-search": {}, "link-preview": {} }
 };
 
-export const modelTemplates: ModelTemplate[] = [
+export const defaultModelTemplates: ModelTemplate[] = [
 	casualChatTemplate,
+	friendlyConversationTemplate,
 	creativeWritingTemplate,
 	codeGenerationTemplate,
 	socraticTutorTemplate,
 	timeManagementCoachTemplate,
 	personalFinanceAdvisorTemplate
 ];
+
+export function applyModelTemplate(template: ModelTemplate) {
+	const currentChatID = get(selectedChatID);
+	if (!currentChatID) {
+		if (!get(newChatSettings).model) return;
+
+		for (const modelID of template.settings.modelIDs) {
+			if (get(availableModels).find((model) => model.id === modelID)) {
+				newChatSettings.update((settings) => {
+					if (!settings.model) return settings;
+
+					settings.model.model = modelID;
+					return settings;
+				});
+				break;
+			}
+		}
+
+		newChatSettings.update((settings) => {
+			if (!settings.model) return settings;
+
+			settings.model.systemMessage = template.settings.systemMessage;
+			settings.model.temperature = template.settings.temperature;
+			settings.model.topP = template.settings.topP;
+
+			settings.tools = template.tools;
+
+			return settings;
+		});
+	} else {
+		for (const modelID of template.settings.modelIDs) {
+			if (get(availableModels).find((model) => model.id === modelID)) {
+				chatDataMap.update((settings) => {
+					if (!settings[currentChatID].model) return settings;
+
+					settings[currentChatID].model.model = modelID;
+					return settings;
+				});
+				break;
+			}
+		}
+
+		chatDataMap.update((settings) => {
+			if (!settings[currentChatID].model) return settings;
+
+			settings[currentChatID].model.systemMessage = template.settings.systemMessage;
+			settings[currentChatID].model.temperature = template.settings.temperature;
+			settings[currentChatID].model.topP = template.settings.topP;
+
+			settings[currentChatID].tools = template.tools;
+
+			return settings;
+		});
+	}
+
+	currentModelTemplate.set(template.name);
+}
+
+export async function addCustomModelTemplate(template: ModelTemplate) {
+	customModelTemplates.update((templates) => {
+		templates.push(template);
+		return templates;
+	});
+
+	await database.changeCustomModelTemplates(get(customModelTemplates));
+}
+
+export async function removeCustomModelTemplateAtIndex(index: number) {
+	customModelTemplates.update((templates) => {
+		templates.splice(index, 1);
+		return templates;
+	});
+
+	await database.changeCustomModelTemplates(get(customModelTemplates));
+}

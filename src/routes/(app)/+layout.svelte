@@ -4,6 +4,7 @@
 	import {
 		anthropicApiKey,
 		availableModels,
+		customModelTemplates,
 		geminiApiKey,
 		groqApiKey,
 		hiddenTags,
@@ -37,6 +38,7 @@
 		geminiApiKey.set(data.geminiApiKey);
 
 		hiddenTags.set(data.hiddenTags);
+		customModelTemplates.set(data.customModelTemplates);
 	}
 
 	onMount(async () => {

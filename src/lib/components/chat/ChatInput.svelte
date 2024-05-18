@@ -7,6 +7,9 @@
 	import { cn } from "$lib/utils";
 	import { createEventDispatcher } from "svelte";
 	import ImageListInput from "$lib/components/chat/ImageListInput.svelte";
+	import InputAction from "$lib/components/chat/InputAction.svelte";
+	import { applyModelTemplate, defaultModelTemplates, type ModelTemplate } from '$lib/scripts/misc/model-templates';
+	import { customModelTemplates } from "$lib/scripts/misc/stores";
 
 	const dispatch = createEventDispatcher<{ submit: { value: string; images?: File[] } }>();
 
@@ -27,26 +30,22 @@
 
 	let cursorPos = 0;
 	let actionWord: string = "";
+
 	$: actionWord =
 		value
 			.slice(0, cursorPos)
 			.split(/[\s\n]+/)
 			.pop() || "";
+
 	$: {
 		isActionCommand = false;
-		isActionMention = false;
-
-		if (actionWord.startsWith("/")) {
-			isActionCommand = true;
-		}
-
-		if (actionWord.startsWith("@")) {
-			isActionMention = true;
-		}
+		isActionMention = actionWord.startsWith("@");
 	}
 
 	let isActionCommand = false;
 	let isActionMention = false;
+
+	let mentionElement: ModelTemplate | undefined;
 
 	$: if (!canAttachImages) imageInputFiles = [];
 
@@ -66,16 +65,49 @@
 	}
 
 	function onKeyDown(event: KeyboardEvent) {
+		if (isActionMention) {
+			if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+				event.preventDefault();
+			}
+
+			if(event.key === "Enter" && !event.shiftKey) {
+				event.preventDefault();
+				deleteActionWord();
+
+				if(mentionElement) {
+					applyModelTemplate(mentionElement)
+				}
+
+				return
+			}
+		}
+
 		if (event.key === "Enter" && !event.shiftKey) {
 			event.preventDefault();
 			send();
 		}
 	}
+
+	function deleteActionWord() {
+		if(!actionWord) return;
+
+		const start = value.slice(0, cursorPos).lastIndexOf(actionWord);
+
+		value = value.slice(0, start) + value.slice(start + actionWord.length);
+	}
 </script>
 
 <div class="rounded-2lg bg-background">
 	<div class={cn(isActionCommand ? "block" : "hidden")}>Command: {actionWord}</div>
-	<div class={cn(isActionMention ? "block" : "hidden")}>Mention: {actionWord}</div>
+	<div class={cn(isActionMention ? "block" : "hidden")}>
+		<InputAction
+			{actionWord}
+			actionElements={[...defaultModelTemplates, ...$customModelTemplates].map((template) => {
+				return { name: template.name, element: template };
+			})}
+			bind:selectedElement={mentionElement}
+		/>
+	</div>
 	<div class={cn(imageInputFiles.length > 0 ? "block" : "hidden")}>
 		<ImageListInput bind:imageFiles={imageInputFiles} />
 	</div>

@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AssistantStructure, ChatMessageStructure } from "$lib/scripts/misc/types";
 import * as errorHandler from "$lib/scripts/operations/error-handler";
 import { toast } from "svelte-sonner";
+import type { ModelTemplate } from "$lib/scripts/misc/model-templates";
 
 class Database {
 	private _supabaseClient: SupabaseClient | null = null;
@@ -271,6 +272,33 @@ class Database {
 		}
 
 		toast.success("Hidden tags saved");
+		return true;
+	}
+
+	async changeCustomModelTemplates(customModelTemplates: ModelTemplate[]) {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return false;
+		}
+
+		const userId = await this._supabaseClient.auth.getUser().then((user) => user.data.user?.id);
+
+		if (!userId) {
+			toast.error("You need to be logged in to save your custom model templates.");
+			return false;
+		}
+
+		const response = await this._supabaseClient
+			.from("Profiles")
+			.update({ custom_model_templates: customModelTemplates })
+			.eq("id", userId);
+
+		if (response.error) {
+			toast.error(response.error.message);
+			return false;
+		}
+
+		toast.success("Custom model templates saved");
 		return true;
 	}
 }
