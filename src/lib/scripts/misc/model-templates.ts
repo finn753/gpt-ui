@@ -35,7 +35,7 @@ const casualChatTemplate: ModelTemplate = {
 		temperature: 0.5,
 		topP: 0.5
 	},
-	tools: { "current-time": {}, "web-search": {}, "link-preview": {} }
+	tools: { "current-time": {}, "web-search": {}, "link-preview": {}, memory: {} }
 };
 
 const friendlyConversationTemplate: ModelTemplate = {
@@ -53,7 +53,7 @@ const friendlyConversationTemplate: ModelTemplate = {
 		temperature: 0.5,
 		topP: 0.5
 	},
-	tools: { "current-time": {}, "web-search": {}, "link-preview": {} }
+	tools: { "current-time": {}, "web-search": {}, "link-preview": {}, memory: {} }
 };
 
 const creativeWritingTemplate: ModelTemplate = {
@@ -66,7 +66,7 @@ const creativeWritingTemplate: ModelTemplate = {
 		temperature: 0.7,
 		topP: 0.8
 	},
-	tools: {}
+	tools: { memory: {} }
 };
 
 const codeGenerationTemplate: ModelTemplate = {
@@ -79,7 +79,7 @@ const codeGenerationTemplate: ModelTemplate = {
 		temperature: 0.1,
 		topP: 0.2
 	},
-	tools: {}
+	tools: { memory: {} }
 };
 
 const socraticTutorTemplate: ModelTemplate = {
@@ -98,7 +98,7 @@ const socraticTutorTemplate: ModelTemplate = {
 		temperature: 0.7,
 		topP: 0.8
 	},
-	tools: { "current-time": {}, "link-preview": {} }
+	tools: { "current-time": {}, "link-preview": {}, memory: {} }
 };
 
 const timeManagementCoachTemplate: ModelTemplate = {
@@ -117,7 +117,7 @@ const timeManagementCoachTemplate: ModelTemplate = {
 		temperature: 0.4,
 		topP: 0.5
 	},
-	tools: { "current-time": {}, "web-search": {}, "link-preview": {} }
+	tools: { "current-time": {}, "web-search": {}, "link-preview": {}, memory: {} }
 };
 
 const personalFinanceAdvisorTemplate: ModelTemplate = {
@@ -130,7 +130,7 @@ const personalFinanceAdvisorTemplate: ModelTemplate = {
 		temperature: 0.3,
 		topP: 0.4
 	},
-	tools: { "current-time": {}, "web-search": {}, "link-preview": {} }
+	tools: { "current-time": {}, "web-search": {}, "link-preview": {}, memory: {} }
 };
 
 export const defaultModelTemplates: ModelTemplate[] = [

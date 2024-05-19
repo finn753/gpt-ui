@@ -5,7 +5,8 @@ import type {
 	GenerationHistory,
 	ChatMessageStructure,
 	ModelType,
-	NewChatSettings
+	NewChatSettings,
+	MemoryElement
 } from "$lib/scripts/misc/types";
 import type { ModelTemplate } from "$lib/scripts/misc/model-templates";
 
@@ -32,3 +33,5 @@ export const geminiApiKey = writable<string | null>();
 
 export const hiddenTags = writable<string[]>([]);
 export const customModelTemplates = writable<ModelTemplate[]>([]);
+
+export const memoryLDS = writable<MemoryElement[]>([]);

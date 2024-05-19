@@ -1,7 +1,11 @@
 import type { LiveDataSource } from "$lib/scripts/misc/types";
 import { getWebsiteContent, runTavilySearch } from "$lib/scripts/api-wrapper/browsing";
 import type { MessageFormat } from "$lib/scripts/api-wrapper/ModelWrapper";
-import { lastLiveDataSourceOutputOfChat, selectedChatID } from "$lib/scripts/misc/stores";
+import {
+	lastLiveDataSourceOutputOfChat,
+	memoryLDS,
+	selectedChatID
+} from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
 
 export const currentTimeSource: LiveDataSource = {
@@ -11,13 +15,20 @@ export const currentTimeSource: LiveDataSource = {
 	},
 	output: async () => {
 		const date = new Date();
+
 		const hours = date.getHours();
 		const minutes = date.getMinutes();
 		const seconds = date.getSeconds();
+		const time = `${hours}:${minutes}:${seconds}`;
+
+		const day = date.getDate();
+		const month = date.toLocaleString("en", { month: "long" });
+		const year = date.getFullYear();
+		const dateStr = `${day}/${month}/${year}`;
 
 		return {
-			content: `The current time is ${hours}:${minutes}:${seconds}`,
-			uiHint: `${hours}:${minutes}:${seconds}`
+			content: `Current time: ${time}\nCurrent date: ${dateStr}`,
+			uiHint: `${time} - ${dateStr}`
 		};
 	},
 	outputLocation: "system"
@@ -79,10 +90,28 @@ export const websitePreviewSource: LiveDataSource = {
 	outputLocation: "user"
 };
 
+export const memorySource: LiveDataSource = {
+	name: "Memory",
+	activation: async (query: string) => {
+		return !!query;
+	},
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	output: async (query: string) => {
+		const memories = get(memoryLDS).map((m) => m.content);
+
+		return {
+			content: "Additional Information:\n´´´\n- " + memories.join("\n- ") + "\n´´´",
+			uiHint: "Used memories: " + (memories.length || "None")
+		};
+	},
+	outputLocation: "system"
+};
+
 export const liveDataSourceMap: Record<string, LiveDataSource> = {
 	"current-time": currentTimeSource,
 	"web-search": webSearchSource,
-	"link-preview": websitePreviewSource
+	"link-preview": websitePreviewSource,
+	memory: memorySource
 };
 
 export async function injectLiveDataSourceIntoMessages(

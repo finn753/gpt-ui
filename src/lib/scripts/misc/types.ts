@@ -52,3 +52,7 @@ export type LiveDataSource = {
 	output: (query: string) => Promise<{ content: string; uiHint?: string }>;
 	outputLocation: "system" | "user";
 };
+
+export type MemoryElement = {
+	content: string;
+};

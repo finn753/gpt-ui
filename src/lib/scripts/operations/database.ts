@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { AssistantStructure, ChatMessageStructure } from "$lib/scripts/misc/types";
+import type {
+	AssistantStructure,
+	ChatMessageStructure,
+	MemoryElement
+} from "$lib/scripts/misc/types";
 import * as errorHandler from "$lib/scripts/operations/error-handler";
 import { toast } from "svelte-sonner";
 import type { ModelTemplate } from "$lib/scripts/misc/model-templates";
@@ -299,6 +303,33 @@ class Database {
 		}
 
 		toast.success("Custom model templates saved");
+		return true;
+	}
+
+	async changeMemoryLDS(memories: MemoryElement[]) {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return false;
+		}
+
+		const userId = await this._supabaseClient.auth.getUser().then((user) => user.data.user?.id);
+
+		if (!userId) {
+			toast.error("You need to be logged in to save to memory.");
+			return false;
+		}
+
+		const response = await this._supabaseClient
+			.from("Profiles")
+			.update({ lds_memory: memories })
+			.eq("id", userId);
+
+		if (response.error) {
+			toast.error(response.error.message);
+			return false;
+		}
+
+		toast.success("Memories saved");
 		return true;
 	}
 }
