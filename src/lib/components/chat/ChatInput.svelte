@@ -8,7 +8,11 @@
 	import { createEventDispatcher } from "svelte";
 	import ImageListInput from "$lib/components/chat/ImageListInput.svelte";
 	import InputAction from "$lib/components/chat/InputAction.svelte";
-	import { applyModelTemplate, defaultModelTemplates, type ModelTemplate } from '$lib/scripts/misc/model-templates';
+	import {
+		applyModelTemplate,
+		defaultModelTemplates,
+		type ModelTemplate
+	} from "$lib/scripts/misc/model-templates";
 	import { customModelTemplates } from "$lib/scripts/misc/stores";
 
 	const dispatch = createEventDispatcher<{ submit: { value: string; images?: File[] } }>();
@@ -70,15 +74,15 @@
 				event.preventDefault();
 			}
 
-			if(event.key === "Enter" && !event.shiftKey) {
+			if (event.key === "Enter" && !event.shiftKey) {
 				event.preventDefault();
 				deleteActionWord();
 
-				if(mentionElement) {
-					applyModelTemplate(mentionElement)
+				if (mentionElement) {
+					applyModelTemplate(mentionElement);
 				}
 
-				return
+				return;
 			}
 		}
 
@@ -89,7 +93,7 @@
 	}
 
 	function deleteActionWord() {
-		if(!actionWord) return;
+		if (!actionWord) return;
 
 		const start = value.slice(0, cursorPos).lastIndexOf(actionWord);
 

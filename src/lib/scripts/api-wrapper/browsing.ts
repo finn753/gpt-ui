@@ -1,7 +1,9 @@
 import { get } from "svelte/store";
 import { tavilyApiKey } from "$lib/scripts/misc/stores";
 
-export async function runTavilySearch(query: string): Promise<string> {
+export async function runTavilySearch(
+	query: string
+): Promise<{ results: { title: string; url: string; content: string }[] } | { error: string }> {
 	const body: Record<string, unknown> = {
 		query: query,
 		api_key: get(tavilyApiKey)
@@ -19,12 +21,16 @@ export async function runTavilySearch(query: string): Promise<string> {
 	if (!response.ok) {
 		console.error("Request failed with status code " + response.status + ": " + json.error);
 
-		return "Request failed with status code " + response.status + ": " + json.error;
+		return { error: "Request failed with status code " + response.status + ": " + json.error };
 	}
 	if (!Array.isArray(json.results)) {
-		return "Could not parse Tavily results. Please try again";
+		return { error: "Could not parse search results. Please try again" };
 	}
-	return JSON.stringify(json.results);
+	return {
+		results: json.results.map((result: { title: string; url: string; content: string }) => ({
+			...result
+		}))
+	};
 }
 
 export async function getWebsiteContent(url: string): Promise<string> {

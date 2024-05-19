@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from "$lib/components/ui/button";
 
 	export let title = "Action";
 	export let actionWord = "";
@@ -21,27 +21,36 @@
 		selectedElement = undefined;
 	}
 
-	$: selectedElementIndex = Math.max(0,Math.min(selectedElementIndex, filteredElements.length - 1));
+	$: selectedElementIndex = Math.max(
+		0,
+		Math.min(selectedElementIndex, filteredElements.length - 1)
+	);
 
 	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'ArrowUp') {
+		if (event.key === "ArrowUp") {
 			selectedElementIndex = Math.max(0, selectedElementIndex - 1);
-		} else if (event.key === 'ArrowDown') {
+		} else if (event.key === "ArrowDown") {
 			selectedElementIndex = Math.min(filteredElements.length - 1, selectedElementIndex + 1);
 		}
 
 		const element = elementRefs[selectedElementIndex];
 
-		element.scrollIntoView({ behavior: 'instant' });
+		if (element) element.scrollIntoView({ behavior: "instant" });
 	}
 </script>
 
-<svelte:window on:keydown={handleKeydown}/>
+<svelte:window on:keydown={handleKeydown} />
 
-<div class="flex flex-col max-h-48 overflow-y-auto p-2">
-	<h3 class="text-xl font-semibold p-2 pt-0">{title}</h3>
+<div class="flex max-h-48 flex-col overflow-y-auto p-2">
+	<h3 class="p-2 pt-0 text-xl font-semibold">{title}</h3>
 	{#each filteredElements as { name }, index}
 		<div bind:this={elementRefs[index]}></div>
-		<Button variant={index === selectedElementIndex ? "glass" : "ghost"} class="justify-start" on:click={() => {selectedElementIndex = index}}>{name}</Button>
+		<Button
+			variant={index === selectedElementIndex ? "glass" : "ghost"}
+			class="justify-start"
+			on:click={() => {
+				selectedElementIndex = index;
+			}}>{name}</Button
+		>
 	{/each}
 </div>

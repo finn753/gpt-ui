@@ -13,6 +13,7 @@ export const chatDataMap = writable<ChatDataMap>({});
 export const chatContentMap = writable<ChatContentMap>({});
 export const selectedChatID = writable<string | null>();
 export const lastContextOfChat = writable<Record<string, ChatMessageStructure[]>>({});
+export const lastLiveDataSourceOutputOfChat = writable<Record<string, Record<string, string>>>({});
 export const newChatSettings = writable<NewChatSettings>({});
 export const currentModelTemplate = writable<string>("");
 export const generationHistory = writable<GenerationHistory>({ images: [], voice: [] });
