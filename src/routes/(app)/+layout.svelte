@@ -8,6 +8,7 @@
 		geminiApiKey,
 		groqApiKey,
 		hiddenTags,
+		memoryLDS,
 		mistralApiKey,
 		openaiApiKey,
 		perplexityApiKey,
@@ -39,6 +40,8 @@
 
 		hiddenTags.set(data.hiddenTags);
 		customModelTemplates.set(data.customModelTemplates);
+
+		memoryLDS.set(data.memories);
 	}
 
 	onMount(async () => {

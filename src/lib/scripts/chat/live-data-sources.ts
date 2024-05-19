@@ -1,6 +1,12 @@
 import type { LiveDataSource } from "$lib/scripts/misc/types";
 import { getWebsiteContent, runTavilySearch } from "$lib/scripts/api-wrapper/browsing";
 import type { MessageFormat } from "$lib/scripts/api-wrapper/ModelWrapper";
+import {
+	lastLiveDataSourceOutputOfChat,
+	memoryLDS,
+	selectedChatID
+} from "$lib/scripts/misc/stores";
+import { get } from "svelte/store";
 
 export const currentTimeSource: LiveDataSource = {
 	name: "Current Time",
@@ -9,11 +15,21 @@ export const currentTimeSource: LiveDataSource = {
 	},
 	output: async () => {
 		const date = new Date();
+
 		const hours = date.getHours();
 		const minutes = date.getMinutes();
 		const seconds = date.getSeconds();
+		const time = `${hours}:${minutes}:${seconds}`;
 
-		return `The current time is ${hours}:${minutes}:${seconds}`;
+		const day = date.getDate();
+		const month = date.toLocaleString("en", { month: "long" });
+		const year = date.getFullYear();
+		const dateStr = `${day}/${month}/${year}`;
+
+		return {
+			content: `Current time: ${time}\nCurrent date: ${dateStr}`,
+			uiHint: `${time} - ${dateStr}`
+		};
 	},
 	outputLocation: "system"
 };
@@ -35,33 +51,67 @@ export const webSearchSource: LiveDataSource = {
 	output: async (query: string) => {
 		const result = await runTavilySearch(query);
 
-		return "Web search results:\n´´´\n" + result + "\n´´´";
+		if ("error" in result) {
+			return { content: "An error occurred while searching the web", uiHint: result.error };
+		}
+
+		const resultMarkdown: string = result.results
+			.map((r) => `**[${r.title}](${r.url})**\n${r.content}`)
+			.join("\n\n");
+
+		const resultDomains = result.results.map((r) => new URL(r.url).hostname);
+
+		return {
+			content: "This is the result of your web search:\n´´´\n" + resultMarkdown + "\n´´´",
+			uiHint: "Search results from " + resultDomains.join(", ")
+		};
 	},
-	outputLocation: "user"
+	outputLocation: "system"
 };
 
 export const websitePreviewSource: LiveDataSource = {
 	name: "Link Preview",
 	activation: async (query: string) => {
-		const urlRegex = /(https?:\/\/[^\s]+)/g;
+		const urlRegex = /(https?:\/\/\S+)/g;
 		return urlRegex.test(query);
 	},
 	output: async (query: string) => {
-		const urlRegex = /(https?:\/\/[^\s]+)/g;
+		const urlRegex = /(https?:\/\/\S+)/g;
 		const urls = query.match(urlRegex);
 		const content = urls ? await Promise.all(urls.map((url) => getWebsiteContent(url))) : [];
 
-		if (content.length === 0) return "";
+		if (content.length === 0) return { content: "" };
 
-		return "Website Content:\n´´´\n" + content.join("\n\n") + "\n´´´";
+		return {
+			content: "Website Content:\n´´´\n" + content.join("\n\n") + "\n´´´",
+			uiHint: `Visited ${content.length} links`
+		};
 	},
 	outputLocation: "user"
+};
+
+export const memorySource: LiveDataSource = {
+	name: "Memory",
+	activation: async (query: string) => {
+		return !!query;
+	},
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	output: async (query: string) => {
+		const memories = get(memoryLDS).map((m) => m.content);
+
+		return {
+			content: "Additional Information:\n´´´\n- " + memories.join("\n- ") + "\n´´´",
+			uiHint: "Used memories: " + (memories.length || "None")
+		};
+	},
+	outputLocation: "system"
 };
 
 export const liveDataSourceMap: Record<string, LiveDataSource> = {
 	"current-time": currentTimeSource,
 	"web-search": webSearchSource,
-	"link-preview": websitePreviewSource
+	"link-preview": websitePreviewSource,
+	memory: memorySource
 };
 
 export async function injectLiveDataSourceIntoMessages(
@@ -82,22 +132,34 @@ export async function injectLiveDataSourceIntoMessages(
 
 	const systemOutputs: string[] = [];
 	const userOutputs: string[] = [];
+	const uiHints: Record<string, string> = {};
 
 	for (const source of sources) {
 		if (await source.activation(queryMessage.content)) {
 			const output = await source.output(queryMessage.content);
 
+			uiHints[source.name] = output.uiHint || "Used";
+
 			if (source.outputLocation === "system") {
-				systemOutputs.push(output);
+				systemOutputs.push(output.content);
 			}
 
 			if (source.outputLocation === "user") {
-				userOutputs.push(output);
+				userOutputs.push(output.content);
 			}
 		}
 
 		systemMessage.content += "\n\n" + systemOutputs.join("\n\n");
 		queryMessage.content += "\n\n" + userOutputs.join("\n\n");
+
+		const currentChatID = get(selectedChatID);
+
+		if (currentChatID) {
+			lastLiveDataSourceOutputOfChat.update((prev) => {
+				prev[currentChatID] = uiHints;
+				return prev;
+			});
+		}
 	}
 
 	return [systemMessage, ...messages, queryMessage];

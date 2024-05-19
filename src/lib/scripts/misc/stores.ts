@@ -5,7 +5,8 @@ import type {
 	GenerationHistory,
 	ChatMessageStructure,
 	ModelType,
-	NewChatSettings
+	NewChatSettings,
+	MemoryElement
 } from "$lib/scripts/misc/types";
 import type { ModelTemplate } from "$lib/scripts/misc/model-templates";
 
@@ -13,6 +14,7 @@ export const chatDataMap = writable<ChatDataMap>({});
 export const chatContentMap = writable<ChatContentMap>({});
 export const selectedChatID = writable<string | null>();
 export const lastContextOfChat = writable<Record<string, ChatMessageStructure[]>>({});
+export const lastLiveDataSourceOutputOfChat = writable<Record<string, Record<string, string>>>({});
 export const newChatSettings = writable<NewChatSettings>({});
 export const currentModelTemplate = writable<string>("");
 export const generationHistory = writable<GenerationHistory>({ images: [], voice: [] });
@@ -31,3 +33,5 @@ export const geminiApiKey = writable<string | null>();
 
 export const hiddenTags = writable<string[]>([]);
 export const customModelTemplates = writable<ModelTemplate[]>([]);
+
+export const memoryLDS = writable<MemoryElement[]>([]);

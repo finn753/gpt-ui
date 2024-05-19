@@ -13,6 +13,8 @@ export const load = async (event) => {
 	const hiddenTags = response.data.hidden_tags || [];
 	const customModelTemplates = response.data.custom_model_templates || [];
 
+	const memories = response.data.lds_memory || [];
+
 	return {
 		openaiApiKey,
 		tavilyApiKey,
@@ -22,6 +24,7 @@ export const load = async (event) => {
 		perplexityApiKey,
 		geminiApiKey,
 		hiddenTags,
-		customModelTemplates
+		customModelTemplates,
+		memories
 	};
 };

@@ -10,6 +10,7 @@
 		chatDataMap,
 		currentModelTemplate,
 		lastContextOfChat,
+		lastLiveDataSourceOutputOfChat,
 		newChatSettings
 	} from "$lib/scripts/misc/stores";
 	import { Label } from "$lib/components/ui/label";
@@ -352,6 +353,11 @@
 							onToolToggle(key);
 						}}
 					/>
+					{#if chatID && $lastLiveDataSourceOutputOfChat[chatID] && $lastLiveDataSourceOutputOfChat[chatID][liveDataSource.name]}
+						<p class="text-muted-foreground">
+							{$lastLiveDataSourceOutputOfChat[chatID][liveDataSource.name]}
+						</p>
+					{/if}
 				</Label>
 			{/each}
 		</Card.Content>

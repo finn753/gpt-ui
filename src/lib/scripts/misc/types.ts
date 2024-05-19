@@ -49,6 +49,10 @@ export type ModelType = {
 export type LiveDataSource = {
 	name: string;
 	activation: (query: string) => Promise<boolean>;
-	output: (query: string) => Promise<string>;
+	output: (query: string) => Promise<{ content: string; uiHint?: string }>;
 	outputLocation: "system" | "user";
+};
+
+export type MemoryElement = {
+	content: string;
 };

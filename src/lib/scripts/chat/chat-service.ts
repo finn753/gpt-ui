@@ -1,4 +1,4 @@
-import { chatContentMap, chatDataMap, hiddenTags } from "$lib/scripts/misc/stores";
+import { chatContentMap, chatDataMap, hiddenTags, selectedChatID } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
 import chatOperations from "$lib/scripts/chat/chat-operations";
 import type { ChatDataMap, ChatMessageStructure } from "$lib/scripts/misc/types";
@@ -104,13 +104,15 @@ class ChatService {
 	}
 
 	public searchChats(chatMap: ChatDataMap, query: string): ChatDataMap {
-		const lowerCaseQuery = query.toLowerCase();
+		const lowerCaseQuery = query.trim().toLowerCase();
 		const lowerCaseQueryWords = lowerCaseQuery.split(" ");
 
-		const filteredChats = Object.entries(chatMap).filter(([, chat]) => {
+		const filteredChats = Object.entries(chatMap).filter(([chatID, chat]) => {
 			const lowerCaseTitle = chat.title.toLowerCase();
 			const lowerCaseSummary = chat.summary.toLowerCase();
 			const lowerCaseTags = chat.tags.map((tag) => tag.toLowerCase());
+
+			const currentChatID = get(selectedChatID);
 
 			const isTagHidden = get(hiddenTags).some(
 				(hiddenTag) =>
@@ -118,8 +120,15 @@ class ChatService {
 					!lowerCaseQueryWords.includes(hiddenTag)
 			);
 
+			if (currentChatID === chatID)
+				console.error(
+					"Current chat ID is the same as the chat ID being filtered",
+					isTagHidden,
+					currentChatID === chatID || !isTagHidden
+				);
+
 			return (
-				!isTagHidden &&
+				(currentChatID === chatID || !isTagHidden) &&
 				(lowerCaseTitle.includes(lowerCaseQuery) ||
 					lowerCaseSummary.includes(lowerCaseQuery) ||
 					lowerCaseQueryWords.some((queryWord) =>
