@@ -4,7 +4,7 @@
 
 @layer base {
 	:root {
-		--hueshift: 45;
+		--hueshift: 35;
 
 		--background: calc(212.7 + var(--hueshift)), 26.8%, 83.9%;
 		--foreground: calc(222.2 + var(--hueshift)) 84% 4.9%;
@@ -82,6 +82,5 @@
 	}
 	body {
 		@apply bg-level-one text-foreground;
-		filter: hue-rotate(var(--hueshift) deg);
 	}
 }
