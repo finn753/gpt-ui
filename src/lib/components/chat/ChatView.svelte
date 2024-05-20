@@ -11,6 +11,7 @@
 	import { generationHelper } from "$lib/scripts/chat/generation-helper";
 	import modelManager from "$lib/scripts/chat/model-manager";
 	import ModelTemplateLibrary from "$lib/components/chat/ModelTemplateLibrary.svelte";
+	import { Button } from '$lib/components/ui/button';
 
 	export let chatID: string;
 	export let generating = false;
@@ -154,6 +155,14 @@
 			await chatService.sendAssistantMessage(chatID, [...response]);
 		}
 	}
+
+	async function onEditButtonClick() {
+		const lastMessage = messages[messages.length - 1];
+		if (lastMessage.role === "user" && lastMessage.id) {
+			await chatOperations.deleteMessage(lastMessage.id, chatID);
+			inputValue = lastMessage.content;
+		}
+	}
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
@@ -176,6 +185,13 @@
 				{/each}
 			{/if}
 		</div>
+		{#if messages.length > 0 && !generating}
+			<div class="w-full flex justify-center items-center p-4 gap-2">
+				{#if messages[messages.length - 1]?.role === "user"}
+					<Button variant="glass" on:click={onEditButtonClick}>Edit</Button>
+				{/if}
+			</div>
+		{/if}
 	</div>
 
 	{#if isNewChat}
