@@ -7,7 +7,7 @@
 		chatDataMap,
 		lastLiveDataSourceOutputOfChat,
 		newChatSettings
-	} from '$lib/scripts/misc/stores';
+	} from "$lib/scripts/misc/stores";
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";

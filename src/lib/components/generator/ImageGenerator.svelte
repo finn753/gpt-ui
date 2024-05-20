@@ -5,6 +5,7 @@
 	import { generationHistory } from "$lib/scripts/misc/stores";
 	import * as Select from "$lib/components/ui/select";
 	import * as modelInvoker from "$lib/scripts/api-wrapper/model-invoker";
+	import { LoaderCircle } from "lucide-svelte";
 
 	let className = "";
 	export { className as class };
@@ -18,13 +19,17 @@
 	let model = modelSelection[0].value;
 	let selectionModel: { value: string; label: string } = modelSelection[0];
 
+	let generating = false;
+
 	async function generateImage() {
 		const prompt = inputValue.trim();
 		inputValue = "";
 
 		if (!prompt) return;
 
+		generating = true;
 		const generatedImage = await modelInvoker.generateImage(prompt, model);
+		generating = false;
 
 		if (!generatedImage) return;
 
@@ -56,10 +61,14 @@
 			</Select.Content>
 			<Select.Input name="selectedModel" />
 		</Select.Root>
-		<Button class="h-10" on:click={generateImage}>Generate</Button>
+		<Button class="h-10" on:click={generateImage} disabled={generating}>Generate</Button>
 	</div>
 
-	{#if $generationHistory.images[0]}
+	{#if generating}
+		<div class="size-full p-2">
+			<LoaderCircle class="animate-spin opacity-50" size={24} />
+		</div>
+	{:else if $generationHistory.images[0]}
 		<div class="flex flex-col items-center gap-2">
 			<img
 				src="data:image/png;base64,{$generationHistory.images[0].b64_json}"
