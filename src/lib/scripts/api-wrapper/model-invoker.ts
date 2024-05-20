@@ -36,9 +36,8 @@ export async function generateVoice(input: string, voice: string) {
 			input
 		});
 
-		const buffer = await mp3.arrayBuffer();
-		const uint8Array = new Uint8Array(buffer);
-		return btoa(String.fromCharCode.apply(null, uint8Array as unknown as number[]));
+		const blob = await mp3.blob();
+		return URL.createObjectURL(blob);
 	} catch (e: unknown) {
 		errorHandler.handleError("Failed to generate voice", e);
 		return;

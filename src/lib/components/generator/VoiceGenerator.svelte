@@ -65,10 +65,8 @@
 
 	{#if $generationHistory.voice[0]}
 		<div class="flex flex-col items-center gap-2">
-			<audio class="w-full" controls src="data:audio/mpeg;base64,{$generationHistory.voice[0]}" />
-			<Button class="w-full" href="data:audio/mpeg;base64,{$generationHistory.voice[0]}" download
-				>Download</Button
-			>
+			<audio class="w-full" controls src={$generationHistory.voice[0]} />
+			<Button class="w-full" href={$generationHistory.voice[0]} download>Download</Button>
 		</div>
 	{/if}
 </div>
