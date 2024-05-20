@@ -120,13 +120,6 @@ class ChatService {
 					!lowerCaseQueryWords.includes(hiddenTag)
 			);
 
-			if (currentChatID === chatID)
-				console.error(
-					"Current chat ID is the same as the chat ID being filtered",
-					isTagHidden,
-					currentChatID === chatID || !isTagHidden
-				);
-
 			return (
 				(currentChatID === chatID || !isTagHidden) &&
 				(lowerCaseTitle.includes(lowerCaseQuery) ||

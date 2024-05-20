@@ -2,7 +2,12 @@
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
 	import type { ChatMessageStructure } from "$lib/scripts/misc/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/scripts/misc/stores";
+	import {
+		chatContentMap,
+		chatDataMap,
+		lastLiveDataSourceOutputOfChat,
+		newChatSettings
+	} from "$lib/scripts/misc/stores";
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";
@@ -11,6 +16,7 @@
 	import { generationHelper } from "$lib/scripts/chat/generation-helper";
 	import modelManager from "$lib/scripts/chat/model-manager";
 	import ModelTemplateLibrary from "$lib/components/chat/ModelTemplateLibrary.svelte";
+	import { Button } from "$lib/components/ui/button";
 
 	export let chatID: string;
 	export let generating = false;
@@ -79,7 +85,10 @@
 
 		generating = false;
 
-		if (startedNewChat) await goto(`/chats/${chatID}`);
+		if (startedNewChat) {
+			$lastLiveDataSourceOutputOfChat[chatID] = $newChatSettings.toolResults || {};
+			await goto(`/chats/${chatID}`);
+		}
 
 		if (!$chatDataMap[chatID].title) {
 			await chatService.setGeneratedTitleForChat(chatID);
@@ -154,6 +163,14 @@
 			await chatService.sendAssistantMessage(chatID, [...response]);
 		}
 	}
+
+	async function onEditButtonClick() {
+		const lastMessage = messages[messages.length - 1];
+		if (lastMessage.role === "user" && lastMessage.id) {
+			await chatOperations.deleteMessage(lastMessage.id, chatID);
+			inputValue = lastMessage.content;
+		}
+	}
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
@@ -168,14 +185,21 @@
 	>
 		<div class="flex flex-col">
 			{#each messages.filter((msg) => msg.content !== "") as message}
-				<ChatMessage {message} {chatID} on:retry={onRetrySendMessage} />
+				<ChatMessage {message} {chatID} on:retry={onRetrySendMessage} bind:generating />
 			{/each}
 			{#if generatingProgress}
 				{#each generatingProgress as message}
-					<ChatMessage {message} {chatID} />
+					<ChatMessage {message} {chatID} bind:generating />
 				{/each}
 			{/if}
 		</div>
+		{#if messages.length > 0 && !generating}
+			<div class="flex w-full items-center justify-center gap-2 p-4">
+				{#if messages[messages.length - 1]?.role === "user"}
+					<Button variant="glass" on:click={onEditButtonClick}>Edit</Button>
+				{/if}
+			</div>
+		{/if}
 	</div>
 
 	{#if isNewChat}

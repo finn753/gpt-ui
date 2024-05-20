@@ -4,6 +4,7 @@ import type { MessageFormat } from "$lib/scripts/api-wrapper/ModelWrapper";
 import {
 	lastLiveDataSourceOutputOfChat,
 	memoryLDS,
+	newChatSettings,
 	selectedChatID
 } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
@@ -157,6 +158,11 @@ export async function injectLiveDataSourceIntoMessages(
 		if (currentChatID) {
 			lastLiveDataSourceOutputOfChat.update((prev) => {
 				prev[currentChatID] = uiHints;
+				return prev;
+			});
+		} else {
+			newChatSettings.update((prev) => {
+				prev.toolResults = uiHints;
 				return prev;
 			});
 		}
