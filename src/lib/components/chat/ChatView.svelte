@@ -11,7 +11,7 @@
 	import { generationHelper } from "$lib/scripts/chat/generation-helper";
 	import modelManager from "$lib/scripts/chat/model-manager";
 	import ModelTemplateLibrary from "$lib/components/chat/ModelTemplateLibrary.svelte";
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from "$lib/components/ui/button";
 
 	export let chatID: string;
 	export let generating = false;
@@ -177,16 +177,16 @@
 	>
 		<div class="flex flex-col">
 			{#each messages.filter((msg) => msg.content !== "") as message}
-				<ChatMessage {message} {chatID} on:retry={onRetrySendMessage} />
+				<ChatMessage {message} {chatID} on:retry={onRetrySendMessage} bind:generating />
 			{/each}
 			{#if generatingProgress}
 				{#each generatingProgress as message}
-					<ChatMessage {message} {chatID} />
+					<ChatMessage {message} {chatID} bind:generating />
 				{/each}
 			{/if}
 		</div>
 		{#if messages.length > 0 && !generating}
-			<div class="w-full flex justify-center items-center p-4 gap-2">
+			<div class="flex w-full items-center justify-center gap-2 p-4">
 				{#if messages[messages.length - 1]?.role === "user"}
 					<Button variant="glass" on:click={onEditButtonClick}>Edit</Button>
 				{/if}

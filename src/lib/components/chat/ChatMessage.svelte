@@ -13,11 +13,13 @@
 	import { chatContentMap, chatDataMap, currentTTSMessageID } from "$lib/scripts/misc/stores";
 	import { generationHelper } from "$lib/scripts/chat/generation-helper";
 	import database from "$lib/scripts/operations/database";
+	import { cn } from "$lib/utils";
 
 	const dispatch = createEventDispatcher<{ retry: { message: ChatMessageStructure } }>();
 
 	export let message: ChatMessageStructure;
 	export let chatID: string;
+	export let generating = false;
 
 	let role: string = "";
 	let model: string = "";
@@ -69,6 +71,8 @@
 
 		if (!queryMessage || queryMessage.role !== "assistant") return;
 
+		generating = true;
+
 		const context = await chatService.getContextFromMessages(
 			messages,
 			get(chatDataMap)[chatID].summary
@@ -94,7 +98,10 @@
 
 			message.content = previousContent + "\n" + newContent;
 		}
+
 		await database.updateMessage(message.id, message);
+
+		generating = false;
 	}
 
 	function textToSpeech() {
@@ -170,7 +177,10 @@
 	{/if}
 
 	<div
-		class="flex flex-row items-center gap-2 py-2 opacity-0 transition-opacity group-hover:opacity-100"
+		class={cn(
+			"flex flex-row items-center gap-2 py-2 opacity-0 transition-opacity",
+			generating ? "" : "group-hover:opacity-100"
+		)}
 	>
 		{#if role === "assistant"}
 			<Button
