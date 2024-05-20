@@ -30,15 +30,19 @@
 
 	$: selectedModel = modelSelection.find((m) => m.value === model) || null;
 
-	$: if ($newChatSettings.tools) {
-		tools = $newChatSettings.tools;
-	}
+	$: $newChatSettings, initializeValues();
 
-	$: if ($newChatSettings.model) {
-		model = $newChatSettings.model.model;
-		temperature = $newChatSettings.model.temperature;
-		topP = $newChatSettings.model.topP;
-		systemMessage = $newChatSettings.model.systemMessage;
+	function initializeValues() {
+		if ($newChatSettings.tools) {
+			tools = $newChatSettings.tools;
+		}
+
+		if ($newChatSettings.model) {
+			model = $newChatSettings.model.model;
+			temperature = $newChatSettings.model.temperature;
+			topP = $newChatSettings.model.topP;
+			systemMessage = $newChatSettings.model.systemMessage;
+		}
 	}
 
 	async function onToolToggle(toolKey: string) {
