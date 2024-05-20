@@ -2,7 +2,12 @@
 	import ChatInput from "$lib/components/chat/ChatInput.svelte";
 	import type { ChatMessageStructure } from "$lib/scripts/misc/types";
 	import ChatMessage from "$lib/components/chat/ChatMessage.svelte";
-	import { chatContentMap, chatDataMap, newChatSettings } from "$lib/scripts/misc/stores";
+	import {
+		chatContentMap,
+		chatDataMap,
+		lastLiveDataSourceOutputOfChat,
+		newChatSettings
+	} from '$lib/scripts/misc/stores';
 	import { goto } from "$app/navigation";
 	import { tick } from "svelte";
 	import { scrollToBottom } from "$lib/utils";
@@ -80,7 +85,10 @@
 
 		generating = false;
 
-		if (startedNewChat) await goto(`/chats/${chatID}`);
+		if (startedNewChat) {
+			$lastLiveDataSourceOutputOfChat[chatID] = $newChatSettings.toolResults || {};
+			await goto(`/chats/${chatID}`);
+		}
 
 		if (!$chatDataMap[chatID].title) {
 			await chatService.setGeneratedTitleForChat(chatID);

@@ -21,6 +21,7 @@ export type NewChatSettings = {
 	model?: AssistantStructure;
 	images?: File[];
 	tools?: Record<string, object>;
+	toolResults?: Record<string, string>;
 };
 
 export type ChatMessageStructure = {
