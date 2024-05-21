@@ -57,3 +57,8 @@ export type LiveDataSource = {
 export type MemoryElement = {
 	content: string;
 };
+
+export type TagElement = {
+	name: string;
+	hidden: boolean;
+};

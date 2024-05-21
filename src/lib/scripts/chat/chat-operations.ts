@@ -135,7 +135,7 @@ class ChatOperations {
 	}
 
 	public async changeTags(chatID: string, tags: string[]) {
-		const success = await database.changeTags(chatID, tags);
+		const success = await database.changeChatTags(chatID, tags);
 
 		if (!success) return;
 

@@ -2,7 +2,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
 	AssistantStructure,
 	ChatMessageStructure,
-	MemoryElement
+	MemoryElement,
+	TagElement
 } from "$lib/scripts/misc/types";
 import * as errorHandler from "$lib/scripts/operations/error-handler";
 import { toast } from "svelte-sonner";
@@ -157,7 +158,7 @@ class Database {
 		return true;
 	}
 
-	async changeTags(chatID: string, tags: string[]): Promise<boolean> {
+	async changeChatTags(chatID: string, tags: string[]): Promise<boolean> {
 		if (!this._supabaseClient) {
 			console.error("Supabase client is not initialized");
 			return false;
@@ -330,6 +331,67 @@ class Database {
 		}
 
 		toast.success("Memories saved");
+		return true;
+	}
+
+	async insertTag(tag: TagElement) {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return;
+		}
+
+		const { error, data } = await this._supabaseClient
+			.from("tags")
+			.insert({
+				name: tag.name,
+				hidden: tag.hidden
+			})
+			.select("id")
+			.single();
+
+		if (error) {
+			errorHandler.handleError("Failed to insert tag", error);
+			return;
+		}
+
+		return data.id as string;
+	}
+
+	async deleteTag(tagID: string) {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return false;
+		}
+
+		const { error } = await this._supabaseClient.from("tags").delete().match({ id: tagID });
+
+		if (error) {
+			errorHandler.handleError("Failed to delete tag", error);
+			return false;
+		}
+
+		return true;
+	}
+
+	async updateTag(tagID: string, tag: TagElement) {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return false;
+		}
+
+		const { error } = await this._supabaseClient
+			.from("tags")
+			.update({
+				name: tag.name,
+				hidden: tag.hidden
+			})
+			.match({ id: tagID });
+
+		if (error) {
+			errorHandler.handleError("Failed to update tag", error);
+			return false;
+		}
+
 		return true;
 	}
 }

@@ -12,7 +12,8 @@
 		mistralApiKey,
 		openaiApiKey,
 		perplexityApiKey,
-		tavilyApiKey
+		tavilyApiKey,
+		userTagMap
 	} from "$lib/scripts/misc/stores";
 	import { initializeModel } from "client-vector-search";
 	import { onMount } from "svelte";
@@ -38,6 +39,8 @@
 		customModelTemplates.set(data.customModelTemplates);
 
 		memoryLDS.set(data.memories);
+
+		userTagMap.set(data.tags);
 	}
 
 	onMount(async () => {

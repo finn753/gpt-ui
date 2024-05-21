@@ -6,7 +6,8 @@ import type {
 	ChatMessageStructure,
 	ModelType,
 	NewChatSettings,
-	MemoryElement
+	MemoryElement,
+	TagElement
 } from "$lib/scripts/misc/types";
 import type { ModelTemplate } from "$lib/scripts/misc/model-templates";
 
@@ -31,6 +32,7 @@ export const anthropicApiKey = writable<string | null>();
 export const perplexityApiKey = writable<string | null>();
 export const geminiApiKey = writable<string | null>();
 
+export const userTagMap = writable<Record<string, TagElement>>({});
 export const hiddenTags = writable<string[]>([]);
 export const customModelTemplates = writable<ModelTemplate[]>([]);
 
