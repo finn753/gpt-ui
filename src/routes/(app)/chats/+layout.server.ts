@@ -20,7 +20,7 @@ function fetchChatList(supabase: SupabaseClient): Promise<ChatDataMap> {
 				const formattedData = response.data?.reduce((acc, chat) => {
 					acc[chat.id] = {
 						title: chat.title,
-						tags: chat.tags && Object.keys(chat.tags).includes("tags") ? chat.tags["tags"] : [],
+						tags: chat.tags ?? [],
 						summary: chat.summary,
 						model: chat.model,
 						tools: chat.tools,

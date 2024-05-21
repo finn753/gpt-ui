@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ChatDataMap, ChatStructure } from "$lib/scripts/misc/types";
 	import { Button } from "$lib/components/ui/button";
-	import { selectedChatID } from "$lib/scripts/misc/stores";
+	import { selectedChatID, userTagMap } from "$lib/scripts/misc/stores";
 	import { format } from "date-fns";
 	import { Ellipsis } from "lucide-svelte";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
@@ -77,8 +77,10 @@
 				</p>
 
 				<div class="flex w-full flex-wrap gap-1 overflow-x-auto py-2">
-					{#each chat.tags as tag}
-						<Badge>{tag}</Badge>
+					{#each chat.tags as tagID}
+						{#if tagID in $userTagMap}
+							<Badge>{$userTagMap[tagID].name}</Badge>
+						{/if}
 					{/each}
 				</div>
 

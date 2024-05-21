@@ -158,7 +158,7 @@ class Database {
 		return true;
 	}
 
-	async changeChatTags(chatID: string, tags: string[]): Promise<boolean> {
+	async changeChatTags(chatID: string, tagsIDs: number[]): Promise<boolean> {
 		if (!this._supabaseClient) {
 			console.error("Supabase client is not initialized");
 			return false;
@@ -166,7 +166,7 @@ class Database {
 
 		const { error } = await this._supabaseClient
 			.from("Chats")
-			.update({ tags: { tags } })
+			.update({ tags: tagsIDs })
 			.match({ id: chatID });
 
 		if (error) {
@@ -250,33 +250,6 @@ class Database {
 			return false;
 		}
 
-		return true;
-	}
-
-	async changeHiddenTags(hiddenTags: string[]) {
-		if (!this._supabaseClient) {
-			console.error("Supabase client is not initialized");
-			return false;
-		}
-
-		const userId = await this._supabaseClient.auth.getUser().then((user) => user.data.user?.id);
-
-		if (!userId) {
-			toast.error("You need to be logged in to save your hidden tags.");
-			return false;
-		}
-
-		const response = await this._supabaseClient
-			.from("Profiles")
-			.update({ hidden_tags: hiddenTags })
-			.eq("id", userId);
-
-		if (response.error) {
-			toast.error(response.error.message);
-			return false;
-		}
-
-		toast.success("Hidden tags saved");
 		return true;
 	}
 

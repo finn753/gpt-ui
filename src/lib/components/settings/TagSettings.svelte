@@ -36,7 +36,7 @@
 		});
 	}
 
-	async function toogleTagVisibility(id: string) {
+	async function toggleTagVisibility(id: string) {
 		const tag = $userTagMap[id];
 		tag.hidden = !tag.hidden;
 		await database.updateTag(id, tag);
@@ -65,7 +65,7 @@
 					<Table.Row>
 						<Table.Cell class="font-medium">{tag.name}</Table.Cell>
 						<Table.Cell
-							><Switch checked={tag.hidden} on:click={() => toogleTagVisibility(id)} /></Table.Cell
+							><Switch checked={tag.hidden} on:click={() => toggleTagVisibility(id)} /></Table.Cell
 						>
 						<Table.Cell>
 							<Button

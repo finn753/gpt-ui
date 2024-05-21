@@ -11,7 +11,8 @@
 		currentModelTemplate,
 		lastContextOfChat,
 		lastLiveDataSourceOutputOfChat,
-		newChatSettings
+		newChatSettings,
+		userTagMap
 	} from "$lib/scripts/misc/stores";
 	import { Label } from "$lib/components/ui/label";
 	import { Input } from "$lib/components/ui/input";
@@ -20,6 +21,8 @@
 	import chatService from "$lib/scripts/chat/chat-service";
 	import { liveDataSourceMap } from "$lib/scripts/chat/live-data-sources";
 	import { Switch } from "$lib/components/ui/switch";
+	import TagInput from "$lib/components/chat/TagInput.svelte";
+	import type { TagElement } from "$lib/scripts/misc/types";
 
 	$: modelSelection = $availableModels.map((model) => ({
 		value: model.id,
@@ -30,7 +33,7 @@
 
 	let title: string = "";
 	let summary: string = "";
-	let tags: string[] = [];
+	let tags: TagElement[] = [];
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let selectedModel: any;
@@ -93,7 +96,9 @@
 		if (chatData) {
 			title = chatData.title;
 			summary = chatData.summary;
-			tags = chatData.tags;
+			tags = chatData.tags
+				.filter((tagID) => tagID in $userTagMap)
+				.map((tagID) => $userTagMap[tagID]);
 
 			if (
 				chatData.model &&
@@ -116,37 +121,23 @@
 
 	$: selectedModel = modelSelection.find((m) => m.value === model) || null;
 
-	let addTagInput = "";
 	let editingTitle = false;
 	let editTitleInput = "";
 	$: editTitleInput = title;
 
-	async function onAddTagChange() {
-		if (addTagInput) {
-			let splitTags = addTagInput.split(/[\s,]+/); //split at space and ,
-
-			if (splitTags.length > 1 && chatID) {
-				let newTag = splitTags.filter((tag) => tag !== "")[0];
-				addTagInput = "";
-				await addTag(newTag);
-			}
-		}
-	}
-
-	async function onAddTagSubmit() {
-		if (addTagInput && chatID) {
-			const newTag = addTagInput;
-			addTagInput = "";
+	async function onAddTagSubmit(event: CustomEvent<TagElement>) {
+		if (chatID) {
+			const newTag = event.detail;
 			await addTag(newTag);
 		}
 	}
 
-	async function addTag(tag: string) {
+	async function addTag(tag: TagElement) {
 		tags = [...tags, tag];
 		await saveTags();
 	}
 
-	async function removeTag(tagToRemove: string) {
+	async function removeTag(tagToRemove: TagElement) {
 		const index = tags.indexOf(tagToRemove);
 		if (index !== -1) {
 			tags.splice(index, 1);
@@ -241,7 +232,7 @@
 					<div class="flex w-full flex-wrap gap-1 overflow-x-auto">
 						{#each tags as tag}
 							<Badge
-								>{tag}
+								>{tag.name}
 								<Button
 									class="pl-1"
 									variant="icon"
@@ -252,17 +243,7 @@
 								></Badge
 							>
 						{/each}
-						<input
-							bind:value={addTagInput}
-							class="w-20 bg-background px-2.5 py-0.5 text-xs font-semibold outline-none placeholder:text-muted-foreground
-						{tags.length === 0 ? 'pl-0' : ''}"
-							placeholder="Add tag"
-							on:blur={onAddTagSubmit}
-							on:keydown={(e) => {
-								if (e.key === "Enter") onAddTagSubmit();
-							}}
-							on:input={onAddTagChange}
-						/>
+						<TagInput on:submit={onAddTagSubmit} />
 					</div>
 				</Card.Description>
 			</Card.Header>

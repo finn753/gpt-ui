@@ -9,7 +9,7 @@ export type AssistantStructure = {
 
 export type ChatStructure = {
 	title: string;
-	tags: string[];
+	tags: number[];
 	summary: string;
 	model: AssistantStructure;
 	tools: Record<string, object>;
@@ -59,6 +59,7 @@ export type MemoryElement = {
 };
 
 export type TagElement = {
+	id: number;
 	name: string;
 	hidden: boolean;
 };

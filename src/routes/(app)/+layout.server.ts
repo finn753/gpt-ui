@@ -12,7 +12,6 @@ export const load = async (event) => {
 	const perplexityApiKey = profileResponse.data.perplexity_api_key || null;
 	const geminiApiKey = profileResponse.data.gemini_api_key || null;
 
-	const hiddenTags = profileResponse.data.hidden_tags || [];
 	const customModelTemplates = profileResponse.data.custom_model_templates || [];
 
 	const memories = profileResponse.data.lds_memory || [];
@@ -20,7 +19,7 @@ export const load = async (event) => {
 	const tagsResponse = await supabase.from("tags").select();
 	const tags: Record<string, TagElement> = tagsResponse.data.reduce(
 		(acc: Record<string, TagElement>, tag: { id: number } & TagElement) => {
-			acc[tag.id] = { name: tag.name, hidden: tag.hidden };
+			acc[tag.id] = { id: tag.id, name: tag.name, hidden: tag.hidden };
 			return acc;
 		},
 		{}
@@ -34,7 +33,6 @@ export const load = async (event) => {
 		anthropicApiKey,
 		perplexityApiKey,
 		geminiApiKey,
-		hiddenTags,
 		customModelTemplates,
 		memories,
 		tags
