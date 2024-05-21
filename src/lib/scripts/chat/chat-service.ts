@@ -1,4 +1,4 @@
-import { chatContentMap, chatDataMap, hiddenTags, selectedChatID } from "$lib/scripts/misc/stores";
+import { chatContentMap, chatDataMap, selectedChatID, userTagMap } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
 import chatOperations from "$lib/scripts/chat/chat-operations";
 import type { ChatDataMap, ChatMessageStructure } from "$lib/scripts/misc/types";
@@ -110,14 +110,17 @@ class ChatService {
 		const filteredChats = Object.entries(chatMap).filter(([chatID, chat]) => {
 			const lowerCaseTitle = chat.title.toLowerCase();
 			const lowerCaseSummary = chat.summary.toLowerCase();
-			const lowerCaseTags = chat.tags.map((tag) => tag.toLowerCase());
+
+			const tagElements = chat.tags
+				.filter((tagID) => tagID in get(userTagMap))
+				.map((tagID) => get(userTagMap)[tagID]);
+			const lowerCaseTags = tagElements.map((tagElement) => tagElement.name.toLowerCase());
 
 			const currentChatID = get(selectedChatID);
 
-			const isTagHidden = get(hiddenTags).some(
-				(hiddenTag) =>
-					lowerCaseTags.includes(hiddenTag.toLowerCase()) &&
-					!lowerCaseQueryWords.includes(hiddenTag)
+			const isTagHidden = tagElements.some(
+				(tagElement) =>
+					tagElement.hidden && !lowerCaseQueryWords.includes(tagElement.name.toLowerCase())
 			);
 
 			return (

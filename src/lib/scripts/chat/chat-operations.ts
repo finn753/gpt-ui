@@ -2,7 +2,8 @@ import database from "$lib/scripts/operations/database";
 import type {
 	AssistantStructure,
 	ChatStructure,
-	ChatMessageStructure
+	ChatMessageStructure,
+	TagElement
 } from "$lib/scripts/misc/types";
 import { chatContentMap, chatDataMap, lastContextOfChat } from "$lib/scripts/misc/stores";
 import { get } from "svelte/store";
@@ -134,12 +135,15 @@ class ChatOperations {
 		this.updateChatDataMap(chatID, { model: assistantData });
 	}
 
-	public async changeTags(chatID: string, tags: string[]) {
-		const success = await database.changeTags(chatID, tags);
+	public async changeTags(chatID: string, tags: TagElement[]) {
+		const success = await database.changeChatTags(
+			chatID,
+			tags.map((tag) => tag.id)
+		);
 
 		if (!success) return;
 
-		this.updateChatDataMap(chatID, { tags });
+		this.updateChatDataMap(chatID, { tags: tags.map((tag) => tag.id) });
 	}
 
 	public async changeTools(chatID: string, tools: Record<string, object>) {

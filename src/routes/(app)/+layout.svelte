@@ -7,12 +7,12 @@
 		customModelTemplates,
 		geminiApiKey,
 		groqApiKey,
-		hiddenTags,
 		memoryLDS,
 		mistralApiKey,
 		openaiApiKey,
 		perplexityApiKey,
-		tavilyApiKey
+		tavilyApiKey,
+		userTagMap
 	} from "$lib/scripts/misc/stores";
 	import { initializeModel } from "client-vector-search";
 	import { onMount } from "svelte";
@@ -22,10 +22,6 @@
 	import modelManager from "$lib/scripts/chat/model-manager";
 
 	$: currentPath = $page.url.pathname;
-
-	const size = 24;
-	const strokeWidth = 2;
-	const color = "#64748B";
 
 	export let data;
 
@@ -38,10 +34,11 @@
 		perplexityApiKey.set(data.perplexityApiKey);
 		geminiApiKey.set(data.geminiApiKey);
 
-		hiddenTags.set(data.hiddenTags);
 		customModelTemplates.set(data.customModelTemplates);
 
 		memoryLDS.set(data.memories);
+
+		userTagMap.set(data.tags);
 	}
 
 	onMount(async () => {
@@ -60,8 +57,12 @@
 	>
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<Button variant={currentPath.startsWith("/chats") ? "secondary" : "ghost"} href="/chats">
-					<MessagesSquare {size} {strokeWidth} {color} />
+				<Button
+					variant={currentPath.startsWith("/chats") ? "secondary" : "ghost"}
+					class={currentPath.startsWith("/chats") ? "" : "opacity-50"}
+					href="/chats"
+				>
+					<MessagesSquare />
 				</Button>
 			</Tooltip.Trigger>
 			<Tooltip.Content>Chats</Tooltip.Content>
@@ -72,8 +73,9 @@
 				<Button
 					variant={currentPath.startsWith("/generator") ? "secondary" : "ghost"}
 					href="/generator"
+					class={currentPath.startsWith("/generator") ? "" : "opacity-50"}
 				>
-					<Brush {size} {strokeWidth} {color} />
+					<Brush />
 				</Button>
 			</Tooltip.Trigger>
 			<Tooltip.Content>Generator</Tooltip.Content>
@@ -86,8 +88,9 @@
 				<Button
 					variant={currentPath.startsWith("/settings") ? "secondary" : "ghost"}
 					href="/settings"
+					class={currentPath.startsWith("/settings") ? "" : "opacity-50"}
 				>
-					<User {size} {strokeWidth} {color} />
+					<User />
 				</Button>
 			</Tooltip.Trigger>
 			<Tooltip.Content>Settings</Tooltip.Content>

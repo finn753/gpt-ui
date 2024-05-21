@@ -50,6 +50,6 @@
 		bind:isOpen={rightOpened}
 		on:open={() => handleMobileSidebar("right")}
 	>
-		<ContextSidebar chatID={$selectedChatID} />
+		<ContextSidebar chatID={$selectedChatID || undefined} />
 	</CollapsibleSidebar>
 </div>

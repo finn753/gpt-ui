@@ -124,7 +124,7 @@
 		return true;
 	}
 
-	async function generateResponse() {
+	async function generateResponse(messageContext = messages) {
 		let model, temperature, topP, systemMessage, tools;
 
 		try {
@@ -135,9 +135,12 @@
 
 		tools = $chatDataMap[chatID].tools || {};
 
-		let context = messages;
+		let context = messageContext;
 		try {
-			context = await chatService.getContextFromMessages(messages, $chatDataMap[chatID].summary);
+			context = await chatService.getContextFromMessages(
+				messageContext,
+				$chatDataMap[chatID].summary
+			);
 		} catch (e: unknown) {
 			console.error("Failed to get context from messages", e);
 		}
@@ -171,6 +174,20 @@
 			inputValue = lastMessage.content;
 		}
 	}
+
+	async function onRegenerateButtonClick() {
+		let lastUserMessageIndex = messages
+			.slice()
+			.reverse()
+			.findIndex((msg) => msg.role === "user");
+		if (lastUserMessageIndex === -1) return;
+
+		let messagesUntilLastUser = messages.slice(0, messages.length - lastUserMessageIndex);
+
+		generating = true;
+		await generateResponse(messagesUntilLastUser);
+		generating = false;
+	}
 </script>
 
 <div class="relative flex size-full flex-col px-4 pb-4 md:px-0">
@@ -198,6 +215,7 @@
 				{#if messages[messages.length - 1]?.role === "user"}
 					<Button variant="glass" on:click={onEditButtonClick}>Edit</Button>
 				{/if}
+				<Button variant="glass" on:click={onRegenerateButtonClick}>Regenerate</Button>
 			</div>
 		{/if}
 	</div>

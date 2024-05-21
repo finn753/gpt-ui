@@ -2,7 +2,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
 	AssistantStructure,
 	ChatMessageStructure,
-	MemoryElement
+	MemoryElement,
+	TagElement
 } from "$lib/scripts/misc/types";
 import * as errorHandler from "$lib/scripts/operations/error-handler";
 import { toast } from "svelte-sonner";
@@ -157,7 +158,7 @@ class Database {
 		return true;
 	}
 
-	async changeTags(chatID: string, tags: string[]): Promise<boolean> {
+	async changeChatTags(chatID: string, tagsIDs: number[]): Promise<boolean> {
 		if (!this._supabaseClient) {
 			console.error("Supabase client is not initialized");
 			return false;
@@ -165,7 +166,7 @@ class Database {
 
 		const { error } = await this._supabaseClient
 			.from("Chats")
-			.update({ tags: { tags } })
+			.update({ tags: tagsIDs })
 			.match({ id: chatID });
 
 		if (error) {
@@ -252,33 +253,6 @@ class Database {
 		return true;
 	}
 
-	async changeHiddenTags(hiddenTags: string[]) {
-		if (!this._supabaseClient) {
-			console.error("Supabase client is not initialized");
-			return false;
-		}
-
-		const userId = await this._supabaseClient.auth.getUser().then((user) => user.data.user?.id);
-
-		if (!userId) {
-			toast.error("You need to be logged in to save your hidden tags.");
-			return false;
-		}
-
-		const response = await this._supabaseClient
-			.from("Profiles")
-			.update({ hidden_tags: hiddenTags })
-			.eq("id", userId);
-
-		if (response.error) {
-			toast.error(response.error.message);
-			return false;
-		}
-
-		toast.success("Hidden tags saved");
-		return true;
-	}
-
 	async changeCustomModelTemplates(customModelTemplates: ModelTemplate[]) {
 		if (!this._supabaseClient) {
 			console.error("Supabase client is not initialized");
@@ -330,6 +304,67 @@ class Database {
 		}
 
 		toast.success("Memories saved");
+		return true;
+	}
+
+	async insertTag(tag: TagElement) {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return;
+		}
+
+		const { error, data } = await this._supabaseClient
+			.from("tags")
+			.insert({
+				name: tag.name,
+				hidden: tag.hidden
+			})
+			.select("id")
+			.single();
+
+		if (error) {
+			errorHandler.handleError("Failed to insert tag", error);
+			return;
+		}
+
+		return data.id as string;
+	}
+
+	async deleteTag(tagID: string) {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return false;
+		}
+
+		const { error } = await this._supabaseClient.from("tags").delete().match({ id: tagID });
+
+		if (error) {
+			errorHandler.handleError("Failed to delete tag", error);
+			return false;
+		}
+
+		return true;
+	}
+
+	async updateTag(tagID: string, tag: TagElement) {
+		if (!this._supabaseClient) {
+			console.error("Supabase client is not initialized");
+			return false;
+		}
+
+		const { error } = await this._supabaseClient
+			.from("tags")
+			.update({
+				name: tag.name,
+				hidden: tag.hidden
+			})
+			.match({ id: tagID });
+
+		if (error) {
+			errorHandler.handleError("Failed to update tag", error);
+			return false;
+		}
+
 		return true;
 	}
 }

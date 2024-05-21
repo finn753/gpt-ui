@@ -4,73 +4,75 @@
 
 @layer base {
 	:root {
-		--background: 212.7, 26.8%, 83.9%;
-		--foreground: 222.2 84% 4.9%;
+		--hueshift: 35;
 
-		--level-one: 210, 40%, 96.1%;
-		--level-two: 214.3, 31.8%, 91.4%;
+		--background: calc(212.7 + var(--hueshift)), 26.8%, 83.9%;
+		--foreground: calc(222.2 + var(--hueshift)) 84% 4.9%;
 
-		--muted: 210 40% 96.1%;
-		--muted-foreground: 215.4 16.3% 46.9%;
+		--level-one: calc(210 + var(--hueshift)), 40%, 96.1%;
+		--level-two: calc(214.3 + var(--hueshift)), 31.8%, 91.4%;
 
-		--popover: 0 0% 100%;
-		--popover-foreground: 222.2 84% 4.9%;
+		--muted: calc(210 + var(--hueshift)) 40% 96.1%;
+		--muted-foreground: calc(215.4 + var(--hueshift)) 16.3% 46.9%;
 
-		--card: 0 0% 100%;
-		--card-foreground: 222.2 84% 4.9%;
+		--popover: calc(0 + var(--hueshift)) 0% 100%;
+		--popover-foreground: calc(222.2 + var(--hueshift)) 84% 4.9%;
 
-		--border: 214.3 31.8% 91.4%;
-		--input: 214.3 31.8% 91.4%;
+		--card: calc(0 + var(--hueshift)) 0% 100%;
+		--card-foreground: calc(222.2 + var(--hueshift)) 84% 4.9%;
 
-		--primary: 222.2 47.4% 11.2%;
-		--primary-foreground: 210 40% 98%;
+		--border: calc(214.3 + var(--hueshift)) 31.8% 91.4%;
+		--input: calc(214.3 + var(--hueshift)) 31.8% 91.4%;
 
-		--secondary: 210 40% 96.1%;
-		--secondary-foreground: 222.2 47.4% 11.2%;
+		--primary: calc(222.2 + var(--hueshift)) 47.4% 11.2%;
+		--primary-foreground: calc(210 + var(--hueshift)) 40% 98%;
 
-		--accent: 210 40% 96.1%;
-		--accent-foreground: 222.2 47.4% 11.2%;
+		--secondary: calc(210 + var(--hueshift)) 40% 96.1%;
+		--secondary-foreground: calc(222.2 + var(--hueshift)) 47.4% 11.2%;
+
+		--accent: calc(210 + var(--hueshift)) 40% 96.1%;
+		--accent-foreground: calc(222.2 + var(--hueshift)) 47.4% 11.2%;
 
 		--destructive: 0 72.2% 50.6%;
 		--destructive-foreground: 210 40% 98%;
 
-		--ring: 222.2 84% 4.9%;
+		--ring: calc(222.2 + var(--hueshift)) 84% 4.9%;
 
 		--radius: 0.5rem;
 	}
 
 	.dark {
-		--background: 222.2 84% 4.9%;
-		--foreground: 210 40% 98%;
+		--background: calc(222.2 + var(--hueshift)) 84% 4.9%;
+		--foreground: calc(210 + var(--hueshift)) 40% 98%;
 
-		--level-one: 217.2, 32.6%, 17.5%;
-		--level-two: 222.2, 47.4%, 11.2%;
+		--level-one: calc(217.2 + var(--hueshift)), 32.6%, 17.5%;
+		--level-two: calc(222.2 + var(--hueshift)), 47.4%, 11.2%;
 
-		--muted: 217.2 32.6% 17.5%;
-		--muted-foreground: 215 20.2% 65.1%;
+		--muted: calc(217.2 + var(--hueshift)) 32.6% 17.5%;
+		--muted-foreground: calc(215 + var(--hueshift)) 20.2% 65.1%;
 
-		--popover: 222.2 84% 4.9%;
-		--popover-foreground: 210 40% 98%;
+		--popover: calc(222.2 + var(--hueshift)) 84% 4.9%;
+		--popover-foreground: calc(210 + var(--hueshift)) 40% 98%;
 
-		--card: 222.2 84% 4.9%;
-		--card-foreground: 210 40% 98%;
+		--card: calc(222.2 + var(--hueshift)) 84% 4.9%;
+		--card-foreground: calc(210 + var(--hueshift)) 40% 98%;
 
-		--border: 217.2 32.6% 17.5%;
-		--input: 217.2 32.6% 17.5%;
+		--border: calc(217.2 + var(--hueshift)) 32.6% 17.5%;
+		--input: calc(217.2 + var(--hueshift)) 32.6% 17.5%;
 
-		--primary: 210 40% 98%;
-		--primary-foreground: 222.2 47.4% 11.2%;
+		--primary: calc(210 + var(--hueshift)) 40% 98%;
+		--primary-foreground: calc(222.2 + var(--hueshift)) 47.4% 11.2%;
 
-		--secondary: 217.2 32.6% 17.5%;
-		--secondary-foreground: 210 40% 98%;
+		--secondary: calc(217.2 + var(--hueshift)) 32.6% 17.5%;
+		--secondary-foreground: calc(210 + var(--hueshift)) 40% 98%;
 
-		--accent: 217.2 32.6% 17.5%;
-		--accent-foreground: 210 40% 98%;
+		--accent: calc(217.2 + var(--hueshift)) 32.6% 17.5%;
+		--accent-foreground: calc(210 + var(--hueshift)) 40% 98%;
 
 		--destructive: 0 62.8% 30.6%;
 		--destructive-foreground: 210 40% 98%;
 
-		--ring: 212.7, 26.8%, 83.9%;
+		--ring: calc(212.7 + var(--hueshift)), 26.8%, 83.9%;
 	}
 }
 
