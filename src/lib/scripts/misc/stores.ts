@@ -7,7 +7,8 @@ import type {
 	ModelType,
 	NewChatSettings,
 	MemoryElement,
-	TagElement
+	TagElement,
+	GeneratedToolData
 } from "$lib/scripts/misc/types";
 import type { ModelTemplate } from "$lib/scripts/misc/model-templates";
 
@@ -36,3 +37,5 @@ export const userTagMap = writable<Record<number, TagElement>>({});
 export const customModelTemplates = writable<ModelTemplate[]>([]);
 
 export const memoryLDS = writable<MemoryElement[]>([]);
+
+export const generatedToolMap = writable<Record<string, GeneratedToolData>>({});

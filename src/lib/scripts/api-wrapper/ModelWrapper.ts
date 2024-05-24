@@ -14,7 +14,7 @@ type GroqMessage = ChatCompletion.Choice.Message;
 
 export type ModelOptions = {
 	temperature?: number;
-	topP?: number;
+	top_p?: number;
 };
 
 export type ModelResponse = {
@@ -40,7 +40,7 @@ export class ModelWrapper {
 	constructor(modelId: string, options?: ModelOptions) {
 		options = {
 			temperature: Number(options?.temperature) || undefined,
-			topP: Number(options?.topP) || undefined
+			top_p: Number(options?.top_p) || undefined
 		};
 
 		this.modelId = modelId;
@@ -184,6 +184,10 @@ export class ModelWrapper {
 
 		if (system) messages.unshift({ role: "system", content: system });
 
+		return this.promptChat(messages);
+	}
+
+	public async promptChat(messages: MessageFormat[]) {
 		const stream = await this.getStream(messages);
 
 		let response = "";
