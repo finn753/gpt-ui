@@ -35,7 +35,7 @@
 
 <div class="flex h-full w-full flex-col items-center gap-2 p-16">
 	<div class="flex w-full max-w-screen-sm flex-col items-center gap-4">
-		<h1 class="text-4xl font-bold">Tool Generator</h1>
+		<h1 class="text-4xl font-bold">Tool Generator (Preview)</h1>
 		<div class="flex w-full items-center justify-center gap-2">
 			<Input
 				class="h-12 max-w-screen-sm rounded-xl text-lg"
