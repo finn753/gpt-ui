@@ -63,3 +63,8 @@ export type TagElement = {
 	name: string;
 	hidden: boolean;
 };
+
+export type GeneratedToolData = {
+	name: string;
+	tsCode: string;
+};

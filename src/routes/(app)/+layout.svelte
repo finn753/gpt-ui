@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from "$lib/components/ui/button";
-	import { MessagesSquare, User, Brush } from "lucide-svelte";
+	import { MessagesSquare, User, Brush, Wrench } from "lucide-svelte";
 	import {
 		anthropicApiKey,
 		availableModels,
@@ -79,6 +79,19 @@
 				</Button>
 			</Tooltip.Trigger>
 			<Tooltip.Content>Generator</Tooltip.Content>
+		</Tooltip.Root>
+
+		<Tooltip.Root>
+			<Tooltip.Trigger>
+				<Button
+					variant={currentPath.startsWith("/tools") ? "secondary" : "ghost"}
+					href="/tools"
+					class={currentPath.startsWith("/tools") ? "" : "opacity-50"}
+				>
+					<Wrench />
+				</Button>
+			</Tooltip.Trigger>
+			<Tooltip.Content>Tools</Tooltip.Content>
 		</Tooltip.Root>
 
 		<div class="hidden md:block md:flex-1"></div>
