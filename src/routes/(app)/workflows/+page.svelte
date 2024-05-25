@@ -51,7 +51,7 @@
 			}
 
 			for (const result of searchResults.results) {
-				results.push(`[${result.title}](${result.url})\n${result.content}`);
+				results.push(`## ${result.title}\n\n${result.url}\n\n${result.content}`);
 			}
 
 			content = results.join("\n\n");
