@@ -10,13 +10,20 @@
 	export let disabled = false;
 	export let placeholder = "";
 
-	onMount(() => (valueSegments = value.split("\n\n")));
-	$: valueSegments = reverseSplit(value, "\n\n");
+	onMount(() => (valueSegments = value.split("\n")));
+	$: valueSegments = reverseSplit(value, "\n");
 
-	afterUpdate(() => (value = valueSegments.join("\n\n")));
+	afterUpdate(() => (value = valueSegments.join("\n")));
+
+	$: valueSegments, autosizeAll();
 
 	function reverseSplit(str: string, separator: string) {
 		return str.split('').reverse().join('').split(separator).map(item => item.split('').reverse().join('')).reverse();
+	}
+
+	async function autosizeAll() {
+		await tick();
+		textareaElements.forEach((textarea) => autosize.update(textarea));
 	}
 
 	async function handleKeyDown(i: number, event: KeyboardEvent) {
@@ -28,13 +35,7 @@
 			target.selectionEnd === 0
 		) {
 			event.preventDefault();
-			handleBackspace(i);
-		}
-
-		if (event.key === "Enter") {
-			event.preventDefault();
-
-			await handleEnter(i, event);
+			await handleBackspace(i);
 		}
 
 		if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
@@ -42,40 +43,19 @@
 		}
 	}
 
-	async function handleEnter(i: number, event: KeyboardEvent) {
-		const target = event.target as HTMLTextAreaElement;
-
-		if(event.shiftKey) {
-			const cursorPosition = target.selectionStart;
-			const lineStart = target.value.lastIndexOf("\n", cursorPosition - 1) + 1;
-			let lineEnd = target.value.indexOf("\n", cursorPosition);
-			if (lineEnd === -1) lineEnd = target.value.length;
-
-			const currentLine = target.value.substring(lineStart, lineEnd);
-
-			if(currentLine === "") return;
-
-			if(target.value[cursorPosition] === "\n") return;
-
-			valueSegments[i] = target.value.substring(0, cursorPosition) + "\n" + target.value.substring(cursorPosition);
-		} else {
-			if(target.value === "") return;
-
-			valueSegments = valueSegments.toSpliced(i + 1, 0, "");
-			await tick();
-			textareaElements[i + 1].focus();
-		}
-	}
-
-	function handleBackspace(i: number) {
+	async function handleBackspace(i: number) {
 		if(i > 0) {
-			if (valueSegments[i] === "") {
+			const segmentLength = valueSegments[i].length;
+
+			if (segmentLength === 0) {
 				valueSegments = valueSegments.toSpliced(i, 1);
 			} else {
-				valueSegments[i - 1] += "\n" + valueSegments[i];
+				valueSegments[i - 1] += valueSegments[i];
 				valueSegments.splice(i, 1);
 			}
 			textareaElements[i - 1].focus();
+			await tick();
+			textareaElements[i - 1].setSelectionRange(textareaElements[i - 1].value.length - segmentLength, textareaElements[i - 1].value.length - segmentLength);
 		} else {
 			if(valueSegments.length > 1) {
 				valueSegments = valueSegments.toSpliced(i, 1);
@@ -100,13 +80,21 @@
 	}
 
 	function getStyleClassesForValue(value: string) {
-		if (value.startsWith("# ")) return "text-4xl font-bold";
-		if (value.startsWith("## ")) return "text-3xl font-bold";
-		if (value.startsWith("### ")) return "text-2xl font-bold";
-		if (value.startsWith("#### ")) return "text-xl font-bold";
-		if (value.startsWith("##### ")) return "text-lg font-bold";
-		if (value.startsWith("###### ")) return "text-base font-bold";
-		return "";
+		if (value.startsWith("# ")) return "text-4xl font-bold mt-4";
+		if (value.startsWith("## ")) return "text-3xl font-bold mt-4";
+		if (value.startsWith("### ")) return "text-2xl font-bold mt-4";
+		if (value.startsWith("#### ")) return "text-xl font-bold mt-4";
+		if (value.startsWith("##### ")) return "text-lg font-bold mt-4";
+		if (value.startsWith("###### ")) return "text-base font-bold mt-4";
+
+		let accumulatedClasses = ""
+
+		if (value.startsWith("- ")) accumulatedClasses += "pl-8 ";
+
+		const linkRegex = /^(- )?https?:\/\/.+\.[a-zA-Z]+\/?\S*$/
+		if(linkRegex.test(value)) accumulatedClasses += "text-blue-500 ";
+
+		return accumulatedClasses;
 	}
 </script>
 
@@ -117,7 +105,7 @@
 		{#each valueSegments as segment, i (i)}
 			<textarea
 				class={cn(
-					"h-[3.5rem] min-h-0 w-full resize-none rounded-xl bg-transparent p-4 pb-0 outline-none transition-colors duration-300 placeholder:text-muted-foreground hover:bg-muted-foreground hover:bg-opacity-50",
+					"h-[2.5rem] min-h-0 w-full resize-none rounded-xl bg-transparent p-4 py-2 outline-none transition-colors duration-300 placeholder:text-transparent focus:placeholder:text-muted-foreground hover:bg-muted-foreground hover:bg-opacity-50",
 					getStyleClassesForValue(segment)
 				)}
 				bind:value={segment}
@@ -126,6 +114,7 @@
 				{disabled}
 				{placeholder}
 				on:keydown={(event) => handleKeyDown(i, event)}
+				on:focus={() => (autosize.update(textareaElements[i]))}
 			/>
 		{/each}
 	</div>

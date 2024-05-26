@@ -51,10 +51,10 @@
 			}
 
 			for (const result of searchResults.results) {
-				results.push(`## ${result.title}\n\n${result.url}\n\n${result.content}`);
+				results.push(`## ${result.title}\n${result.url}\n${result.content}`);
 			}
 
-			content = results.join("\n\n");
+			content = results.join("\n");
 		} else {
 			for (const link of links) {
 				const websiteContent = await getWebsiteContent(link);
@@ -64,7 +64,7 @@
 				}
 			}
 
-			content = results.join("\n\n");
+			content = results.join("\n");
 		}
 	}
 
