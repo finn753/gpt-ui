@@ -2,13 +2,13 @@
 	import CollapsibleSidebar from "$lib/components/CollapsibleSidebar.svelte";
 	import * as Tabs from "$lib/components/ui/tabs";
 	import { Button } from "$lib/components/ui/button";
-	import { Textarea } from "$lib/components/ui/textarea/index.js";
 	import PromptInput from "$lib/components/workflows/PromptInput.svelte";
 	import { type MessageFormat, ModelWrapper } from "$lib/scripts/api-wrapper/ModelWrapper";
 	import { Clipboard, Copy, ListPlus, Pin } from "lucide-svelte";
 	import { toast } from "svelte-sonner";
 	import SvelteMarkdown from "svelte-markdown";
 	import { getWebsiteContent, runTavilySearch } from "$lib/scripts/api-wrapper/browsing";
+	import ContentEditor from "$lib/components/workflows/ContentEditor.svelte";
 
 	let mode: "generator" | "browser" = "generator";
 
@@ -51,10 +51,10 @@
 			}
 
 			for (const result of searchResults.results) {
-				results.push(`[${result.title}](${result.url})\n${result.content}`);
+				results.push(`## ${result.title}\n${result.url}\n${result.content}`);
 			}
 
-			content = results.join("\n\n");
+			content = results.join("\n");
 		} else {
 			for (const link of links) {
 				const websiteContent = await getWebsiteContent(link);
@@ -64,7 +64,7 @@
 				}
 			}
 
-			content = results.join("\n\n");
+			content = results.join("\n");
 		}
 	}
 
@@ -75,7 +75,8 @@
 			{
 				role: "system",
 				content:
-					"Only give me the thing I asked for.\nExample: If I asked for bullet points, only give me the bullet points"
+					"Only give me the thing I asked for.\nExample: If I asked for bullet points, only give me the bullet points" +
+					"\n\nYou can use markdown for structuring.\nAllowed symbols are headings # and bullet points -, no other markdown is allowed, no **bold** or *italic*"
 			}
 		];
 		if (content) {
@@ -166,13 +167,8 @@
 			</Tabs.Content>
 		</Tabs.Root>
 	</CollapsibleSidebar>
-	<div class="col-span-2 flex h-full flex-col gap-2 py-4 pt-16">
-		<Textarea
-			class="flex-1 resize-none rounded-3xl p-4"
-			bind:value={content}
-			disabled={generating}
-			placeholder="Generate here..."
-		/>
+	<div class="col-span-2 flex h-full flex-col gap-2 overflow-y-auto py-4 pt-16">
+		<ContentEditor bind:value={content} disabled={generating} placeholder="Content here..." />
 		<div class="flex flex-row items-center justify-between">
 			<div class="flex flex-row items-center justify-start gap-2">
 				<Button
