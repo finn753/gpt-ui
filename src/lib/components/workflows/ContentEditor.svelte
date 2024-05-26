@@ -41,6 +41,23 @@
 		if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
 			handleArrowKeys(i, event)
 		}
+
+		if(event.key === "Enter") {
+			event.preventDefault();
+			await handleEnter(i);
+		}
+	}
+
+	async function handleEnter(i: number) {
+		const cursorPosition = textareaElements[i].selectionStart;
+		const segment = valueSegments[i];
+		const newSegment = segment.slice(cursorPosition);
+		valueSegments[i] = segment.slice(0, cursorPosition);
+		valueSegments.splice(i + 1, 0, newSegment);
+
+		await tick();
+		textareaElements[i + 1].focus();
+		textareaElements[i + 1].setSelectionRange(0, 0);
 	}
 
 	async function handleBackspace(i: number) {
@@ -101,7 +118,7 @@
 <div
 	class="relative h-full max-h-full overflow-y-auto rounded-3xl bg-muted-foreground bg-opacity-20"
 >
-	<div class="flex flex-col">
+	<div class="flex flex-col pt-2">
 		{#each valueSegments as segment, i (i)}
 			<textarea
 				class={cn(
