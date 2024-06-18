@@ -1,19 +1,4 @@
-# Deployment Guide
 
-## Supabase
-
-### Create a Supabase Project
-
-- Go to [app.supabase.io](https://app.supabase.io) and create an account or login.
-- Click on the `New Project` button.
-- Enter a project name and region.
-- Click on the `Create Project` button.
-- Wait for the project to be created.
-
-### Initialize Project
-- Navigate to the SQL Editor.
-- Run the following SQL query:
-```sql
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -261,32 +246,3 @@ CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_new_user();
-```
-
-### Create your account
-- Navigate to the `Authentication` section.
-- Click on `add user` and create a new user. (use auto confirmation)
-
-## Vercel
-
-### Create a Vercel Project
-- Go to [vercel.com](https://vercel.com) and create an account or login.
-- Click on the `Add new` button and select project
-- Select the `Import Third Party Git Repository` option
-- Enter the URL of the repository and click on the `Continue` button
-- This will duplicate the repository to your github account
-- Give it a name and continue
-- Don't worry, the first deploy will fail because we need to set up the environment variables
-
-### Set up Environment Variables
-- Navigate to your project settings and click on the `Environment Variables` tab
-- We will need some API keys from Supabase
-- Navigate to your Supabase project and click on the `Project Settings` tab
-- Click on the `API` tab and copy the `URL` and `Anon Public Key`
-- On Vercel add `PUBLIC_SUPABASE_URL` with the URL from supabase
-- Add `PUBLIC_SUPABASE_ANON_KEY` with the Anon Public Key from supabase
-- Once you saved the environment variables, you can redeploy the project
-- Navigate to deployments, click on the failed deployment and click on the `Redeploy` button
-- This can take around 2 minutes
-- After the deployment is successful, you can navigate to the URL of the project and see the app running
-- Login with the account you created on your Supabase Project and setup your API keys (like OpenAI, Tavily, etc.) in the settings
